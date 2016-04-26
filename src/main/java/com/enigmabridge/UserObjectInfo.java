@@ -17,14 +17,9 @@ public class UserObjectInfo implements Serializable {
     protected long uoid;
 
     /**
-     * AES-256-CBC end-to-end encryption key.
+     * Communication keys.
      */
-    protected byte[] encKey;
-
-    /**
-     * HMAC-AES-256-CBC key for end-to-end HMAC.
-     */
-    protected byte[] macKey;
+    protected EBCommKeys commKeys = new EBCommKeys();
 
     /**
      * API key for using EB service.
@@ -46,21 +41,21 @@ public class UserObjectInfo implements Serializable {
 
     public UserObjectInfo(long uoid, byte[] encKey, byte[] macKey) {
         this.uoid = uoid;
-        this.encKey = encKey;
-        this.macKey = macKey;
+        this.commKeys.encKey = encKey;
+        this.commKeys.macKey = macKey;
     }
 
     public UserObjectInfo(long uoid, byte[] encKey, byte[] macKey, String apiKey) {
         this.uoid = uoid;
-        this.encKey = encKey;
-        this.macKey = macKey;
+        this.commKeys.encKey = encKey;
+        this.commKeys.macKey = macKey;
         this.apiKey = apiKey;
     }
 
-    public UserObjectInfo(long uoid, byte[] encKey, byte[] macKey, String apiKey, String endpointInfo) {
+    public UserObjectInfo(long uoid, byte[] encKey, byte[] macKey, String apiKey, EBEndpointInfo endpointInfo) {
         this.uoid = uoid;
-        this.encKey = encKey;
-        this.macKey = macKey;
+        this.commKeys.encKey = encKey;
+        this.commKeys.macKey = macKey;
         this.apiKey = apiKey;
         this.endpointInfo = endpointInfo;
     }
@@ -131,8 +126,7 @@ public class UserObjectInfo implements Serializable {
     public String toString() {
         return "UserObjectInfo{" +
                 "uoid=" + uoid +
-                ", encKey=" + Arrays.toString(encKey) +
-                ", macKey=" + Arrays.toString(macKey) +
+                ", commKeys=" + this.commKeys +
                 ", apiKey='" + apiKey + '\'' +
                 ", endpointInfo='" + endpointInfo + '\'' +
                 '}';
@@ -146,8 +140,7 @@ public class UserObjectInfo implements Serializable {
         UserObjectInfo that = (UserObjectInfo) o;
 
         if (uoid != that.uoid) return false;
-        if (!Arrays.equals(encKey, that.encKey)) return false;
-        if (!Arrays.equals(macKey, that.macKey)) return false;
+        if (commKeys != null ? !commKeys.equals(that.commKeys) : that.commKeys != null) return false;
         if (apiKey != null ? !apiKey.equals(that.apiKey) : that.apiKey != null) return false;
         return endpointInfo != null ? endpointInfo.equals(that.endpointInfo) : that.endpointInfo == null;
 
@@ -156,8 +149,7 @@ public class UserObjectInfo implements Serializable {
     @Override
     public int hashCode() {
         int result = (int) (uoid ^ (uoid >>> 32));
-        result = 31 * result + Arrays.hashCode(encKey);
-        result = 31 * result + Arrays.hashCode(macKey);
+        result = 31 * result + (commKeys != null ? commKeys.hashCode() : 0);
         result = 31 * result + (apiKey != null ? apiKey.hashCode() : 0);
         result = 31 * result + (endpointInfo != null ? endpointInfo.hashCode() : 0);
         return result;
@@ -173,20 +165,20 @@ public class UserObjectInfo implements Serializable {
     }
 
     public byte[] getEncKey() {
-        return encKey;
+        return commKeys.encKey;
     }
 
     public UserObjectInfo setEncKey(byte[] encKey) {
-        this.encKey = encKey;
+        this.commKeys.encKey = encKey;
         return this;
     }
 
     public byte[] getMacKey() {
-        return macKey;
+        return commKeys.macKey;
     }
 
     public UserObjectInfo setMacKey(byte[] macKey) {
-        this.macKey = macKey;
+        this.commKeys.macKey = macKey;
         return this;
     }
 
@@ -199,11 +191,19 @@ public class UserObjectInfo implements Serializable {
         return this;
     }
 
-    public String getEndpointInfo() {
+    public EBCommKeys getCommKeys() {
+        return commKeys;
+    }
+
+    public void setCommKeys(EBCommKeys commKeys) {
+        this.commKeys = commKeys;
+    }
+
+    public EBEndpointInfo getEndpointInfo() {
         return endpointInfo;
     }
 
-    public UserObjectInfo setEndpointInfo(String endpointInfo) {
+    public UserObjectInfo setEndpointInfo(EBEndpointInfo endpointInfo) {
         this.endpointInfo = endpointInfo;
         return this;
     }
