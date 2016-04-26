@@ -1,5 +1,6 @@
 package com.enigmabridge;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import javax.xml.bind.DatatypeConverter;
 
@@ -7,7 +8,9 @@ import javax.xml.bind.DatatypeConverter;
  * EB communication keys.
  * Created by dusanklinec on 26.04.16.
  */
-public class EBCommKeys {
+public class EBCommKeys implements Serializable{
+    public static final long serialVersionUID = 1L;
+
     /**
      * AES-256-CBC end-to-end encryption key.
      */

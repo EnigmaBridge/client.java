@@ -1,5 +1,6 @@
 package com.enigmabridge;
 
+import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.regex.Matcher;
@@ -11,7 +12,9 @@ import java.util.regex.Pattern;
  *
  * Created by dusanklinec on 26.04.16.
  */
-public class EBEndpointInfo {
+public class EBEndpointInfo implements Serializable {
+    public static final long serialVersionUID = 1L;
+
     private static final int DEFAULT_PORT = 11180;
     private static final String DEFAULT_SCHEME = "https";
     private static final Pattern PROTOCOL_PATTERN = Pattern.compile("^([a-zA-Z0-9])+://");
