@@ -1,14 +1,17 @@
 package com.enigmabridge;
 
+import com.enigmabridge.comm.EBProcessDataUtils;
+
 import java.io.Serializable;
 import java.util.Arrays;
+import javax.crypto.SecretKey;
 import javax.xml.bind.DatatypeConverter;
 
 /**
  * EB communication keys.
  * Created by dusanklinec on 26.04.16.
  */
-public class EBCommKeys implements Serializable{
+public class EBCommKeys implements SecretKey, Serializable{
     public static final long serialVersionUID = 1L;
 
     /**
@@ -86,5 +89,25 @@ public class EBCommKeys implements Serializable{
                 "encKey=" + Arrays.toString(encKey) +
                 ", macKey=" + Arrays.toString(macKey) +
                 '}';
+    }
+
+    @Override
+    public String getAlgorithm() {
+        return EBProcessDataUtils.PROCESS_DATA_CIPHER;
+    }
+
+    @Override
+    public String getFormat() {
+        return "RAW";
+    }
+
+    @Override
+    public byte[] getEncoded() {
+        final int encLen = encKey.length;
+        final int macLen = macKey.length;
+        final byte[] bytes = new byte[encLen + macLen];
+        System.arraycopy(encKey, 0, bytes, 0, encLen);
+        System.arraycopy(macKey, 0, bytes, encLen, macLen);
+        return bytes;
     }
 }
