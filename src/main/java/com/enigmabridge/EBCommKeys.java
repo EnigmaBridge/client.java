@@ -1,6 +1,7 @@
 package com.enigmabridge;
 
 import com.enigmabridge.comm.EBProcessDataUtils;
+import sun.security.util.Length;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -11,8 +12,10 @@ import javax.xml.bind.DatatypeConverter;
  * EB communication keys.
  * Created by dusanklinec on 26.04.16.
  */
-public class EBCommKeys implements SecretKey, Serializable{
+public class EBCommKeys implements SecretKey, Length, Serializable{
     public static final long serialVersionUID = 1L;
+    public static final int ENC_KEY_LEN = 32;
+    public static final int MAC_KEY_LEN = 32;
 
     /**
      * AES-256-CBC end-to-end encryption key.
@@ -27,9 +30,29 @@ public class EBCommKeys implements SecretKey, Serializable{
     public EBCommKeys() {
     }
 
+    /**
+     * Constructor initializes each key separately.
+     * @param encKey
+     * @param macKey
+     */
     public EBCommKeys(byte[] encKey, byte[] macKey) {
         this.encKey = encKey;
         this.macKey = macKey;
+    }
+
+    /**
+     * Initializes comm keys from the encoded form.
+     * @param encoded
+     */
+    public EBCommKeys(byte[] encoded) {
+        if (encoded.length != ENC_KEY_LEN + MAC_KEY_LEN){
+            throw new IllegalArgumentException("Invalid encoded form");
+        }
+
+        encKey = new byte[ENC_KEY_LEN];
+        macKey = new byte[MAC_KEY_LEN];
+        System.arraycopy(encoded, 0,           encKey, 0, ENC_KEY_LEN);
+        System.arraycopy(encoded, ENC_KEY_LEN, macKey, 0, MAC_KEY_LEN);
     }
 
     public byte[] getEncKey() {
@@ -60,8 +83,12 @@ public class EBCommKeys implements SecretKey, Serializable{
         return this;
     }
 
+    /**
+     * Returns true if commkeys are initialized correctly.
+     * @return
+     */
     public boolean areKeysOK(){
-        return encKey != null && macKey != null && encKey.length == 32 && macKey.length == 32;
+        return encKey != null && macKey != null && encKey.length == ENC_KEY_LEN && macKey.length == MAC_KEY_LEN;
     }
 
     @Override
@@ -109,5 +136,10 @@ public class EBCommKeys implements SecretKey, Serializable{
         System.arraycopy(encKey, 0, bytes, 0, encLen);
         System.arraycopy(macKey, 0, bytes, encLen, macLen);
         return bytes;
+    }
+
+    @Override
+    public int length() {
+        return encKey.length + macKey.length;
     }
 }
