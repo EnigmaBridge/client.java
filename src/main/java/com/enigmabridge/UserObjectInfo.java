@@ -1,7 +1,6 @@
 package com.enigmabridge;
 
 import java.io.*;
-import java.util.Arrays;
 
 /**
  * Holder represents user object and all required parameters for using it.
