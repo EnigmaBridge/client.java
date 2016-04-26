@@ -1,4 +1,4 @@
-package com.enigmabridge.provider;
+package com.enigmabridge;
 
 import java.io.*;
 import java.util.Arrays;
@@ -35,7 +35,7 @@ public class UserObjectInfo implements Serializable {
      * Connection string to the EB endpoint
      * https://site1.enigmabridge.com:11180
      */
-    protected String connectionString;
+    protected EBEndpointInfo endpointInfo;
 
     public UserObjectInfo() {
     }
@@ -57,12 +57,12 @@ public class UserObjectInfo implements Serializable {
         this.apiKey = apiKey;
     }
 
-    public UserObjectInfo(long uoid, byte[] encKey, byte[] macKey, String apiKey, String connectionString) {
+    public UserObjectInfo(long uoid, byte[] encKey, byte[] macKey, String apiKey, String endpointInfo) {
         this.uoid = uoid;
         this.encKey = encKey;
         this.macKey = macKey;
         this.apiKey = apiKey;
-        this.connectionString = connectionString;
+        this.endpointInfo = endpointInfo;
     }
 
     /**
@@ -134,7 +134,7 @@ public class UserObjectInfo implements Serializable {
                 ", encKey=" + Arrays.toString(encKey) +
                 ", macKey=" + Arrays.toString(macKey) +
                 ", apiKey='" + apiKey + '\'' +
-                ", connectionString='" + connectionString + '\'' +
+                ", endpointInfo='" + endpointInfo + '\'' +
                 '}';
     }
 
@@ -149,7 +149,7 @@ public class UserObjectInfo implements Serializable {
         if (!Arrays.equals(encKey, that.encKey)) return false;
         if (!Arrays.equals(macKey, that.macKey)) return false;
         if (apiKey != null ? !apiKey.equals(that.apiKey) : that.apiKey != null) return false;
-        return connectionString != null ? connectionString.equals(that.connectionString) : that.connectionString == null;
+        return endpointInfo != null ? endpointInfo.equals(that.endpointInfo) : that.endpointInfo == null;
 
     }
 
@@ -159,7 +159,7 @@ public class UserObjectInfo implements Serializable {
         result = 31 * result + Arrays.hashCode(encKey);
         result = 31 * result + Arrays.hashCode(macKey);
         result = 31 * result + (apiKey != null ? apiKey.hashCode() : 0);
-        result = 31 * result + (connectionString != null ? connectionString.hashCode() : 0);
+        result = 31 * result + (endpointInfo != null ? endpointInfo.hashCode() : 0);
         return result;
     }
 
@@ -199,12 +199,12 @@ public class UserObjectInfo implements Serializable {
         return this;
     }
 
-    public String getConnectionString() {
-        return connectionString;
+    public String getEndpointInfo() {
+        return endpointInfo;
     }
 
-    public UserObjectInfo setConnectionString(String connectionString) {
-        this.connectionString = connectionString;
+    public UserObjectInfo setEndpointInfo(String endpointInfo) {
+        this.endpointInfo = endpointInfo;
         return this;
     }
 }
