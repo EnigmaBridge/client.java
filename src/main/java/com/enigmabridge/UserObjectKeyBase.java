@@ -20,12 +20,42 @@ public class UserObjectKeyBase implements UserObjectKey {
     }
 
     @Override
+    public UserObjectKeyType getKeyType() {
+        return keyType;
+    }
+
+    @Override
+    public long getUoid() {
+        return uo.getUoid();
+    }
+
+    @Override
+    public String getApiKey() {
+        return uo.getApiKey();
+    }
+
+    @Override
+    public EBCommKeys getCommKeys() {
+        return uo.getCommKeys();
+    }
+
+    @Override
+    public long getUserObjectType() {
+        return uo.getUserObjectType();
+    }
+
+    @Override
+    public EBEndpointInfo getEndpointInfo() {
+        return uo.getEndpointInfo();
+    }
+
+    @Override
     public UserObjectInfo getUserObjectInfo() {
         return uo;
     }
 
     @Override
-    public UserObjectKeyType getKeyType() {
-        return keyType;
+    public UserObjectKey getUserObjectKey() {
+        return this;
     }
 }

@@ -24,6 +24,7 @@ import javax.crypto.spec.OAEPParameterSpec;
 import javax.crypto.spec.PSource;
 import java.io.ByteArrayOutputStream;
 import java.security.*;
+import java.security.interfaces.RSAKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.AlgorithmParameterSpec;
@@ -99,27 +100,18 @@ public class CipherSpi
         }
     }
 
-    protected int engineGetKeySize(
-        Key key)
+    protected int engineGetKeySize(Key key)
     {
-        if (key instanceof RSAPrivateKey)
+        if (key instanceof RSAKey)
         {
-            RSAPrivateKey k = (RSAPrivateKey)key;
-
-            return k.getModulus().bitLength();
-        }
-        else if (key instanceof RSAPublicKey)
-        {
-            RSAPublicKey k = (RSAPublicKey)key;
-
+            RSAKey k = (RSAKey)key;
             return k.getModulus().bitLength();
         }
 
         throw new IllegalArgumentException("not an RSA key!");
     }
 
-    protected int engineGetOutputSize(
-        int     inputLen) 
+    protected int engineGetOutputSize(int inputLen)
     {
         try
         {
@@ -242,7 +234,7 @@ public class CipherSpi
 
         if (params == null || params instanceof OAEPParameterSpec)
         {
-            if (key instanceof RSAPublicKey)
+            if (key instanceof EBRSAPublicKey)
             {
                 if (privateKeyOnly && opmode == Cipher.ENCRYPT_MODE)
                 {
@@ -250,9 +242,9 @@ public class CipherSpi
                                 "mode 1 requires RSAPrivateKey");
                 }
 
-                param = RSAUtil.generatePublicKeyParameter((RSAPublicKey)key);
+                param = RSAUtil.generatePublicKeyParameter((EBRSAPublicKey)key);
             }
-            else if (key instanceof RSAPrivateKey)
+            else if (key instanceof EBRSAPrivateKey)
             {
                 if (publicKeyOnly && opmode == Cipher.ENCRYPT_MODE)
                 {
@@ -260,7 +252,7 @@ public class CipherSpi
                                 "mode 2 requires RSAPublicKey");
                 }
 
-                param = RSAUtil.generatePrivateKeyParameter((RSAPrivateKey)key);
+                param = RSAUtil.generatePrivateKeyParameter((EBRSAPrivateKey)key);
             }
             else
             {

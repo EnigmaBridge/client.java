@@ -16,8 +16,14 @@ public class EBRSAKeyParameter extends EBAsymmetricKeyParameter implements UserO
     protected BigInteger modulus;
     protected BigInteger publicExponent;
 
-    public EBRSAKeyParameter(boolean privateKey) {
-        super(privateKey);
+    public EBRSAKeyParameter(boolean privateKey, UserObjectKey uo) {
+        super(privateKey, uo);
+    }
+
+    public EBRSAKeyParameter(boolean privateKey, UserObjectKey uo, BigInteger modulus, BigInteger publicExponent) {
+        super(privateKey, uo);
+        this.modulus = modulus;
+        this.publicExponent = publicExponent;
     }
 
     /**

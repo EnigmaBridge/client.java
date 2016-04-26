@@ -16,5 +16,4 @@ import java.security.interfaces.RSAKey;
  */
 public class EBRSAPrivateKey extends EBRSAKey {
     static final long serialVersionUID = 1;
-
 }

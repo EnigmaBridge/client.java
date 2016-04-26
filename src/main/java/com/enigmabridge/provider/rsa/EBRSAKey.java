@@ -14,10 +14,20 @@ import java.security.interfaces.RSAKey;
  */
 public class EBRSAKey extends EBKeyBase implements PrivateKey, RSAKey {
     static final long serialVersionUID = 1;
+    protected BigInteger modulus;
+
+    /**
+     * If null for encryption operation -> operation fails.
+     * If null for decryption operation -> operation runs without blinding.
+     */
+    protected BigInteger publicExponent;
 
     @Override
     public BigInteger getModulus() {
-        return null;
+        return modulus;
     }
 
+    public BigInteger getPublicExponent() {
+        return publicExponent;
+    }
 }

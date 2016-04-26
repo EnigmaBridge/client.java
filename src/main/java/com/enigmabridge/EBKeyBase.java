@@ -1,8 +1,5 @@
 package com.enigmabridge;
 
-import com.enigmabridge.EBUOKey;
-import com.enigmabridge.UserObjectInfo;
-
 /**
  * Base class for all EB keys.
  * Created by dusanklinec on 26.04.16.
@@ -12,9 +9,7 @@ public abstract class EBKeyBase implements EBUOKey{
     public static final String FORMAT_X509 = "X.509";
     public static final String FORMAT_PKCS8 = "PKCS#8";
 
-    protected UserObjectInfo uo;
-    protected String algorithm;
-    protected int keyLength;
+    protected UserObjectKeyBase uo;
 
     protected boolean tokenObject = true;
     protected boolean sensitive = true;
@@ -26,8 +21,8 @@ public abstract class EBKeyBase implements EBUOKey{
     }
 
     @Override
-    public String getAlgorithm() {
-        return algorithm;
+    public UserObjectKey getUserObjectKey() {
+        return uo;
     }
 
     @Override
@@ -44,6 +39,41 @@ public abstract class EBKeyBase implements EBUOKey{
 
     @Override
     public int length() {
-        return keyLength;
+        return uo.length();
+    }
+
+    @Override
+    public UserObjectKeyType getKeyType() {
+        return uo.getKeyType();
+    }
+
+    @Override
+    public long getUoid() {
+        return uo.getUoid();
+    }
+
+    @Override
+    public String getApiKey() {
+        return uo.getApiKey();
+    }
+
+    @Override
+    public EBCommKeys getCommKeys() {
+        return uo.getCommKeys();
+    }
+
+    @Override
+    public long getUserObjectType() {
+        return uo.getUserObjectType();
+    }
+
+    @Override
+    public EBEndpointInfo getEndpointInfo() {
+        return uo.getEndpointInfo();
+    }
+
+    @Override
+    public String getAlgorithm() {
+        return uo.getAlgorithm();
     }
 }

@@ -1,9 +1,6 @@
 package com.enigmabridge.provider.parameters;
 
-import com.enigmabridge.EBUOReference;
-import com.enigmabridge.UserObjectInfo;
-import com.enigmabridge.UserObjectKey;
-import com.enigmabridge.UserObjectKeyType;
+import com.enigmabridge.*;
 import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
 
 /**
@@ -16,9 +13,44 @@ public class EBAsymmetricKeyParameter extends AsymmetricKeyParameter implements 
         super(privateKey);
     }
 
+    public EBAsymmetricKeyParameter(boolean privateKey, UserObjectKey uo) {
+        super(privateKey);
+        this.uo = uo;
+    }
+
+    @Override
+    public UserObjectKey getUserObjectKey() {
+        return uo.getUserObjectKey();
+    }
+
     @Override
     public UserObjectInfo getUserObjectInfo() {
         return uo.getUserObjectInfo();
+    }
+
+    @Override
+    public long getUoid() {
+        return uo.getUoid();
+    }
+
+    @Override
+    public String getApiKey() {
+        return uo.getApiKey();
+    }
+
+    @Override
+    public EBCommKeys getCommKeys() {
+        return uo.getCommKeys();
+    }
+
+    @Override
+    public long getUserObjectType() {
+        return uo.getUserObjectType();
+    }
+
+    @Override
+    public EBEndpointInfo getEndpointInfo() {
+        return uo.getEndpointInfo();
     }
 
     @Override

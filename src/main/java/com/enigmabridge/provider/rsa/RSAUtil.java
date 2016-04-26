@@ -1,5 +1,6 @@
 package com.enigmabridge.provider.rsa;
 
+import com.enigmabridge.provider.parameters.EBRSAKeyParameter;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
@@ -38,29 +39,15 @@ public class RSAUtil
         return false;
     }
 
-    static RSAKeyParameters generatePublicKeyParameter(
-        RSAPublicKey key)
+    static EBRSAKeyParameter generatePublicKeyParameter(
+        EBRSAKey key)
     {
-        return new RSAKeyParameters(false, key.getModulus(), key.getPublicExponent());
-
+        return new EBRSAKeyParameter(false, key.getUserObjectKey(), key.getModulus(), key.getPublicExponent());
     }
 
-    static RSAKeyParameters generatePrivateKeyParameter(
-        RSAPrivateKey key)
+    static EBRSAKeyParameter generatePrivateKeyParameter(
+        EBRSAKey key)
     {
-        if (key instanceof RSAPrivateCrtKey)
-        {
-            RSAPrivateCrtKey k = (RSAPrivateCrtKey)key;
-
-            return new RSAPrivateCrtKeyParameters(k.getModulus(),
-                k.getPublicExponent(), k.getPrivateExponent(),
-                k.getPrimeP(), k.getPrimeQ(), k.getPrimeExponentP(), k.getPrimeExponentQ(), k.getCrtCoefficient());
-        }
-        else
-        {
-            RSAPrivateKey k = key;
-
-            return new RSAKeyParameters(true, k.getModulus(), k.getPrivateExponent());
-        }
+        return new EBRSAKeyParameter(false, key.getUserObjectKey(), key.getModulus(), key.getPublicExponent());
     }
 }
