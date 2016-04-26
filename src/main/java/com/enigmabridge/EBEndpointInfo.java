@@ -90,4 +90,34 @@ public class EBEndpointInfo implements Serializable {
         this.hostname = hostname;
         return this;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        EBEndpointInfo that = (EBEndpointInfo) o;
+
+        if (port != that.port) return false;
+        if (scheme != null ? !scheme.equals(that.scheme) : that.scheme != null) return false;
+        return hostname != null ? hostname.equals(that.hostname) : that.hostname == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = scheme != null ? scheme.hashCode() : 0;
+        result = 31 * result + (hostname != null ? hostname.hashCode() : 0);
+        result = 31 * result + port;
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "EBEndpointInfo{" +
+                "scheme='" + scheme + '\'' +
+                ", hostname='" + hostname + '\'' +
+                ", port=" + port +
+                '}';
+    }
 }
