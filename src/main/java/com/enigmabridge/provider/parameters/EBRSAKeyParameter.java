@@ -1,7 +1,41 @@
 package com.enigmabridge.provider.parameters;
 
+import com.enigmabridge.UserObjectKey;
+import com.enigmabridge.UserObjectKeyType;
+
+import java.math.BigInteger;
+
 /**
+ * EB RSA parameters.
  * Created by dusanklinec on 26.04.16.
  */
-public class EBRSAKeyParameter {
+public class EBRSAKeyParameter extends EBAsymmetricKeyParameter implements UserObjectKey {
+    /**
+     * Modulus & public exponents are required for blinding.
+     */
+    protected BigInteger modulus;
+    protected BigInteger publicExponent;
+
+    public EBRSAKeyParameter(boolean privateKey) {
+        super(privateKey);
+    }
+
+    /**
+     * Returns true if blinding is possible with given parameters.
+     * @return
+     */
+    public boolean canBlind(){
+        return modulus != null
+                && publicExponent != null
+                && !modulus.equals(BigInteger.ZERO)
+                && !publicExponent.equals(BigInteger.ZERO);
+    }
+
+    public BigInteger getModulus() {
+        return modulus;
+    }
+
+    public BigInteger getPublicExponent() {
+        return publicExponent;
+    }
 }

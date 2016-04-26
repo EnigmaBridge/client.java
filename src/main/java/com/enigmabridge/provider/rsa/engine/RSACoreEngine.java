@@ -1,7 +1,11 @@
 package com.enigmabridge.provider.rsa.engine;
 
+import com.enigmabridge.provider.parameters.EBCipherParameters;
+import com.enigmabridge.provider.parameters.EBRSAKeyParameter;
+import com.enigmabridge.provider.rsa.EBRSAKey;
 import org.bouncycastle.crypto.CipherParameters;
 import org.bouncycastle.crypto.DataLengthException;
+import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithRandom;
 import org.bouncycastle.crypto.params.RSAKeyParameters;
 import org.bouncycastle.crypto.params.RSAPrivateCrtKeyParameters;
@@ -13,8 +17,8 @@ import java.math.BigInteger;
  */
 class RSACoreEngine
 {
-    private RSAKeyParameters key;
-    private boolean          forEncryption;
+    private EBRSAKeyParameter key;
+    private boolean forEncryption;
 
     /**
      * initialise the RSA engine.
@@ -26,17 +30,12 @@ class RSACoreEngine
         boolean          forEncryption,
         CipherParameters param)
     {
-        if (param instanceof ParametersWithRandom)
-        {
-            ParametersWithRandom    rParam = (ParametersWithRandom)param;
-
-            key = (RSAKeyParameters)rParam.getParameters();
-        }
-        else
-        {
-            key = (RSAKeyParameters)param;
+        if (param instanceof ParametersWithRandom) {
+            ParametersWithRandom rParam = (ParametersWithRandom) param;
+            param = rParam.getParameters();
         }
 
+        key = (EBRSAKeyParameter)param;
         this.forEncryption = forEncryption;
     }
 
@@ -49,7 +48,7 @@ class RSACoreEngine
      */
     public int getInputBlockSize()
     {
-        int     bitSize = key.getModulus().bitLength();
+        int     bitSize = key.length();
 
         if (forEncryption)
         {
@@ -70,7 +69,7 @@ class RSACoreEngine
      */
     public int getOutputBlockSize()
     {
-        int     bitSize = key.getModulus().bitLength();
+        int     bitSize = key.length();
 
         if (forEncryption)
         {
@@ -110,7 +109,10 @@ class RSACoreEngine
         }
 
         BigInteger res = new BigInteger(1, block);
-        if (res.compareTo(key.getModulus()) >= 0)
+        if (
+                    (key.getModulus() != null && res.compareTo(key.getModulus()) >= 0)
+                ||  (key.getModulus() == null && res.bitLength() >= key.length())
+           )
         {
             throw new DataLengthException("input too large for RSA cipher.");
         }
@@ -160,44 +162,7 @@ class RSACoreEngine
 
     public BigInteger processBlock(BigInteger input)
     {
-        if (key instanceof RSAPrivateCrtKeyParameters)
-        {
-            //
-            // we have the extra factors, use the Chinese Remainder Theorem - the author
-            // wishes to express his thanks to Dirk Bonekaemper at rtsffm.com for
-            // advice regarding the expression of this.
-            //
-            RSAPrivateCrtKeyParameters crtKey = (RSAPrivateCrtKeyParameters)key;
-
-            BigInteger p = crtKey.getP();
-            BigInteger q = crtKey.getQ();
-            BigInteger dP = crtKey.getDP();
-            BigInteger dQ = crtKey.getDQ();
-            BigInteger qInv = crtKey.getQInv();
-
-            BigInteger mP, mQ, h, m;
-
-            // mP = ((input mod p) ^ dP)) mod p
-            mP = (input.remainder(p)).modPow(dP, p);
-
-            // mQ = ((input mod q) ^ dQ)) mod q
-            mQ = (input.remainder(q)).modPow(dQ, q);
-
-            // h = qInv * (mP - mQ) mod p
-            h = mP.subtract(mQ);
-            h = h.multiply(qInv);
-            h = h.mod(p);               // mod (in Java) returns the positive residual
-
-            // m = h * q + mQ
-            m = h.multiply(q);
-            m = m.add(mQ);
-
-            return m;
-        }
-        else
-        {
-            return input.modPow(
-                        key.getExponent(), key.getModulus());
-        }
+        // TODO: call EB with given private key parameters.
+        return null;
     }
 }

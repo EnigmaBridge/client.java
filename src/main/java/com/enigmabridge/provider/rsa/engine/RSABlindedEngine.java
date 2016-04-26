@@ -1,5 +1,6 @@
 package com.enigmabridge.provider.rsa.engine;
 
+import com.enigmabridge.provider.parameters.EBRSAKeyParameter;
 import org.bouncycastle.crypto.AsymmetricBlockCipher;
 import org.bouncycastle.crypto.CipherParameters;
 import org.bouncycastle.crypto.DataLengthException;
@@ -20,7 +21,7 @@ public class RSABlindedEngine
     private static final BigInteger ONE = BigInteger.valueOf(1);
 
     private RSACoreEngine    core = new RSACoreEngine();
-    private RSAKeyParameters key;
+    private EBRSAKeyParameter key;
     private SecureRandom     random;
 
     /**
@@ -34,19 +35,13 @@ public class RSABlindedEngine
         CipherParameters    param)
     {
         core.init(forEncryption, param);
-
-        if (param instanceof ParametersWithRandom)
-        {
-            ParametersWithRandom    rParam = (ParametersWithRandom)param;
-
-            key = (RSAKeyParameters)rParam.getParameters();
+        if (param instanceof ParametersWithRandom) {
+            ParametersWithRandom rParam = (ParametersWithRandom) param;
             random = rParam.getRandom();
+            param = rParam.getParameters();
         }
-        else
-        {
-            key = (RSAKeyParameters)param;
-            random = new SecureRandom();
-        }
+
+        key = (EBRSAKeyParameter)param;
     }
 
     /**
@@ -93,36 +88,24 @@ public class RSABlindedEngine
         }
 
         BigInteger input = core.convertInput(in, inOff, inLen);
-
         BigInteger result;
-        if (key instanceof RSAPrivateCrtKeyParameters)
-        {
-            RSAPrivateCrtKeyParameters k = (RSAPrivateCrtKeyParameters)key;
 
-            BigInteger e = k.getPublicExponent();
-            if (e != null)   // can't do blinding without a public exponent
+        if (key.canBlind()){
+            BigInteger e = key.getPublicExponent();
+            BigInteger m = key.getModulus();
+            BigInteger r = BigIntegers.createRandomInRange(ONE, m.subtract(ONE), random);
+
+            BigInteger blindedInput = r.modPow(e, m).multiply(input).mod(m);
+            BigInteger blindedResult = core.processBlock(blindedInput);
+
+            BigInteger rInv = r.modInverse(m);
+            result = blindedResult.multiply(rInv).mod(m);
+            // defence against Arjen Lenstra’s CRT attack
+            if (!input.equals(result.modPow(e, m)))
             {
-                BigInteger m = k.getModulus();
-                BigInteger r = BigIntegers.createRandomInRange(ONE, m.subtract(ONE), random);
-
-                BigInteger blindedInput = r.modPow(e, m).multiply(input).mod(m);
-                BigInteger blindedResult = core.processBlock(blindedInput);
-
-                BigInteger rInv = r.modInverse(m);
-                result = blindedResult.multiply(rInv).mod(m);
-                // defence against Arjen Lenstra’s CRT attack
-                if (!input.equals(result.modPow(e, m)))
-                {
-                    throw new IllegalStateException("RSA engine faulty decryption/signing detected");
-                }
+                throw new IllegalStateException("RSA engine faulty decryption/signing detected");
             }
-            else
-            {
-                result = core.processBlock(input);
-            }
-        }
-        else
-        {
+        } else {
             result = core.processBlock(input);
         }
 
