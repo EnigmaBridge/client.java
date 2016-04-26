@@ -17,6 +17,12 @@ public class UserObjectInfo implements Serializable {
     protected long uoid;
 
     /**
+     * Type of the user object.
+     * Required for API token build.
+     */
+    protected long userObjectType;
+
+    /**
      * Communication keys.
      */
     protected EBCommKeys commKeys = new EBCommKeys();
@@ -126,9 +132,10 @@ public class UserObjectInfo implements Serializable {
     public String toString() {
         return "UserObjectInfo{" +
                 "uoid=" + uoid +
-                ", commKeys=" + this.commKeys +
+                ", userObjectType=" + userObjectType +
+                ", commKeys=" + commKeys +
                 ", apiKey='" + apiKey + '\'' +
-                ", endpointInfo='" + endpointInfo + '\'' +
+                ", endpointInfo=" + endpointInfo +
                 '}';
     }
 
@@ -140,6 +147,7 @@ public class UserObjectInfo implements Serializable {
         UserObjectInfo that = (UserObjectInfo) o;
 
         if (uoid != that.uoid) return false;
+        if (userObjectType != that.userObjectType) return false;
         if (commKeys != null ? !commKeys.equals(that.commKeys) : that.commKeys != null) return false;
         if (apiKey != null ? !apiKey.equals(that.apiKey) : that.apiKey != null) return false;
         return endpointInfo != null ? endpointInfo.equals(that.endpointInfo) : that.endpointInfo == null;
@@ -149,6 +157,7 @@ public class UserObjectInfo implements Serializable {
     @Override
     public int hashCode() {
         int result = (int) (uoid ^ (uoid >>> 32));
+        result = 31 * result + (int) (userObjectType ^ (userObjectType >>> 32));
         result = 31 * result + (commKeys != null ? commKeys.hashCode() : 0);
         result = 31 * result + (apiKey != null ? apiKey.hashCode() : 0);
         result = 31 * result + (endpointInfo != null ? endpointInfo.hashCode() : 0);
@@ -197,6 +206,14 @@ public class UserObjectInfo implements Serializable {
 
     public void setCommKeys(EBCommKeys commKeys) {
         this.commKeys = commKeys;
+    }
+
+    public long getUserObjectType() {
+        return userObjectType;
+    }
+
+    public void setUserObjectType(long userObjectType) {
+        this.userObjectType = userObjectType;
     }
 
     public EBEndpointInfo getEndpointInfo() {
