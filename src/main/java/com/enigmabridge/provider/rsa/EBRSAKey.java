@@ -1,6 +1,6 @@
 package com.enigmabridge.provider.rsa;
 
-import com.enigmabridge.EBKeyBase;
+import com.enigmabridge.provider.EBKeyBase;
 
 import java.math.BigInteger;
 import java.security.PrivateKey;

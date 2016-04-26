@@ -1,10 +1,12 @@
-package com.enigmabridge;
+package com.enigmabridge.provider;
+
+import com.enigmabridge.*;
 
 /**
  * Base class for all EB keys.
  * Created by dusanklinec on 26.04.16.
  */
-public abstract class EBKeyBase implements EBUOKey{
+public abstract class EBKeyBase implements EBUOKey {
     public static final String FORMAT_RAW = "RAW";
     public static final String FORMAT_X509 = "X.509";
     public static final String FORMAT_PKCS8 = "PKCS#8";

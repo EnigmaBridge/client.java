@@ -1,4 +1,7 @@
-package com.enigmabridge;
+package com.enigmabridge.provider;
+
+import com.enigmabridge.UserObjectKey;
+import com.enigmabridge.provider.EBKey;
 
 /**
  * EB key represented with single UO.

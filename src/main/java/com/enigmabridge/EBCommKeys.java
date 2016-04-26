@@ -1,6 +1,7 @@
 package com.enigmabridge;
 
 import com.enigmabridge.comm.EBProcessDataUtils;
+import org.bouncycastle.crypto.CipherParameters;
 import sun.security.util.Length;
 
 import java.io.Serializable;
@@ -12,7 +13,7 @@ import javax.xml.bind.DatatypeConverter;
  * EB communication keys.
  * Created by dusanklinec on 26.04.16.
  */
-public class EBCommKeys implements SecretKey, Length, Serializable{
+public class EBCommKeys implements SecretKey, CipherParameters, Length, Serializable{
     public static final long serialVersionUID = 1L;
     public static final int ENC_KEY_LEN = 32;
     public static final int MAC_KEY_LEN = 32;
