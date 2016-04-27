@@ -55,12 +55,12 @@ public class DigestSignatureSpi
         PublicKey publicKey)
         throws InvalidKeyException
     {
-        if (!(publicKey instanceof RSAPublicKey))
+        if (!(publicKey instanceof EBRSAPublicKey))
         {
-            throw new InvalidKeyException("Supplied key (" + getType(publicKey) + ") is not a RSAPublicKey instance");
+            throw new InvalidKeyException("Supplied key (" + getType(publicKey) + ") is not an EBRSAPublicKey instance");
         }
 
-        CipherParameters param = RSAUtil.generatePublicKeyParameter((RSAPublicKey)publicKey);
+        CipherParameters param = RSAUtil.generatePublicKeyParameter((EBRSAPublicKey)publicKey);
 
         digest.reset();
         cipher.init(false, param);
@@ -70,12 +70,12 @@ public class DigestSignatureSpi
         PrivateKey privateKey)
         throws InvalidKeyException
     {
-        if (!(privateKey instanceof RSAPrivateKey))
+        if (!(privateKey instanceof EBRSAPrivateKey))
         {
-            throw new InvalidKeyException("Supplied key (" + getType(privateKey) + ") is not a RSAPrivateKey instance");
+            throw new InvalidKeyException("Supplied key (" + getType(privateKey) + ") is not an EBRSAPrivateKey instance");
         }
 
-        CipherParameters param = RSAUtil.generatePrivateKeyParameter((RSAPrivateKey)privateKey);
+        CipherParameters param = RSAUtil.generatePrivateKeyParameter((EBRSAPrivateKey)privateKey);
 
         digest.reset();
 
