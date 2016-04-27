@@ -1,5 +1,6 @@
 package com.enigmabridge;
 
+import com.enigmabridge.comm.EBProcessDataCipher;
 import com.enigmabridge.comm.EBProcessDataUtils;
 import org.bouncycastle.crypto.CipherParameters;
 import sun.security.util.Length;
@@ -7,7 +8,6 @@ import sun.security.util.Length;
 import java.io.Serializable;
 import java.util.Arrays;
 import javax.crypto.SecretKey;
-import javax.xml.bind.DatatypeConverter;
 
 /**
  * EB communication keys.
@@ -83,12 +83,12 @@ public class EBCommKeys implements SecretKey, CipherParameters, Length, Serializ
     }
 
     public EBCommKeys setEncKey(String encKey) {
-        this.encKey = DatatypeConverter.parseHexBinary(encKey);
+        this.encKey = EBUtils.hex2byte(encKey);
         return this;
     }
 
     public EBCommKeys setMacKey(String macKey) {
-        this.macKey = DatatypeConverter.parseHexBinary(macKey);
+        this.macKey = EBUtils.hex2byte(macKey);
         return this;
     }
 
@@ -129,7 +129,7 @@ public class EBCommKeys implements SecretKey, CipherParameters, Length, Serializ
 
     @Override
     public String getAlgorithm() {
-        return EBProcessDataUtils.PROCESS_DATA_CIPHER;
+        return EBProcessDataCipher.PROCESS_DATA_CIPHER;
     }
 
     @Override
