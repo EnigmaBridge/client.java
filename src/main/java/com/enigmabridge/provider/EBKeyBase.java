@@ -12,6 +12,8 @@ public abstract class EBKeyBase implements EBUOKey {
     public static final String FORMAT_PKCS8 = "PKCS#8";
 
     protected UserObjectKeyBase uo;
+    protected EBEngine ebEngine;
+    protected EBOperationConfiguration ebOperationConfig;
 
     protected boolean tokenObject = true;
     protected boolean sensitive = true;
@@ -77,5 +79,15 @@ public abstract class EBKeyBase implements EBUOKey {
     @Override
     public String getAlgorithm() {
         return uo.getAlgorithm();
+    }
+
+    @Override
+    public EBEngine getEBEngine() {
+        return ebEngine;
+    }
+
+    @Override
+    public EBOperationConfiguration getOperationConfiguration() {
+        return ebOperationConfig;
     }
 }
