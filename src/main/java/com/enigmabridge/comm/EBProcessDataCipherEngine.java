@@ -1,18 +1,17 @@
 package com.enigmabridge.comm;
 
 import org.bouncycastle.crypto.*;
-import org.bouncycastle.crypto.macs.CMac;
 import org.bouncycastle.crypto.modes.AEADBlockCipher;
-import org.bouncycastle.crypto.modes.SICBlockCipher;
 import org.bouncycastle.crypto.params.AEADParameters;
 import org.bouncycastle.crypto.params.ParametersWithIV;
 import org.bouncycastle.util.Arrays;
-import org.omg.CORBA.DynAnyPackage.Invalid;
 
 import javax.crypto.Cipher;
 
 /**
  * Encrypt-then-MAC cipher.
+ * Not implemented yet, do not use...
+ *
  * Created by dusanklinec on 26.04.16.
  */
 public class EBProcessDataCipherEngine implements AEADBlockCipher {
@@ -336,7 +335,7 @@ public class EBProcessDataCipherEngine implements AEADBlockCipher {
     {
         bufBlock[bufOff++] = b;
 
-        // TODO: optimize this.
+        // TODO: optimize this, do function call only on block encryption.
         if (bufOff == bufBlock.length)
         {
             if (out.length < (outOff + blockSize))

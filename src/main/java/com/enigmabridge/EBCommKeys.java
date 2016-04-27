@@ -46,14 +46,22 @@ public class EBCommKeys implements SecretKey, CipherParameters, Length, Serializ
      * @param encoded
      */
     public EBCommKeys(byte[] encoded) {
-        if (encoded.length != ENC_KEY_LEN + MAC_KEY_LEN){
+        initFromEncoded(encoded, 0, encoded.length);
+    }
+
+    public EBCommKeys(byte[] encoded, int keyOff, int keyLen){
+        initFromEncoded(encoded, keyOff, keyLen);
+    }
+
+    private void initFromEncoded(byte[] encoded, int keyOff, int keyLen){
+        if (keyLen != ENC_KEY_LEN + MAC_KEY_LEN){
             throw new IllegalArgumentException("Invalid encoded form");
         }
 
         encKey = new byte[ENC_KEY_LEN];
         macKey = new byte[MAC_KEY_LEN];
-        System.arraycopy(encoded, 0,           encKey, 0, ENC_KEY_LEN);
-        System.arraycopy(encoded, ENC_KEY_LEN, macKey, 0, MAC_KEY_LEN);
+        System.arraycopy(encoded, keyOff,             encKey, 0, ENC_KEY_LEN);
+        System.arraycopy(encoded, keyOff+ENC_KEY_LEN, macKey, 0, MAC_KEY_LEN);
     }
 
     public byte[] getEncKey() {
