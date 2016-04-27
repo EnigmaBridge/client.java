@@ -1,5 +1,8 @@
-package com.enigmabridge.provider.rsa;
+package com.enigmabridge.provider.rsa.signature;
 
+import com.enigmabridge.provider.rsa.EBRSAPrivateKey;
+import com.enigmabridge.provider.rsa.EBRSAPublicKey;
+import com.enigmabridge.provider.rsa.RSAUtil;
 import com.enigmabridge.provider.rsa.engine.RSABlindedEngine;
 import org.bouncycastle.asn1.ASN1Encoding;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
@@ -19,8 +22,6 @@ import org.bouncycastle.util.Arrays;
 
 import java.io.IOException;
 import java.security.*;
-import java.security.interfaces.RSAPrivateKey;
-import java.security.interfaces.RSAPublicKey;
 import java.security.spec.AlgorithmParameterSpec;
 
 public class DigestSignatureSpi

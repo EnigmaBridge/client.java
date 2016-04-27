@@ -39,13 +39,13 @@ public class RSAUtil
         return false;
     }
 
-    static EBRSAKeyParameter generatePublicKeyParameter(
+    public static EBRSAKeyParameter generatePublicKeyParameter(
         EBRSAKey key)
     {
         return new EBRSAKeyParameter(false, key.getUserObjectKey(), key.getModulus(), key.getPublicExponent());
     }
 
-    static EBRSAKeyParameter generatePrivateKeyParameter(
+    public static EBRSAKeyParameter generatePrivateKeyParameter(
         EBRSAKey key)
     {
         return new EBRSAKeyParameter(false, key.getUserObjectKey(), key.getModulus(), key.getPublicExponent());
