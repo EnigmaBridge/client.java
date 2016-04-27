@@ -1,6 +1,8 @@
 package com.enigmabridge;
 
 /**
+ * Basic implementation of the UserObjectKey.
+ *
  * Created by dusanklinec on 26.04.16.
  */
 public class UserObjectKeyBase implements UserObjectKey {
