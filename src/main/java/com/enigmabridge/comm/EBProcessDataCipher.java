@@ -101,6 +101,16 @@ public class EBProcessDataCipher {
     }
 
     /**
+     * Used to add data to MAC.
+     * @param input
+     * @param inputOffset
+     * @param length
+     */
+    public void add2mac(byte[] input, int inputOffset, int length){
+        mac.update(input, inputOffset, length);
+    }
+
+    /**
      * Performs cipher operation on the given input data.
      * In case of invalid MAC, exception is thrown.
      *
@@ -109,14 +119,14 @@ public class EBProcessDataCipher {
      * @return
      * @throws EBCryptoException
      */
-    public byte[] processBuffer(byte[] input, int inputOffset) throws EBCryptoException {
+    public byte[] processBuffer(byte[] input, int inputOffset, int length) throws EBCryptoException {
         checkValid();
 
-        final int inputLen = input.length - inputOffset;
+        final int inputLen = length - inputOffset;
         int outBuffSize = getOutputBufferSize(inputLen);
 
         byte[] output = new byte[outBuffSize];
-        final int processed = processBuffer(input, inputOffset, input.length - inputOffset, output, 0);
+        final int processed = processBuffer(input, inputOffset, length - inputOffset, output, 0);
         if(processed != outBuffSize){
             byte[] ret = new byte[processed];
             System.arraycopy(output, 0, ret, 0, processed);
