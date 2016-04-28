@@ -8,7 +8,7 @@ public class EBRawRequest {
     public static final String METHOD_GET = "GET";
     public static final String METHOD_POST = "POST";
 
-    protected String method;
+    protected String method = METHOD_GET;
     protected String query;
     protected String body;
 
