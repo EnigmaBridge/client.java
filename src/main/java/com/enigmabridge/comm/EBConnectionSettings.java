@@ -6,15 +6,41 @@ package com.enigmabridge.comm;
  */
 public class EBConnectionSettings {
     /**
-     * Timeout for reading data in milliseconds.
+     * Timeout for connecting to the endpoint in milliseconds.
      */
-    protected int timeoutMilliseconds = 30000;
+    protected int connectTimeoutMilli = 30000;
 
-    public int getTimeoutMilliseconds() {
-        return timeoutMilliseconds;
+    /**
+     * Timeout for reading data from the endpoint.
+     */
+    protected int readTimeoutMilli = 30000;
+
+    /**
+     * Timeout for writing data to the endpoint.
+     */
+    protected int writeTimeoutMilli = 30000;
+
+    public int getConnectTimeoutMilli() {
+        return connectTimeoutMilli;
     }
 
-    public void setTimeoutMilliseconds(int timeoutMilliseconds) {
-        this.timeoutMilliseconds = timeoutMilliseconds;
+    public void setConnectTimeoutMilli(int connectTimeoutMilli) {
+        this.connectTimeoutMilli = connectTimeoutMilli;
+    }
+
+    public int getReadTimeoutMilli() {
+        return readTimeoutMilli;
+    }
+
+    public void setReadTimeoutMilli(int readTimeoutMilli) {
+        this.readTimeoutMilli = readTimeoutMilli;
+    }
+
+    public int getWriteTimeoutMilli() {
+        return writeTimeoutMilli;
+    }
+
+    public void setWriteTimeoutMilli(int writeTimeoutMilli) {
+        this.writeTimeoutMilli = writeTimeoutMilli;
     }
 }
