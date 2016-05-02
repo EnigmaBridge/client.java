@@ -27,6 +27,11 @@ public class EBConnector {
     protected EBRawRequest rawRequest;
 
     /**
+     * OkHttp call, for cancellation.
+     */
+    private Call call;
+
+    /**
      * Do the request, performs real service call.
      */
     public EBRawResponse request() throws IOException {
@@ -68,7 +73,10 @@ public class EBConnector {
 
         // Do the call.
         final long timeStart = System.currentTimeMillis();
-        final Response response = client.newCall(request).execute();
+        call = client.newCall(request);
+
+        // Synchronous call.
+        final Response response = call.execute();
 
         final EBRawResponse ebResponse = new EBRawResponse();
         ebResponse.setHttpCode(response.code())
@@ -78,6 +86,12 @@ public class EBConnector {
                 .setSuccessful(response.isSuccessful());
 
         return ebResponse;
+    }
+
+    public void cancel(){
+        if (call!=null){
+            call.cancel();
+        }
     }
 
     public EBConnectionSettings getSettings() {

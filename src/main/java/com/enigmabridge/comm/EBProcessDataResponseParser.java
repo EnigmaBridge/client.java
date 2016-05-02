@@ -26,7 +26,7 @@ public class EBProcessDataResponseParser extends EBResponseParserBase{
      * @param options
      * @returns request unwrapped response.
      */
-    public EBResponse parse(JSONObject data, EBResponse resp, EBResponseParserOptions options) throws EBCorruptedException{
+    public EBResponse parseResponse(JSONObject data, EBResponse resp, EBResponseParserOptions options) throws EBCorruptedException{
         if (resp == null){
             resp = new EBProcessDataResponse();
         }
@@ -68,8 +68,13 @@ public class EBProcessDataResponseParser extends EBResponseParserBase{
         // Response = plainData + decryptedData.
         pdResp.setProtectedData(Arrays.copyOfRange(decryptedData, decOffset, decryptedData.length));
         pdResp.setPlainData(plainBytes);
-        
-        return resp;
+
+        // If parsing function is already set, use it.
+        if (subParser != null){
+            return subParser.parseResponse(data, pdResp, options);
+        }
+
+        return pdResp;
     }
 
     public UserObjectInfo getUo() {

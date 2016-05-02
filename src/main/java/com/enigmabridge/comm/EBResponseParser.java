@@ -7,5 +7,6 @@ import org.json.JSONObject;
  * Created by dusanklinec on 28.04.16.
  */
 public interface EBResponseParser {
-    EBResponse parse(JSONObject data, EBResponse resp, EBResponseParserOptions options) throws EBCorruptedException;
+    EBResponse parseResponse(JSONObject data, EBResponse resp, EBResponseParserOptions options) throws EBCorruptedException;
+    EBResponseParser getSubParser();
 }

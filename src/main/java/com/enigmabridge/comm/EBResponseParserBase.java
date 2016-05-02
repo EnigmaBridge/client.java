@@ -41,7 +41,7 @@ public class EBResponseParserBase implements EBResponseParser{
      * @param options
      * @returns request unwrapped response.
      */
-    public EBResponse parse(JSONObject data, EBResponse resp, EBResponseParserOptions options) throws EBCorruptedException{
+    public EBResponse parseResponse(JSONObject data, EBResponse resp, EBResponseParserOptions options) throws EBCorruptedException{
         if (resp == null){
             resp = new EBResponse();
         }
@@ -50,7 +50,7 @@ public class EBResponseParserBase implements EBResponseParser{
 
         // If parsing function is already set, use it.
         if (subParser != null){
-            return subParser.parse(data, resp, options);
+            return subParser.parseResponse(data, resp, options);
         }
 
         return resp;
