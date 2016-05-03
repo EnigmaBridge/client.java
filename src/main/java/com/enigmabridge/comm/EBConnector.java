@@ -45,7 +45,7 @@ public class EBConnector {
 
         final OkHttpClient client = clientBuilder.build();
 
-        final HttpUrl url = HttpUrl.parse("").newBuilder()
+        final HttpUrl url = new HttpUrl.Builder()
                 .scheme(endpoint.getScheme())
                 .host(endpoint.getHostname())
                 .port(endpoint.getPort())
