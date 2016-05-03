@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 import org.testng.annotations.*;
 
 import java.security.Security;
-import java.util.List;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
@@ -68,6 +67,86 @@ public class EBProcessDataCallIT {
 
     @AfterMethod(alwaysRun = true, groups = {"integration"}, enabled = false)
     public void tearDownMethod() throws Exception {
+    }
+
+    @Test(groups = {"integration"}) //, timeOut = 100000
+    public void testInvalidUo() throws Exception {
+        LOG.trace("### UT ## EBProcessDataCallIT::testInvalidUo ## BEGIN ###");
+
+        try {
+            final EBConnectionSettings settings = new EBConnectionSettings()
+                    .setMethod(EBCommUtils.METHOD_GET)
+                    .setTrust(trust);
+
+            final UserObjectInfoBase uo = new UserObjectInfoBase.Builder()
+                    .setUoid(0xFFFFL)
+                    .setUserObjectType(1)
+                    .setApiKey(apiKey)
+                    .setEndpointInfo(endpoint)
+                    .setCommKeys(ckAES)
+                    .build();
+
+            final EBProcessDataCall call = new EBProcessDataCall.Builder()
+                    .setEngine(engine)
+                    .setSettings(settings)
+                    .setUo(uo)
+                    .setProcessFunction(EBRequestTypes.PLAINAES)
+                    .build();
+
+            final EBProcessDataResponse response = call.doRequest(EBUtils.hex2byte("6bc1bee22e409f96e93d7e117393172a"));
+            assertNotNull(response, "Response is null");
+            assertNotNull(response.getRawResponse(), "Raw response is null");
+            assertTrue(response.getRawResponse().isSuccessful(), "HTTP request was not successful");
+            assertEquals(response.getStatusCode(), EBCommStatus.SW_STAT_INVALID_USER_OBJECT_ID, "Invalid UO should be detected");
+
+        } catch (Exception ex){
+            LOG.error("Exception in ProcessData(PLAINAES, data)", ex);
+            assertTrue(false);
+        }
+
+        LOG.trace("### UT ## EBProcessDataCallIT::testInvalidUo ## END ###");
+    }
+
+    @Test(groups = {"integration"}) //, timeOut = 100000
+    public void testAESInvalidMac() throws Exception {
+        LOG.trace("### UT ## EBProcessDataCallIT::testAESInvalidMac ## BEGIN ###");
+
+        try {
+            final EBConnectionSettings settings = new EBConnectionSettings()
+                    .setMethod(EBCommUtils.METHOD_GET)
+                    .setTrust(trust);
+
+            final EBCommKeys ck = new EBCommKeys()
+                    .setEncKey("e134567890123456789012345678901234567890123456789012345678901234")
+                    .setMacKey("f224262820223456789012345678901234567890123456789012345678901234");
+
+            final UserObjectInfoBase uo = new UserObjectInfoBase.Builder()
+                    .setUoid(0xEE01L)
+                    .setUserObjectType(1)
+                    .setApiKey(apiKey)
+                    .setEndpointInfo(endpoint)
+                    .setCommKeys(ck)
+                    .build();
+
+            final EBProcessDataCall call = new EBProcessDataCall.Builder()
+                    .setEngine(engine)
+                    .setSettings(settings)
+                    .setUo(uo)
+                    .setProcessFunction(EBRequestTypes.PLAINAES)
+                    .build();
+
+            final EBProcessDataResponse response = call.doRequest(EBUtils.hex2byte("6bc1bee22e409f96e93d7e117393172a"));
+            assertNotNull(response, "Response is null");
+            assertNotNull(response.getRawResponse(), "Raw response is null");
+            assertTrue(response.getRawResponse().isSuccessful(), "HTTP request was not successful");
+            assertEquals(response.getStatusCode(), EBCommStatus.SW_WRONG_MAC_DATA, "Wrong MAC should be detected");
+
+        } catch (Exception ex){
+            LOG.error("Exception in ProcessData(PLAINAES, data)", ex);
+            assertTrue(false);
+        }
+
+        LOG.trace("### UT ## EBProcessDataCallIT::testAESInvalidMac ## END ###");
     }
 
     @Test(groups = {"integration"}) //, timeOut = 100000
@@ -239,7 +318,7 @@ public class EBProcessDataCallIT {
     private void testResponse(EBResponse response){
         assertNotNull(response, "Response is null");
         assertNotNull(response.getRawResponse(), "Raw response is null");
-        assertTrue(response.isCodeOk(), "Response code is not OK");
         assertTrue(response.getRawResponse().isSuccessful(), "HTTP request was not successful");
+        assertTrue(response.isCodeOk(), "Response code is not OK");
     }
 }
