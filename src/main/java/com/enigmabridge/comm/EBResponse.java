@@ -1,5 +1,7 @@
 package com.enigmabridge.comm;
 
+import org.json.JSONObject;
+
 /**
  * Base EB response.
  *
@@ -10,7 +12,7 @@ public class EBResponse {
      * Parsed status code. 0x9000 = OK.
      * @output
      */
-    int statusCode = -1;
+    short statusCode = -1;
 
     /**
      * Parsed status detail.
@@ -27,7 +29,7 @@ public class EBResponse {
      * Raw result of the call.
      * Usually processed by child classes.
      */
-    String result;
+    Object result;
 
     /**
      * Raw response as a reference.
@@ -37,7 +39,7 @@ public class EBResponse {
     public EBResponse() {
     }
 
-    public EBResponse(String result, int statusCode, String statusDetail, String function) {
+    public EBResponse(JSONObject result, short statusCode, String statusDetail, String function) {
         this.result = result;
         this.statusCode = statusCode;
         this.statusDetail = statusDetail;
@@ -61,11 +63,11 @@ public class EBResponse {
         );
     }
 
-    public int getStatusCode() {
+    public short getStatusCode() {
         return statusCode;
     }
 
-    public void setStatusCode(int statusCode) {
+    public void setStatusCode(short statusCode) {
         this.statusCode = statusCode;
     }
 
@@ -85,11 +87,11 @@ public class EBResponse {
         this.function = function;
     }
 
-    public String getResult() {
+    public Object getResult() {
         return result;
     }
 
-    public void setResult(String result) {
+    public void setResult(Object result) {
         this.result = result;
     }
 

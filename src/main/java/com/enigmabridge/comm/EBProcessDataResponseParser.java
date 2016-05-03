@@ -38,7 +38,7 @@ public class EBProcessDataResponseParser extends EBResponseParserBase{
         }
 
         final EBProcessDataResponse pdResp = (EBProcessDataResponse) resp;
-        final String resultBuffer = resp.getResult();
+        final String resultBuffer = (String)resp.getResult();
         final byte[] baResult = EBUtils.hex2byte(resultBuffer.substring(0, resultBuffer.indexOf('_')));
 
         short offset = 0;

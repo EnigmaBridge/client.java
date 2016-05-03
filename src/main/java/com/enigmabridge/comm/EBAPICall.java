@@ -5,6 +5,7 @@ import com.enigmabridge.EBEngine;
 import com.enigmabridge.UserObjectInfo;
 
 /**
+ * Base API call to the EB service.
  * Created by dusanklinec on 27.04.16.
  */
 public class EBAPICall {

@@ -1,5 +1,6 @@
 package com.enigmabridge.comm;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 /**
@@ -26,10 +27,10 @@ public class EBResponseParserBase implements EBResponseParser{
         }
 
         // Build new response message.
-        resp.setStatusCode(EBCommUtils.getAsInteger(data, FIELD_STATUS, 16));
+        resp.setStatusCode((short)EBCommUtils.getAsInteger(data, FIELD_STATUS, 16));
         resp.setStatusDetail(EBCommUtils.getAsStringOrNull(data, FIELD_STATUS_DETAIL));
         resp.setFunction(EBCommUtils.tryGetAsString(data, FIELD_FUNCTION));
-        resp.setResult(EBCommUtils.tryGetAsString(data, FIELD_RESULT));
+        resp.setResult(data.has(FIELD_RESULT) ? data.get(FIELD_RESULT) : null);
         return resp;
     }
 
