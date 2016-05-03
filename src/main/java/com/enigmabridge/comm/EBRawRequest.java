@@ -5,10 +5,7 @@ package com.enigmabridge.comm;
  * Created by dusanklinec on 28.04.16.
  */
 public class EBRawRequest {
-    public static final String METHOD_GET = "GET";
-    public static final String METHOD_POST = "POST";
-
-    protected String method = METHOD_GET;
+    protected String method = EBCommUtils.METHOD_DEFAULT;
     protected String query;
     protected String body;
 

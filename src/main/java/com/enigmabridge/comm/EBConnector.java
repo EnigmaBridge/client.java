@@ -58,10 +58,10 @@ public class EBConnector {
                 .addHeader("Accept", "application/json; q=0.5");
 
         final String method = rawRequest.getMethod();
-        if (EBRawRequest.METHOD_GET.equals(method)){
+        if (EBCommUtils.METHOD_GET.equals(method)){
             // Nothing to do really.
 
-        } else if (EBRawRequest.METHOD_POST.equals(method)){
+        } else if (EBCommUtils.METHOD_POST.equals(method)){
             final RequestBody body = RequestBody.create(JSON, rawRequest.getBody());
             requestBuilder.post(body);
 

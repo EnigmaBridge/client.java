@@ -23,6 +23,10 @@ public class EBCommUtils {
     public final static byte AES_BLOCK_LEN =                       (byte) 0x10;
     public final static byte APDU_MAC_AES_LENGTH =                 (byte) 0x10;
 
+    public static final String METHOD_GET = "GET";
+    public static final String METHOD_POST = "POST";
+    public static final String METHOD_DEFAULT = METHOD_POST;
+
     /**
      * Converts mangled nonce value to the original one in ProcessData response.
      * ProcessData response has nonce return value response_nonce[i] = request_nonce[i] + 0x1

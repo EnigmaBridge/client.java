@@ -5,9 +5,6 @@ package com.enigmabridge.comm;
  * Created by dusanklinec on 26.04.16.
  */
 public class EBConnectionSettings {
-    public static final String METHOD_GET = "GET";
-    public static final String METHOD_POST = "POST";
-
     /**
      * Timeout for connecting to the endpoint in milliseconds.
      */
@@ -26,41 +23,41 @@ public class EBConnectionSettings {
     /**
      * Method used for the API call.
      */
-    protected String method = METHOD_GET;
-
-
-
-
+    protected String method = EBCommUtils.METHOD_DEFAULT;
 
     public int getConnectTimeoutMilli() {
         return connectTimeoutMilli;
     }
 
-    public void setConnectTimeoutMilli(int connectTimeoutMilli) {
+    public EBConnectionSettings setConnectTimeoutMilli(int connectTimeoutMilli) {
         this.connectTimeoutMilli = connectTimeoutMilli;
+        return this;
     }
 
     public int getReadTimeoutMilli() {
         return readTimeoutMilli;
     }
 
-    public void setReadTimeoutMilli(int readTimeoutMilli) {
+    public EBConnectionSettings setReadTimeoutMilli(int readTimeoutMilli) {
         this.readTimeoutMilli = readTimeoutMilli;
+        return this;
     }
 
     public int getWriteTimeoutMilli() {
         return writeTimeoutMilli;
     }
 
-    public void setWriteTimeoutMilli(int writeTimeoutMilli) {
+    public EBConnectionSettings setWriteTimeoutMilli(int writeTimeoutMilli) {
         this.writeTimeoutMilli = writeTimeoutMilli;
+        return this;
     }
 
     public String getMethod() {
         return method;
     }
 
-    public void setMethod(String method) {
+    public EBConnectionSettings setMethod(String method) {
         this.method = method;
+        return this;
     }
 }
