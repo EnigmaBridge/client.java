@@ -209,6 +209,11 @@ public class EBProcessDataCall extends EBAPICall {
         pdResponseParser = new EBProcessDataResponseParser();
         pdResponseParser.setUo(getUo());
         pdResponseParser.parseResponse(new JSONObject(rawResponse.getBody()), pdResponse, null);
+
+        // Return connector.
+        engine.getConMgr().doneWithConnector(connector);
+        this.connector = null;
+
         return pdResponse;
     }
 

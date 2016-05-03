@@ -158,6 +158,10 @@ public class EBGetPubKeyCall extends EBAPICall implements EBResponseParser{
         parser.setSubParser(this);
         parser.parseResponse(new JSONObject(rawResponse.getBody()), pkResponse, null);
 
+        // Return connector.
+        engine.getConMgr().doneWithConnector(connector);
+        this.connector = null;
+
         return pkResponse;
     }
 
