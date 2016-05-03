@@ -2,8 +2,11 @@ package com.enigmabridge.comm;
 
 import com.enigmabridge.EBEndpointInfo;
 import okhttp3.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -15,6 +18,8 @@ import java.util.concurrent.TimeUnit;
  * Created by dusanklinec on 26.04.16.
  */
 public class EBConnector {
+    private static final Logger LOG = LoggerFactory.getLogger(EBConnector.class);
+
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
     /**
@@ -82,11 +87,20 @@ public class EBConnector {
 
         // Synchronous call.
         final Response response = call.execute();
+        final ResponseBody body = response.body();
+        final byte[] respBytes = body.bytes();
+        String respString = null;
+        try {
+            final Charset charset = body.contentType() == null ? null : body.contentType().charset();
+            respString = new String(respBytes, charset == null ? "UTF-8" : charset.name());
+        } catch(RuntimeException e){
+            LOG.error("Exception in converting response bytes to string", e);
+        }
 
         final EBRawResponse ebResponse = new EBRawResponse();
         ebResponse.setHttpCode(response.code())
-                .setBody(response.body().string())
-                .setBodyBytes(response.body().bytes())
+                .setBodyBytes(respBytes)
+                .setBody(respString)
                 .setResponseTime(System.currentTimeMillis() - timeStart)
                 .setSuccessful(response.isSuccessful());
 
