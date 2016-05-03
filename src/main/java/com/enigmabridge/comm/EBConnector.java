@@ -41,6 +41,11 @@ public class EBConnector {
                     .connectTimeout(settings.getConnectTimeoutMilli(), TimeUnit.MILLISECONDS)
                     .writeTimeout(settings.getWriteTimeoutMilli(), TimeUnit.MILLISECONDS)
                     .readTimeout(settings.getReadTimeoutMilli(), TimeUnit.MILLISECONDS);
+
+            final EBAdditionalTrust trust = settings.getTrust();
+            if (trust != null){
+                trust.install(clientBuilder);
+            }
         }
 
         final OkHttpClient client = clientBuilder.build();

@@ -25,6 +25,11 @@ public class EBConnectionSettings {
      */
     protected String method = EBCommUtils.METHOD_DEFAULT;
 
+    /**
+     * Custom trust roots for SSL/TLS.
+     */
+    protected EBAdditionalTrust trust;
+
     public int getConnectTimeoutMilli() {
         return connectTimeoutMilli;
     }
@@ -58,6 +63,15 @@ public class EBConnectionSettings {
 
     public EBConnectionSettings setMethod(String method) {
         this.method = method;
+        return this;
+    }
+
+    public EBAdditionalTrust getTrust() {
+        return trust;
+    }
+
+    public EBConnectionSettings setTrust(EBAdditionalTrust trust) {
+        this.trust = trust;
         return this;
     }
 }
