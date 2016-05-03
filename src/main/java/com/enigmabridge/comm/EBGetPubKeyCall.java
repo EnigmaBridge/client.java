@@ -154,7 +154,10 @@ public class EBGetPubKeyCall extends EBAPICall implements EBResponseParser{
         }
 
         // Parse process data response.
-        this.parseResponse(new JSONObject(rawResponse.getBody()), pkResponse, null);
+        final EBResponseParserBase parser = new EBResponseParserBase();
+        parser.setSubParser(this);
+        parser.parseResponse(new JSONObject(rawResponse.getBody()), pkResponse, null);
+
         return pkResponse;
     }
 
