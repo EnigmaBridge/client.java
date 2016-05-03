@@ -195,14 +195,14 @@ public class EBGetPubKeyCall extends EBAPICall implements EBResponseParser{
             if (cur.has(FIELD_CERTIFICATE)){
                 final String certStr = EBCommUtils.getAsStringOrNull(cur, FIELD_CERTIFICATE);
                 if (certStr != null){
-                    cKey.setCertificateRaw(EBUtils.hex2byte(certStr.replace("/\\s+/g","")));
+                    cKey.setCertificateRaw(EBUtils.hex2byte(certStr.replaceAll("\\s","")));
                 }
             }
 
             if (cur.has(FIELD_KEY)){
                 final String keyStr = EBCommUtils.getAsStringOrNull(cur, FIELD_KEY);
                 if (keyStr != null){
-                    cKey.setKeyRaw(EBUtils.hex2byte(keyStr.replace("/\\s+/g","")));
+                    cKey.setKeyRaw(EBUtils.hex2byte(keyStr.replaceAll("\\s","")));
                 }
             }
 
