@@ -11,6 +11,8 @@ import org.bouncycastle.crypto.engines.AESLightEngine;
 import org.bouncycastle.crypto.macs.CBCBlockCipherMac;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.util.Arrays;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
@@ -28,6 +30,8 @@ import java.security.NoSuchAlgorithmException;
  * Created by dusanklinec on 26.04.16.
  */
 public class EBProcessDataCipher {
+    private static final Logger LOG = LoggerFactory.getLogger(EBProcessDataCipher.class);
+
     public static final String PROCESS_DATA_CIPHER = "ProcessDataV1";
     public static final byte[] ZERO_IV = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
@@ -53,10 +57,26 @@ public class EBProcessDataCipher {
         try {
             // Initialize cipher
             final Cipher enc = Cipher.getInstance("AES/CBC/PKCS5Padding");
-            enc.init(
-                    forEncryption ? Cipher.ENCRYPT_MODE : Cipher.DECRYPT_MODE,
-                    new SecretKeySpec(keys.getEncKey(), "AES"),
-                    new IvParameterSpec(ZERO_IV));
+
+            try {
+                enc.init(
+                        forEncryption ? Cipher.ENCRYPT_MODE : Cipher.DECRYPT_MODE,
+                        new SecretKeySpec(keys.getEncKey(), "AES"),
+                        new IvParameterSpec(ZERO_IV));
+
+            } catch(InvalidKeyException ex){
+                // We are using AES-256 which is not allowed by default in Java.
+                // You may need to install Java Cryptography Extension (JCE) Unlimited Strength Jurisdiction Policy Files
+                // http://stackoverflow.com/questions/6481627/java-security-illegal-key-size-or-default-parameters
+                if (keys.getEncKey() != null && keys.getEncKey().length == 32){
+                    final String msg = "Invalid key exception - install Java Cryptography Extension (JCE) Unlimited Strength Jurisdiction Policy Files";
+
+                    LOG.error(msg);
+                    throw new EBEngineException(msg, ex);
+                } else {
+                    throw ex;
+                }
+            }
 
             // Initialize CBC MAC.
             // There is no AES-CBC-MAC in the BouncyCastle provider.
