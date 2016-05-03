@@ -13,6 +13,10 @@ public class EBUtils {
         return DatatypeConverter.parseHexBinary(hex);
     }
 
+    public static byte[] hex2byte(String hex, boolean removeWhitespaces){
+        return DatatypeConverter.parseHexBinary(removeWhitespaces ? hex.replaceAll("\\s","") : hex);
+    }
+
     public static String byte2hex(byte[] bytes){
         return DatatypeConverter.printHexBinary(bytes);
     }

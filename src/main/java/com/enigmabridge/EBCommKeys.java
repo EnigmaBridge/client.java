@@ -1,8 +1,9 @@
 package com.enigmabridge;
 
+import com.enigmabridge.comm.EBCommUtils;
 import com.enigmabridge.comm.EBProcessDataCipher;
-import com.enigmabridge.comm.EBProcessDataUtils;
 import org.bouncycastle.crypto.CipherParameters;
+import org.json.JSONObject;
 import sun.security.util.Length;
 
 import java.io.Serializable;
@@ -17,6 +18,8 @@ public class EBCommKeys implements SecretKey, CipherParameters, Length, Serializ
     public static final long serialVersionUID = 1L;
     public static final int ENC_KEY_LEN = 32;
     public static final int MAC_KEY_LEN = 32;
+    public static final String FIELD_ENCKEY = "encKey";
+    public static final String FIELD_MACKEY = "macKey";
 
     /**
      * AES-256-CBC end-to-end encryption key.
@@ -53,6 +56,10 @@ public class EBCommKeys implements SecretKey, CipherParameters, Length, Serializ
         initFromEncoded(encoded, keyOff, keyLen);
     }
 
+    public EBCommKeys(JSONObject json){
+        initFromJson(json);
+    }
+
     private void initFromEncoded(byte[] encoded, int keyOff, int keyLen){
         if (keyLen != ENC_KEY_LEN + MAC_KEY_LEN){
             throw new IllegalArgumentException("Invalid encoded form");
@@ -62,6 +69,41 @@ public class EBCommKeys implements SecretKey, CipherParameters, Length, Serializ
         macKey = new byte[MAC_KEY_LEN];
         System.arraycopy(encoded, keyOff,             encKey, 0, ENC_KEY_LEN);
         System.arraycopy(encoded, keyOff+ENC_KEY_LEN, macKey, 0, MAC_KEY_LEN);
+    }
+
+    private void initFromJson(JSONObject json){
+        if (json == null
+                || !json.has(FIELD_ENCKEY)
+                || !json.has(FIELD_MACKEY))
+        {
+            throw new IllegalArgumentException("Invalid JSON form");
+        }
+
+        byte[] encKeyByte = EBUtils.hex2byte(json.getString(FIELD_ENCKEY), true);
+        byte[] macKeyByte = EBUtils.hex2byte(json.getString(FIELD_MACKEY), true);
+        if (encKeyByte == null || encKeyByte.length != ENC_KEY_LEN
+                || macKeyByte == null || macKeyByte.length != MAC_KEY_LEN)
+        {
+            throw new IllegalArgumentException("Invalid encoded keys form");
+        }
+
+        setEncKey(encKeyByte);
+        setMacKey(macKeyByte);
+    }
+
+    /**
+     * Converts to JSON representation.
+     * @param json
+     * @return
+     */
+    public JSONObject toJSON(JSONObject json){
+        if (json == null){
+            json = new JSONObject();
+        }
+
+        json.put(FIELD_ENCKEY, EBUtils.byte2hex(encKey));
+        json.put(FIELD_MACKEY, EBUtils.byte2hex(macKey));
+        return json;
     }
 
     public byte[] getEncKey() {
