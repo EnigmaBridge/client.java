@@ -87,7 +87,7 @@ public class EBProcessDataRequestBuilder {
                 inDataWithUOID, (int)commOffset, (int)offset - commOffset,
                 inDataWithUOID, (int)commOffset);
 
-        final String requestBase = "Packet0_" + requestType + "_" + EBUtils.byte2hex(inDataWithUOID, 0, processed);
+        final String requestBase = "Packet0_" + requestType + "_" + EBUtils.byte2hex(inDataWithUOID, 0, commOffset+processed);
         //this.log('ProcessData request body: ' + requestBase);
 
         return new EBProcessDataRequest(requestBase, null, uoInfo, nonce);
