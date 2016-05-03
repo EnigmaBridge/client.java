@@ -1,6 +1,5 @@
 package com.enigmabridge;
 
-import com.enigmabridge.comm.EBCommUtils;
 import org.json.JSONObject;
 
 import java.io.*;
@@ -201,14 +200,14 @@ public class UserObjectInfoBase implements UserObjectInfo {
         }
 
         final UserObjectInfoBase b = new UserObjectInfoBase();
-        b.setUoid(EBCommUtils.getAsLong(json, FIELD_UOID, 16));
+        b.setUoid(EBUtils.getAsLong(json, FIELD_UOID, 16));
 
-        final Integer uotype = EBCommUtils.tryGetAsInteger(json, FIELD_UOTYPE, 16);
+        final Integer uotype = EBUtils.tryGetAsInteger(json, FIELD_UOTYPE, 16);
         b.setUserObjectType(uotype == null ? -1 : uotype);
 
-        b.setApiKey(EBCommUtils.getAsStringOrNull(json, FIELD_APIKEY));
+        b.setApiKey(EBUtils.getAsStringOrNull(json, FIELD_APIKEY));
 
-        final String endpointStr = EBCommUtils.getAsStringOrNull(json, FIELD_ENDPOINT);
+        final String endpointStr = EBUtils.getAsStringOrNull(json, FIELD_ENDPOINT);
         if (endpointStr != null){
             b.setEndpointInfo(new EBEndpointInfo(endpointStr));
         }

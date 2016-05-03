@@ -192,18 +192,18 @@ public class EBGetPubKeyCall extends EBAPICall implements EBResponseParser{
                 continue;
             }
 
-            cKey.setId(EBCommUtils.getAsInteger(cur, FIELD_ID, 10));
-            cKey.setType(EBCommUtils.getAsStringOrNull(cur, FIELD_TYPE));
+            cKey.setId(EBUtils.getAsInteger(cur, FIELD_ID, 10));
+            cKey.setType(EBUtils.getAsStringOrNull(cur, FIELD_TYPE));
 
             if (cur.has(FIELD_CERTIFICATE)){
-                final String certStr = EBCommUtils.getAsStringOrNull(cur, FIELD_CERTIFICATE);
+                final String certStr = EBUtils.getAsStringOrNull(cur, FIELD_CERTIFICATE);
                 if (certStr != null){
                     cKey.setCertificateRaw(EBUtils.hex2byte(certStr.replaceAll("\\s","")));
                 }
             }
 
             if (cur.has(FIELD_KEY)){
-                final String keyStr = EBCommUtils.getAsStringOrNull(cur, FIELD_KEY);
+                final String keyStr = EBUtils.getAsStringOrNull(cur, FIELD_KEY);
                 if (keyStr != null){
                     cKey.setKeyRaw(EBUtils.hex2byte(keyStr.replaceAll("\\s","")));
                 }
