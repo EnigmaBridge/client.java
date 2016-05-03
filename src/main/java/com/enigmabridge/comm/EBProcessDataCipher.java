@@ -141,12 +141,10 @@ public class EBProcessDataCipher {
      */
     public byte[] processBuffer(byte[] input, int inputOffset, int length) throws EBCryptoException {
         checkValid();
-
-        final int inputLen = length - inputOffset;
-        int outBuffSize = getOutputBufferSize(inputLen);
+        int outBuffSize = getOutputBufferSize(length);
 
         byte[] output = new byte[outBuffSize];
-        final int processed = processBuffer(input, inputOffset, length - inputOffset, output, 0);
+        final int processed = processBuffer(input, inputOffset, length, output, 0);
         if(processed != outBuffSize){
             byte[] ret = new byte[processed];
             System.arraycopy(output, 0, ret, 0, processed);
