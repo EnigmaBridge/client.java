@@ -44,7 +44,7 @@ public class EBAsymmetricKeyParameter extends AsymmetricKeyParameter implements 
     }
 
     @Override
-    public long getUserObjectType() {
+    public int getUserObjectType() {
         return uo.getUserObjectType();
     }
 

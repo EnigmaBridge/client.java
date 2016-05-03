@@ -42,7 +42,7 @@ public class UserObjectKeyBase implements UserObjectKey {
     }
 
     @Override
-    public long getUserObjectType() {
+    public int getUserObjectType() {
         return uo.getUserObjectType();
     }
 

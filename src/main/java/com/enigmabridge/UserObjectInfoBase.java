@@ -19,7 +19,7 @@ public class UserObjectInfoBase implements UserObjectInfo {
      * Type of the user object.
      * Required for API token build.
      */
-    protected long userObjectType;
+    protected int userObjectType;
 
     /**
      * Communication keys.
@@ -207,11 +207,11 @@ public class UserObjectInfoBase implements UserObjectInfo {
         this.commKeys = commKeys;
     }
 
-    public long getUserObjectType() {
+    public int getUserObjectType() {
         return userObjectType;
     }
 
-    public void setUserObjectType(long userObjectType) {
+    protected void setUserObjectType(int userObjectType) {
         this.userObjectType = userObjectType;
     }
 

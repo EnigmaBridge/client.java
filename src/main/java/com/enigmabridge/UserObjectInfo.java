@@ -20,7 +20,7 @@ public interface UserObjectInfo extends Serializable {
      * Required for API Token generation.
      * @return UO type
      */
-    long getUserObjectType();
+    int getUserObjectType();
 
      /**
       * Communication encryption&MAC keys.
