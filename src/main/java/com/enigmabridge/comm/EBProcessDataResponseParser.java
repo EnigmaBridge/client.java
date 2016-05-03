@@ -33,7 +33,7 @@ public class EBProcessDataResponseParser extends EBResponseParserBase{
 
         this.parseCommonHeaders(resp, data);
         if (!resp.isCodeOk()){
-            LOG.debug("Error in processing, status: %s, message: %s", resp.getStatusCode(), resp.getStatusDetail());
+            LOG.debug(String.format("Error in processing, status: %04X, message: %s", (long)resp.getStatusCode(), resp.getStatusDetail()));
             return resp;
         }
 

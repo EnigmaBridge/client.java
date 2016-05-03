@@ -190,7 +190,7 @@ public class EBAPICall {
     }
 
     protected EBAPICall setSettings(EBConnectionSettings settings) {
-        this.settings = settings;
+        this.settings = settings; // TODO: should clone own copy?
         return this;
     }
 
