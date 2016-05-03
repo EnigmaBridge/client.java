@@ -71,14 +71,11 @@ public class EBAPICall {
         public abstract T getObj();
     }
 
-    public static class EBAPICallBuilder extends AbstractEBAPICallBuilder<EBAPICall, EBAPICallBuilder> {
+    public static class Builder extends AbstractEBAPICallBuilder<EBAPICall, Builder> {
         private final EBAPICall parent = new EBAPICall();
 
-        public EBAPICallBuilder() {
-        }
-
         @Override
-        public EBAPICallBuilder getThisBuilder() {
+        public Builder getThisBuilder() {
             return this;
         }
 

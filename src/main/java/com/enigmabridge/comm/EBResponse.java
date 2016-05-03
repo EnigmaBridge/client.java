@@ -10,7 +10,7 @@ public class EBResponse {
      * Parsed status code. 0x9000 = OK.
      * @output
      */
-    int statusCode;
+    int statusCode = -1;
 
     /**
      * Parsed status detail.
@@ -28,6 +28,11 @@ public class EBResponse {
      * Usually processed by child classes.
      */
     String result;
+
+    /**
+     * Raw response as a reference.
+     */
+    EBRawResponse rawResponse;
 
     public EBResponse() {
     }
@@ -86,5 +91,13 @@ public class EBResponse {
 
     public void setResult(String result) {
         this.result = result;
+    }
+
+    public EBRawResponse getRawResponse() {
+        return rawResponse;
+    }
+
+    public void setRawResponse(EBRawResponse rawResponse) {
+        this.rawResponse = rawResponse;
     }
 }

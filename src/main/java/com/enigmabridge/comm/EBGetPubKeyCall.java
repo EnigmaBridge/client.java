@@ -77,7 +77,7 @@ public class EBGetPubKeyCall extends EBAPICall implements EBResponseParser{
         public abstract T getObj();
     }
 
-    public static class EBGetPubKeyCallBuilder extends AbstractEBGetPubKeyBuilder<EBGetPubKeyCall, EBGetPubKeyCallBuilder> {
+    public static class Builder extends AbstractEBGetPubKeyBuilder<EBGetPubKeyCall, Builder> {
         private final EBGetPubKeyCall child = new EBGetPubKeyCall();
 
         @Override
@@ -100,7 +100,7 @@ public class EBGetPubKeyCall extends EBAPICall implements EBResponseParser{
         }
 
         @Override
-        public EBGetPubKeyCallBuilder getThisBuilder() {
+        public Builder getThisBuilder() {
             return this;
         }
     }
@@ -132,7 +132,11 @@ public class EBGetPubKeyCall extends EBAPICall implements EBResponseParser{
      * @throws IOException
      * @throws EBCorruptedException
      */
-    public void doRequest() throws IOException, EBCorruptedException {
+    public EBGetPubKeyResponse doRequest() throws IOException, EBCorruptedException {
+        if (apiBlock == null){
+            build();
+        }
+
         this.connector = engine.getConMgr().getConnector(this.endpoint);
         this.connector.setEndpoint(this.endpoint);
         this.connector.setSettings(this.settings);
@@ -141,16 +145,17 @@ public class EBGetPubKeyCall extends EBAPICall implements EBResponseParser{
         LOG.trace("Going to call request...");
         this.rawResponse = this.connector.request();
 
-        if (!rawResponse.isSuccessful()){
-            LOG.info("Response was not successful: " + rawResponse.toString());
-            return;
-        }
-
         // Empty response to parse data to.
         pkResponse = new EBGetPubKeyResponse();
+        pkResponse.setRawResponse(rawResponse);
+        if (!rawResponse.isSuccessful()){
+            LOG.info("Response was not successful: " + rawResponse.toString());
+            return pkResponse;
+        }
 
         // Parse process data response.
         this.parseResponse(new JSONObject(rawResponse.getBody()), pkResponse, null);
+        return pkResponse;
     }
 
     @Override

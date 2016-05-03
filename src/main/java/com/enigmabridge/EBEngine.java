@@ -17,6 +17,9 @@ public class EBEngine {
     protected SecureRandom rnd;
 
     public EBConnectorManager getConMgr() {
+        if (conMgr == null){
+            conMgr = new EBConnectorManager();
+        }
         return conMgr;
     }
 

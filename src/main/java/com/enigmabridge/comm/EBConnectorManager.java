@@ -18,7 +18,7 @@ public class EBConnectorManager {
      */
     public EBConnector getConnector(EBEndpointInfo endpoint){
         // TODO: implement.
-        return null;
+        return new EBConnector().setEndpoint(endpoint);
     }
 
     /**

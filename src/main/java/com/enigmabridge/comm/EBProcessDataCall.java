@@ -84,7 +84,7 @@ public class EBProcessDataCall extends EBAPICall {
         public abstract T getObj();
     }
 
-    public static class EBProcessDataCallBuilder extends AbstractEBProcessDataCallBuilder<EBProcessDataCall, EBProcessDataCallBuilder> {
+    public static class Builder extends AbstractEBProcessDataCallBuilder<EBProcessDataCall, Builder> {
         private final EBProcessDataCall child = new EBProcessDataCall();
 
         @Override
@@ -116,7 +116,7 @@ public class EBProcessDataCall extends EBAPICall {
         }
 
         @Override
-        public EBProcessDataCallBuilder getThisBuilder() {
+        public Builder getThisBuilder() {
             return this;
         }
     }
@@ -170,7 +170,22 @@ public class EBProcessDataCall extends EBAPICall {
      * @throws IOException
      * @throws EBCorruptedException
      */
-    public void doRequest() throws IOException, EBCorruptedException {
+    public EBProcessDataResponse doRequest() throws IOException, EBCorruptedException {
+        return doRequest(null);
+    }
+
+    /**
+     * Performs request to the remote endpoint with built request.
+     * @throws IOException
+     * @throws EBCorruptedException
+     */
+    public EBProcessDataResponse doRequest(byte[] requestData) throws IOException, EBCorruptedException {
+        if (apiBlock == null && requestData == null){
+            throw new IllegalArgumentException("Call was not built with request data, cannot build now - no data");
+        } else if (requestData != null){
+            build(requestData);
+        }
+
         this.connector = engine.getConMgr().getConnector(this.endpoint);
         this.connector.setEndpoint(this.endpoint);
         this.connector.setSettings(this.settings);
@@ -179,18 +194,20 @@ public class EBProcessDataCall extends EBAPICall {
         LOG.trace("Going to call request...");
         this.rawResponse = this.connector.request();
 
-        if (!rawResponse.isSuccessful()){
-            LOG.info("Response was not successful: " + rawResponse.toString());
-            return;
-        }
-
         // Empty response to parse data to.
         pdResponse = new EBProcessDataResponse();
+        pdResponse.setRawResponse(rawResponse);
+
+        if (!rawResponse.isSuccessful()){
+            LOG.info("Response was not successful: " + rawResponse.toString());
+            return pdResponse;
+        }
 
         // Parse process data response.
         pdResponseParser = new EBProcessDataResponseParser();
         pdResponseParser.setUo(getUo());
         pdResponseParser.parseResponse(new JSONObject(rawResponse.getBody()), pdResponse, null);
+        return pdResponse;
     }
 
     /**
@@ -218,8 +235,6 @@ public class EBProcessDataCall extends EBAPICall {
         doRequest();
         return pdResponse.getProtectedData();
     }
-
-
 
     // Getters & Setters.
     public String getProcessFunction() {
