@@ -145,7 +145,9 @@ public class EBProcessDataCall extends EBAPICall {
         // Build request - headers.
         if (isMethodPost()){
             // POST
-            rawRequest.setBody(pdRequest.getRequest());
+            JSONObject jsonBody = new JSONObject();
+            jsonBody.put("data", pdRequest.getRequest());
+            rawRequest.setBody(jsonBody.toString());
             rawRequest.setQuery(String.format("%s/%s/%s/%s",
                     this.apiVersion,
                     this.apiBlock,
