@@ -76,7 +76,7 @@ public class EBCommKeys implements SecretKey, CipherParameters, Length, Serializ
                 || !json.has(FIELD_ENCKEY)
                 || !json.has(FIELD_MACKEY))
         {
-            throw new IllegalArgumentException("Invalid JSON form");
+            throw new IllegalArgumentException("Invalid JSON format");
         }
 
         byte[] encKeyByte = EBUtils.hex2byte(json.getString(FIELD_ENCKEY), true);

@@ -1,5 +1,8 @@
 package com.enigmabridge;
 
+import com.enigmabridge.comm.EBCommUtils;
+import org.json.JSONObject;
+
 import java.io.*;
 
 /**
@@ -9,6 +12,11 @@ import java.io.*;
  */
 public class UserObjectInfoBase implements UserObjectInfo {
     public static final long serialVersionUID = 1L;
+    public static final String FIELD_UOID = "uoid";
+    public static final String FIELD_UOTYPE = "uotype";
+    public static final String FIELD_COMMKEYS = "commKeys";
+    public static final String FIELD_APIKEY = "apiKey";
+    public static final String FIELD_ENDPOINT = "endpoint";
 
     /**
      * User object handle.
@@ -36,6 +44,56 @@ public class UserObjectInfoBase implements UserObjectInfo {
      * https://site1.enigmabridge.com:11180
      */
     protected EBEndpointInfo endpointInfo;
+
+    public static abstract class AbstractUOBaseBuilder<T extends UserObjectInfoBase, B extends AbstractUOBaseBuilder> {
+        public B setUoid(long a) {
+            getObj().setUoid(a);
+            return getThisBuilder();
+        }
+
+        public B setUserObjectType(int b) {
+            getObj().setUserObjectType(b);
+            return getThisBuilder();
+        }
+
+        public B setApiKey(String apiKey){
+            getObj().setApiKey(apiKey);
+            return getThisBuilder();
+        }
+
+        public B setEndpointInfo(EBEndpointInfo info){
+            getObj().setEndpointInfo(info);
+            return getThisBuilder();
+        }
+
+        public B setCommKeys(EBCommKeys ck){
+            getObj().setCommKeys(ck);
+            return getThisBuilder();
+        }
+
+        public abstract T build();
+        public abstract B getThisBuilder();
+        public abstract T getObj();
+    }
+
+    public static class Builder extends AbstractUOBaseBuilder<UserObjectInfoBase, Builder> {
+        private final UserObjectInfoBase parent = new UserObjectInfoBase();
+
+        @Override
+        public Builder getThisBuilder() {
+            return this;
+        }
+
+        @Override
+        public UserObjectInfoBase getObj() {
+            return parent;
+        }
+
+        @Override
+        public UserObjectInfoBase build() {
+            return parent;
+        }
+    }
 
     public UserObjectInfoBase() {
     }
@@ -127,6 +185,56 @@ public class UserObjectInfoBase implements UserObjectInfo {
         }
     }
 
+    /**
+     * Builds user object from string representation.
+     * @param json
+     * @return
+     * @throws IOException
+     * @throws ClassNotFoundException
+     */
+    public static UserObjectInfoBase build(JSONObject json) throws IOException {
+        if (json == null
+                || !json.has(FIELD_UOID)
+                || !json.has(FIELD_COMMKEYS))
+        {
+            throw new IllegalArgumentException("Invalid JSON format");
+        }
+
+        final UserObjectInfoBase b = new UserObjectInfoBase();
+        b.setUoid(EBCommUtils.getAsLong(json, FIELD_UOID, 16));
+
+        final Integer uotype = EBCommUtils.tryGetAsInteger(json, FIELD_UOTYPE, 16);
+        b.setUserObjectType(uotype == null ? -1 : uotype);
+
+        b.setApiKey(EBCommUtils.getAsStringOrNull(json, FIELD_APIKEY));
+
+        final String endpointStr = EBCommUtils.getAsStringOrNull(json, FIELD_ENDPOINT);
+        if (endpointStr != null){
+            b.setEndpointInfo(new EBEndpointInfo(endpointStr));
+        }
+
+        b.setCommKeys(new EBCommKeys(json.getJSONObject(FIELD_COMMKEYS)));
+        return b;
+    }
+
+    /**
+     * Serializes to JSON.
+     * @param json
+     * @return
+     */
+    public JSONObject toJSON(JSONObject json){
+        if (json == null){
+            json = new JSONObject();
+        }
+
+        json.put(FIELD_UOID, this.getUoid());
+        json.put(FIELD_UOTYPE, this.getUserObjectType());
+        json.put(FIELD_APIKEY, this.getApiKey());
+        json.put(FIELD_ENDPOINT, getEndpointInfo() == null ? null : getEndpointInfo().getConnectionString());
+        json.put(FIELD_COMMKEYS, getCommKeys() == null ? null : getCommKeys().toJSON(null));
+        return json;
+    }
+
     @Override
     public String toString() {
         return "UserObjectInfoBase{" +
@@ -167,7 +275,7 @@ public class UserObjectInfoBase implements UserObjectInfo {
         return uoid;
     }
 
-    public UserObjectInfoBase setUoid(long uoid) {
+    protected UserObjectInfoBase setUoid(long uoid) {
         this.uoid = uoid;
         return this;
     }
@@ -176,7 +284,7 @@ public class UserObjectInfoBase implements UserObjectInfo {
         return commKeys.encKey;
     }
 
-    public UserObjectInfoBase setEncKey(byte[] encKey) {
+    protected UserObjectInfoBase setEncKey(byte[] encKey) {
         this.commKeys.encKey = encKey;
         return this;
     }
@@ -185,7 +293,7 @@ public class UserObjectInfoBase implements UserObjectInfo {
         return commKeys.macKey;
     }
 
-    public UserObjectInfoBase setMacKey(byte[] macKey) {
+    protected UserObjectInfoBase setMacKey(byte[] macKey) {
         this.commKeys.macKey = macKey;
         return this;
     }
@@ -194,7 +302,7 @@ public class UserObjectInfoBase implements UserObjectInfo {
         return apiKey;
     }
 
-    public UserObjectInfoBase setApiKey(String apiKey) {
+    protected UserObjectInfoBase setApiKey(String apiKey) {
         this.apiKey = apiKey;
         return this;
     }
@@ -203,7 +311,7 @@ public class UserObjectInfoBase implements UserObjectInfo {
         return commKeys;
     }
 
-    public void setCommKeys(EBCommKeys commKeys) {
+    protected void setCommKeys(EBCommKeys commKeys) {
         this.commKeys = commKeys;
     }
 
@@ -219,7 +327,7 @@ public class UserObjectInfoBase implements UserObjectInfo {
         return endpointInfo;
     }
 
-    public UserObjectInfoBase setEndpointInfo(EBEndpointInfo endpointInfo) {
+    protected UserObjectInfoBase setEndpointInfo(EBEndpointInfo endpointInfo) {
         this.endpointInfo = endpointInfo;
         return this;
     }
