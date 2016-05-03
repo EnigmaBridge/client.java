@@ -198,7 +198,7 @@ public class EBProcessDataCipher {
                 // Process rest of data, without last MAC block.
                 int written = enc.doFinal(input, inputOffset, inputLength - macSize, output, outputOffset);
 
-                if (!verifyMac(computedMac, input, inputLength - macSize)){
+                if (!verifyMac(computedMac, input, inputOffset + inputLength - macSize)){
                     throw new BadPaddingException("Invalid MAC");
                 }
 
