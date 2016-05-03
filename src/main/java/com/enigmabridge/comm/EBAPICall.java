@@ -131,7 +131,7 @@ public class EBAPICall {
         String apiKeyToUser = apiKey == null ? this.getApiKey() : apiKey;
         int low4b = low4B == null ? (int)this.getUo().getUoid() : low4B;
 
-        this.apiBlock = String.format("%s%010x", apiKey, low4b);
+        this.apiBlock = String.format("%s%010x", apiKeyToUser, low4b);
         return this.apiBlock;
     }
 
