@@ -10,7 +10,7 @@ import java.io.*;
  *
  * Created by dusanklinec on 21.04.16.
  */
-public class UserObjectInfoBase implements UserObjectInfo {
+public class UserObjectInfoBase implements UserObjectInfo, EBJSONSerializable {
     public static final long serialVersionUID = 1L;
     public static final String FIELD_UOID = "uoid";
     public static final String FIELD_UOTYPE = "uotype";
