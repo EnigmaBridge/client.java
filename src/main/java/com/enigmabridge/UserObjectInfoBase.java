@@ -1,5 +1,6 @@
 package com.enigmabridge;
 
+import com.enigmabridge.comm.EBConnectionSettings;
 import org.json.JSONObject;
 
 import java.io.*;
@@ -44,6 +45,11 @@ public class UserObjectInfoBase implements UserObjectInfo {
      */
     protected EBEndpointInfo endpointInfo;
 
+    /**
+     * Connection settings for UO operation.
+     */
+    protected EBConnectionSettings connectionSettings;
+
     public static abstract class AbstractUOBaseBuilder<T extends UserObjectInfoBase, B extends AbstractUOBaseBuilder> {
         public B setUoid(long a) {
             getObj().setUoid(a);
@@ -67,6 +73,11 @@ public class UserObjectInfoBase implements UserObjectInfo {
 
         public B setCommKeys(EBCommKeys ck){
             getObj().setCommKeys(ck);
+            return getThisBuilder();
+        }
+
+        public B setConnectionSettings(EBConnectionSettings cs){
+            getObj().setConnectionSettings(cs);
             return getThisBuilder();
         }
 
@@ -328,6 +339,16 @@ public class UserObjectInfoBase implements UserObjectInfo {
 
     protected UserObjectInfoBase setEndpointInfo(EBEndpointInfo endpointInfo) {
         this.endpointInfo = endpointInfo;
+        return this;
+    }
+
+    @Override
+    public EBConnectionSettings getConnectionSettings() {
+        return connectionSettings;
+    }
+
+    public UserObjectInfoBase setConnectionSettings(EBConnectionSettings connectionSettings) {
+        this.connectionSettings = connectionSettings;
         return this;
     }
 }

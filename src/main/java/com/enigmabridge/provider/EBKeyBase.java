@@ -1,6 +1,7 @@
 package com.enigmabridge.provider;
 
 import com.enigmabridge.*;
+import com.enigmabridge.comm.EBConnectionSettings;
 
 /**
  * Base class for all EB keys.
@@ -74,6 +75,11 @@ public abstract class EBKeyBase implements EBUOKey {
     @Override
     public EBEndpointInfo getEndpointInfo() {
         return uo.getEndpointInfo();
+    }
+
+    @Override
+    public EBConnectionSettings getConnectionSettings() {
+        return null;
     }
 
     @Override

@@ -65,6 +65,9 @@ public class EBProcessDataCall extends EBAPICall {
                 if (uo.getEndpointInfo() != null && obj.getEndpoint() == null){
                     obj.setEndpoint(uo.getEndpointInfo());
                 }
+                if(uo.getConnectionSettings() != null && obj.getSettings() == null){
+                    obj.setSettings(uo.getConnectionSettings());
+                }
             }
             return getThisBuilder();
         }

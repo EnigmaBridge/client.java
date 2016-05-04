@@ -1,6 +1,7 @@
 package com.enigmabridge.provider.parameters;
 
 import com.enigmabridge.*;
+import com.enigmabridge.comm.EBConnectionSettings;
 import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
 
 /**
@@ -66,5 +67,10 @@ public class EBAsymmetricKeyParameter extends AsymmetricKeyParameter implements 
     @Override
     public int length() {
         return uo.length();
+    }
+
+    @Override
+    public EBConnectionSettings getConnectionSettings() {
+        return uo.getConnectionSettings();
     }
 }

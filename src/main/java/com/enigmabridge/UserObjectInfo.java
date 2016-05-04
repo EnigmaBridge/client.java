@@ -1,5 +1,7 @@
 package com.enigmabridge;
 
+import com.enigmabridge.comm.EBConnectionSettings;
+
 import java.io.Serializable;
 
 /**
@@ -43,4 +45,11 @@ public interface UserObjectInfo extends Serializable {
      * @return endpoint info
      */
     EBEndpointInfo getEndpointInfo();
+
+    /**
+     * Returns connection settings for the EB call.
+     * @return connection settings
+     */
+    EBConnectionSettings getConnectionSettings();
 }
+

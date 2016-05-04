@@ -1,5 +1,7 @@
 package com.enigmabridge;
 
+import com.enigmabridge.comm.EBConnectionSettings;
+
 /**
  * Basic implementation of the UserObjectKey.
  *
@@ -9,7 +11,7 @@ public class UserObjectKeyBase implements UserObjectKey {
     protected UserObjectInfo uo;
     protected String algorithm;
     protected int keyLength;
-    UserObjectKeyType keyType;
+    protected UserObjectKeyType keyType;
 
     @Override
     public String getAlgorithm() {
@@ -59,5 +61,26 @@ public class UserObjectKeyBase implements UserObjectKey {
     @Override
     public UserObjectKey getUserObjectKey() {
         return this;
+    }
+
+    @Override
+    public EBConnectionSettings getConnectionSettings() {
+        return uo.getConnectionSettings();
+    }
+
+    protected void setUo(UserObjectInfo uo) {
+        this.uo = uo;
+    }
+
+    protected void setAlgorithm(String algorithm) {
+        this.algorithm = algorithm;
+    }
+
+    protected void setKeyLength(int keyLength) {
+        this.keyLength = keyLength;
+    }
+
+    protected void setKeyType(UserObjectKeyType keyType) {
+        this.keyType = keyType;
     }
 }
