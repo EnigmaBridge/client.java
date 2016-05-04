@@ -2,12 +2,16 @@ package com.enigmabridge.comm;
 
 import org.json.JSONObject;
 
+import java.io.Serializable;
+
 /**
  * Base EB response.
  *
  * Created by dusanklinec on 27.04.16.
  */
-public class EBResponse {
+public class EBResponse implements Serializable {
+    public static final long serialVersionUID = 1L;
+    
     /**
      * Parsed status code. 0x9000 = OK.
      * @output

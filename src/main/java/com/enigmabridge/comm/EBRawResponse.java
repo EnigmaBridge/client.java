@@ -1,10 +1,14 @@
 package com.enigmabridge.comm;
 
+import java.io.Serializable;
+
 /**
  * RAW response received from the EB.
  * Created by dusanklinec on 29.04.16.
  */
-public class EBRawResponse {
+public class EBRawResponse implements Serializable {
+    public static final long serialVersionUID = 1L;
+
     protected boolean successful = false;
     protected int httpCode;
     protected byte[] bodyBytes;

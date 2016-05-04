@@ -1,10 +1,14 @@
 package com.enigmabridge.comm;
 
+import java.io.Serializable;
+
 /**
  * Raw request to EB.
  * Created by dusanklinec on 28.04.16.
  */
-public class EBRawRequest {
+public class EBRawRequest implements Serializable{
+    public static final long serialVersionUID = 1L;
+
     protected String method = EBCommUtils.METHOD_DEFAULT;
     protected String query;
     protected String body;
