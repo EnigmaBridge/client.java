@@ -27,7 +27,7 @@ public class EBAPICall {
 
     protected EBEngine engine;
 
-    public static abstract class AbstractEBAPICallBuilder<T extends EBAPICall, B extends AbstractEBAPICallBuilder> {
+    public static abstract class AbstractBuilder<T extends EBAPICall, B extends AbstractBuilder> {
         public B setEndpoint(EBEndpointInfo a) {
             getObj().setEndpoint(a);
             return getThisBuilder();
@@ -73,7 +73,7 @@ public class EBAPICall {
         public abstract T getObj();
     }
 
-    public static class Builder extends AbstractEBAPICallBuilder<EBAPICall, Builder> {
+    public static class Builder extends AbstractBuilder<EBAPICall, Builder> {
         private final EBAPICall parent = new EBAPICall();
 
         @Override

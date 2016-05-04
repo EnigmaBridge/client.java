@@ -30,7 +30,7 @@ public class EBProcessDataCall extends EBAPICall {
      * @param <T>
      * @param <B>
      */
-    public static abstract class AbstractEBProcessDataCallBuilder<T extends EBProcessDataCall, B extends AbstractEBProcessDataCallBuilder> {
+    public static abstract class AbstractBuilder<T extends EBProcessDataCall, B extends AbstractBuilder> {
         public B setEndpoint(EBEndpointInfo a) {
             getObj().setEndpoint(a);
             return getThisBuilder();
@@ -106,7 +106,7 @@ public class EBProcessDataCall extends EBAPICall {
         public abstract T getObj();
     }
 
-    public static class Builder extends AbstractEBProcessDataCallBuilder<EBProcessDataCall, Builder> {
+    public static class Builder extends AbstractBuilder<EBProcessDataCall, Builder> {
         private final EBProcessDataCall child = new EBProcessDataCall();
 
         @Override

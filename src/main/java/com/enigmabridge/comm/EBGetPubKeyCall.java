@@ -28,7 +28,7 @@ public class EBGetPubKeyCall extends EBAPICall implements EBResponseParser{
      * @param <T>
      * @param <B>
      */
-    public static abstract class AbstractEBGetPubKeyBuilder<T extends EBGetPubKeyCall, B extends AbstractEBGetPubKeyBuilder> {
+    public static abstract class AbstractBuilder<T extends EBGetPubKeyCall, B extends AbstractBuilder> {
         public B setEndpoint(EBEndpointInfo a) {
             getObj().setEndpoint(a);
             return getThisBuilder();
@@ -90,7 +90,7 @@ public class EBGetPubKeyCall extends EBAPICall implements EBResponseParser{
         public abstract T getObj();
     }
 
-    public static class Builder extends AbstractEBGetPubKeyBuilder<EBGetPubKeyCall, Builder> {
+    public static class Builder extends AbstractBuilder<EBGetPubKeyCall, Builder> {
         private final EBGetPubKeyCall child = new EBGetPubKeyCall();
 
         @Override

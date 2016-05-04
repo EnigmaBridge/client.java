@@ -18,8 +18,8 @@ public class UserObjectKeyBase extends UserObjectInfoBase implements UserObjectK
     protected int keyLength;
     protected UserObjectKeyType keyType;
 
-    public static abstract class AbstractUOKeyBaseBuilder<T extends UserObjectKeyBase, B extends AbstractUOKeyBaseBuilder>
-    extends AbstractUOBaseBuilder<T,B>
+    public static abstract class AbstractBuilder<T extends UserObjectKeyBase, B extends AbstractBuilder>
+    extends UserObjectInfoBase.AbstractBuilder<T,B>
     {
         public B setAlgorithm(String algorithm) {
             getObj().setAlgorithm(algorithm);
@@ -41,7 +41,7 @@ public class UserObjectKeyBase extends UserObjectInfoBase implements UserObjectK
         public abstract T getObj();
     }
 
-    public static class Builder extends AbstractUOKeyBaseBuilder<UserObjectKeyBase, Builder> {
+    public static class Builder extends AbstractBuilder<UserObjectKeyBase, Builder> {
         private final UserObjectKeyBase parent = new UserObjectKeyBase();
 
         @Override

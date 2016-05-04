@@ -39,7 +39,7 @@ public class UserObjectInfoBase implements UserObjectInfo, EBJSONSerializable {
      */
     protected EBSettingsBase settings;
 
-    public static abstract class AbstractUOBaseBuilder<T extends UserObjectInfoBase, B extends AbstractUOBaseBuilder> {
+    public static abstract class AbstractBuilder<T extends UserObjectInfoBase, B extends AbstractBuilder> {
         public B setUoid(long a) {
             getObj().setUoid(a);
             return getThisBuilder();
@@ -98,7 +98,7 @@ public class UserObjectInfoBase implements UserObjectInfo, EBJSONSerializable {
         public abstract T getObj();
     }
 
-    public static class Builder extends AbstractUOBaseBuilder<UserObjectInfoBase, Builder> {
+    public static class Builder extends AbstractBuilder<UserObjectInfoBase, Builder> {
         private final UserObjectInfoBase parent = new UserObjectInfoBase();
 
         @Override
