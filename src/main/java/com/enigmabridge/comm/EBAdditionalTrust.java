@@ -1,6 +1,9 @@
 package com.enigmabridge.comm;
 
+import com.enigmabridge.EBCommKeys;
+import com.enigmabridge.EBEndpointInfo;
 import com.enigmabridge.EBJSONSerializable;
+import com.enigmabridge.EBUtils;
 import okhttp3.OkHttpClient;
 import org.json.JSONObject;
 
@@ -24,10 +27,13 @@ import java.util.LinkedList;
  */
 public class EBAdditionalTrust implements EBJSONSerializable, Serializable {
     public static final long serialVersionUID = 1L;
+    public static final String FIELD_LETSENCRYPT = "letsencrypt";
+    public static final String FIELD_SYSTEM = "system";
+    public static final String FIELD_CUSTOM = "custom";
 
     // Flags for serialization.
-    protected final boolean letsEncryptFlag;
-    protected final boolean systemFlag;
+    protected boolean letsEncryptFlag;
+    protected boolean systemFlag;
     protected Collection<Certificate> customRoots;
 
     // Runtime
@@ -73,8 +79,34 @@ public class EBAdditionalTrust implements EBJSONSerializable, Serializable {
      * @param json
      */
     public EBAdditionalTrust(JSONObject json){
-        // TODO: implement
-        throw new UnsupportedOperationException("Not implemented yet");
+        if (customRoots != null && !customRoots.isEmpty()) {
+            // TODO: implement
+            throw new UnsupportedOperationException("Not implemented yet");
+        }
+
+        if (json == null) {
+            throw new IllegalArgumentException("Invalid JSON format");
+        }
+
+        letsEncryptFlag = EBUtils.getAsBoolean(json, FIELD_LETSENCRYPT);
+        systemFlag = EBUtils.getAsBoolean(json, FIELD_SYSTEM);
+        init(letsEncryptFlag, systemFlag, null);
+    }
+
+    @Override
+    public JSONObject toJSON(JSONObject json) {
+        if (customRoots != null && !customRoots.isEmpty()) {
+            // TODO: implement
+            throw new UnsupportedOperationException("Not implemented yet");
+        }
+
+        if (json == null){
+            json = new JSONObject();
+        }
+
+        json.put(FIELD_LETSENCRYPT, letsEncryptFlag);
+        json.put(FIELD_SYSTEM, systemFlag);
+        return json;
     }
 
     protected void init(boolean letsEncrypt, boolean system, InputStream additionalRoots) {
@@ -116,12 +148,6 @@ public class EBAdditionalTrust implements EBJSONSerializable, Serializable {
     public EBAdditionalTrust install(OkHttpClient.Builder builder){
         builder.sslSocketFactory(sslSocketFactory);
         return this;
-    }
-
-    @Override
-    public JSONObject toJSON(JSONObject json) {
-        // TODO: implement
-        throw new UnsupportedOperationException("Not implemented yet");
     }
 
     /**

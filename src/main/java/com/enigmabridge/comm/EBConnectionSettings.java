@@ -1,9 +1,13 @@
 package com.enigmabridge.comm;
 
+import com.enigmabridge.EBCommKeys;
+import com.enigmabridge.EBEndpointInfo;
 import com.enigmabridge.EBJSONSerializable;
+import com.enigmabridge.EBUtils;
 import org.json.JSONObject;
 
 import java.io.Serializable;
+import java.net.MalformedURLException;
 
 /**
  * Misc connection preferences for connectors.
@@ -11,6 +15,11 @@ import java.io.Serializable;
  */
 public class EBConnectionSettings implements Serializable, EBJSONSerializable {
     public static final long serialVersionUID = 1L;
+    public static final String FIELD_CONNECT_TIMEOUT = "connectTimeout";
+    public static final String FIELD_READ_TIMEOUT = "readTimeout";
+    public static final String FIELD_WRITE_TIMEOUT = "writeTimeout";
+    public static final String FIELD_HTTP_METHOD = "httpMethod";
+    public static final String FIELD_TRUST = "trust";
 
     /**
      * Timeout for connecting to the endpoint in milliseconds.
@@ -41,14 +50,51 @@ public class EBConnectionSettings implements Serializable, EBJSONSerializable {
     }
 
     public EBConnectionSettings(JSONObject json) {
-        // TODO: implement
-        throw new UnsupportedOperationException("Not implemented yet");
+        fromJSON(json);
+    }
+
+    protected void fromJSON(JSONObject json) {
+        if (json == null) {
+            throw new IllegalArgumentException("Invalid JSON format");
+        }
+
+        if (json.has(FIELD_CONNECT_TIMEOUT)){
+            connectTimeoutMilli = EBUtils.getAsInteger(json, FIELD_CONNECT_TIMEOUT, 10);
+        }
+
+        if (json.has(FIELD_READ_TIMEOUT)){
+            readTimeoutMilli = EBUtils.getAsInteger(json, FIELD_READ_TIMEOUT, 10);
+        }
+
+        if (json.has(FIELD_WRITE_TIMEOUT)){
+            writeTimeoutMilli = EBUtils.getAsInteger(json, FIELD_WRITE_TIMEOUT, 10);
+        }
+
+        if (json.has(FIELD_HTTP_METHOD)){
+            method = EBUtils.getAsStringOrNull(json, FIELD_HTTP_METHOD);
+        }
+
+        if (json.has(FIELD_TRUST)){
+            setTrust(new EBAdditionalTrust(json.getJSONObject(FIELD_TRUST)));
+        }
     }
 
     @Override
     public JSONObject toJSON(JSONObject json) {
-        // TODO: implement
-        throw new UnsupportedOperationException("Not implemented yet");
+        if (json == null){
+            json = new JSONObject();
+        }
+
+        json.put(FIELD_CONNECT_TIMEOUT, getConnectTimeoutMilli());
+        json.put(FIELD_READ_TIMEOUT, getReadTimeoutMilli());
+        json.put(FIELD_WRITE_TIMEOUT, getWriteTimeoutMilli());
+        json.put(FIELD_HTTP_METHOD, getMethod());
+
+        if (getTrust() != null){
+            json.put(FIELD_TRUST, getTrust().toJSON(null));
+        }
+
+        return json;
     }
 
     public int getConnectTimeoutMilli() {
