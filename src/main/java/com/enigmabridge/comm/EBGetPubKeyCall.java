@@ -1,9 +1,6 @@
 package com.enigmabridge.comm;
 
-import com.enigmabridge.EBEndpointInfo;
-import com.enigmabridge.EBEngine;
-import com.enigmabridge.EBUtils;
-import com.enigmabridge.UserObjectInfo;
+import com.enigmabridge.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -39,6 +36,19 @@ public class EBGetPubKeyCall extends EBAPICall implements EBResponseParser{
 
         public B setSettings(EBConnectionSettings b) {
             getObj().setSettings(b);
+            return getThisBuilder();
+        }
+
+        public B setSettings(EBSettings settings) {
+            if (settings.getApiKey() != null){
+                getObj().setApiKey(settings.getApiKey());
+            }
+            if (settings.getEndpointInfo() != null){
+                getObj().setEndpoint(settings.getEndpointInfo());
+            }
+            if (settings.getConnectionSettings() != null){
+                getObj().setSettings(settings.getConnectionSettings());
+            }
             return getThisBuilder();
         }
 

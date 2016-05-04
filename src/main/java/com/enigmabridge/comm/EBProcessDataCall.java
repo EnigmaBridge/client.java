@@ -51,20 +51,25 @@ public class EBProcessDataCall extends EBAPICall {
             return getThisBuilder();
         }
 
+        public B setSettings(EBSettings settings) {
+            if (settings.getApiKey() != null){
+                getObj().setApiKey(settings.getApiKey());
+            }
+            if (settings.getEndpointInfo() != null){
+                getObj().setEndpoint(settings.getEndpointInfo());
+            }
+            if (settings.getConnectionSettings() != null){
+                getObj().setSettings(settings.getConnectionSettings());
+            }
+            return getThisBuilder();
+        }
+
         public B setUo(UserObjectInfo uo){
             final T obj = getObj();
             obj.setUo(uo);
 
             if (uo != null){
-                if (uo.getApiKey() != null && obj.getApiKey() == null){
-                    obj.setApiKey(uo.getApiKey());
-                }
-                if (uo.getEndpointInfo() != null && obj.getEndpoint() == null){
-                    obj.setEndpoint(uo.getEndpointInfo());
-                }
-                if(uo.getConnectionSettings() != null && obj.getSettings() == null){
-                    obj.setSettings(uo.getConnectionSettings());
-                }
+                getThisBuilder().setSettings(uo);
             }
             return getThisBuilder();
         }

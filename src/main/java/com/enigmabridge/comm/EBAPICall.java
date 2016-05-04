@@ -12,6 +12,7 @@ public class EBAPICall {
     protected EBConnectionSettings settings;
     protected EBEndpointInfo endpoint;
     protected String apiKey;
+
     protected String apiVersion = "1.0";
     protected String callFunction;
     protected UserObjectInfo uo;
