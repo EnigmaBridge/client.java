@@ -1,17 +1,65 @@
 package com.enigmabridge;
 
 import com.enigmabridge.comm.EBConnectionSettings;
+import org.json.JSONObject;
+
+import java.net.MalformedURLException;
 
 /**
  * Basic implementation of the UserObjectKey.
  *
  * Created by dusanklinec on 26.04.16.
  */
-public class UserObjectKeyBase implements UserObjectKey {
-    protected UserObjectInfo uo;
+public class UserObjectKeyBase extends UserObjectInfoBase implements UserObjectKey {
+    public static final String FIELD_ALGORITHM = "algorithm";
+    public static final String FIELD_KEY_LENGTH = "keyLen";
+    public static final String FIELD_KEY_TYPE = "keyType";
+
     protected String algorithm;
     protected int keyLength;
     protected UserObjectKeyType keyType;
+
+    public static abstract class AbstractUOKeyBaseBuilder<T extends UserObjectKeyBase, B extends AbstractUOKeyBaseBuilder>
+    extends AbstractUOBaseBuilder<T,B>
+    {
+        public B setAlgorithm(String algorithm) {
+            getObj().setAlgorithm(algorithm);
+            return getThisBuilder();
+        }
+
+        public B setKeyLength(int keyLen) {
+            getObj().setKeyLength(keyLen);
+            return getThisBuilder();
+        }
+
+        public B setKeyType(UserObjectKeyType keyType){
+            getObj().setKeyType(keyType);
+            return getThisBuilder();
+        }
+
+        public abstract T build();
+        public abstract B getThisBuilder();
+        public abstract T getObj();
+    }
+
+    public static class Builder extends AbstractUOKeyBaseBuilder<UserObjectKeyBase, Builder> {
+        private final UserObjectKeyBase parent = new UserObjectKeyBase();
+
+        @Override
+        public Builder getThisBuilder() {
+            return this;
+        }
+
+        @Override
+        public UserObjectKeyBase getObj() {
+            return parent;
+        }
+
+        @Override
+        public UserObjectKeyBase build() {
+            return parent;
+        }
+    }
 
     @Override
     public String getAlgorithm() {
@@ -29,33 +77,8 @@ public class UserObjectKeyBase implements UserObjectKey {
     }
 
     @Override
-    public long getUoid() {
-        return uo.getUoid();
-    }
-
-    @Override
-    public String getApiKey() {
-        return uo.getApiKey();
-    }
-
-    @Override
-    public EBCommKeys getCommKeys() {
-        return uo.getCommKeys();
-    }
-
-    @Override
-    public int getUserObjectType() {
-        return uo.getUserObjectType();
-    }
-
-    @Override
-    public EBEndpointInfo getEndpointInfo() {
-        return uo.getEndpointInfo();
-    }
-
-    @Override
     public UserObjectInfo getUserObjectInfo() {
-        return uo;
+        return this;
     }
 
     @Override
@@ -63,15 +86,46 @@ public class UserObjectKeyBase implements UserObjectKey {
         return this;
     }
 
+    /**
+     * Initializes object form the JSON.
+     * @param json
+     * @throws MalformedURLException
+     */
     @Override
-    public EBConnectionSettings getConnectionSettings() {
-        return uo.getConnectionSettings();
+    protected void fromJSON(JSONObject json) throws MalformedURLException {
+        super.fromJSON(json);
+        if (json == null
+                || !json.has(FIELD_ALGORITHM)
+                || !json.has(FIELD_KEY_LENGTH)
+                || !json.has(FIELD_KEY_TYPE))
+        {
+            throw new IllegalArgumentException("Invalid JSON format");
+        }
+
+        setAlgorithm(EBUtils.getAsStringOrNull(json, FIELD_ALGORITHM));
+        setKeyLength(EBUtils.getAsInteger(json, FIELD_KEY_LENGTH, 10));
+        setKeyType(UserObjectKeyType.valueOf(EBUtils.getAsStringOrNull(json, FIELD_KEY_TYPE)));
     }
 
-    protected void setUo(UserObjectInfo uo) {
-        this.uo = uo;
+    /**
+     * Serializes to JSON.
+     * @param json
+     * @return
+     */
+    @Override
+    public JSONObject toJSON(JSONObject json) {
+        json = super.toJSON(json);
+        if (json == null){
+            json = new JSONObject();
+        }
+
+        json.put(FIELD_ALGORITHM, this.getAlgorithm());
+        json.put(FIELD_KEY_LENGTH, this.length());
+        json.put(FIELD_KEY_TYPE, this.getKeyType().toString());
+        return json;
     }
 
+    // Protected setters - object can be created only with builders.
     protected void setAlgorithm(String algorithm) {
         this.algorithm = algorithm;
     }
