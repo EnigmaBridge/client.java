@@ -21,13 +21,13 @@ public class UserObjectInfoBase implements UserObjectInfo, EBJSONSerializable {
     /**
      * User object handle.
      */
-    protected long uoid;
+    protected long uoid = -1;
 
     /**
      * Type of the user object.
      * Required for API token build.
      */
-    protected int userObjectType;
+    protected int userObjectType = -1;
 
     /**
      * Communication keys.
