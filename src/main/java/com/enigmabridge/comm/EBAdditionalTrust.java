@@ -24,10 +24,38 @@ import java.util.LinkedList;
  * Created by dusanklinec on 03.05.16.
  */
 public class EBAdditionalTrust {
-    protected final TrustManager[] trustManagers;
-    protected final SSLSocketFactory sslSocketFactory;
+    protected TrustManager[] trustManagers;
+    protected SSLSocketFactory sslSocketFactory;
 
+    /**
+     * Initializes trust in a default way - with letsencrypt & system roots included.
+     */
+    public EBAdditionalTrust() {
+        init(true, true, null);
+    }
+
+    /**
+     * Initializes trust in a default way - with letsencrypt & system roots included + user can add
+     * own trusted roots in PEM format in the input stream.
+     * @param additionalRoots input stream of additional trusted roots in PEM format, concatenated. May be null.
+     */
+    public EBAdditionalTrust(InputStream additionalRoots) {
+        init(true, true, additionalRoots);
+    }
+
+    /**
+     * As LetsEcrypt is not yet in the Java trusted roots, this class offer to build own view on trusted roots for EB
+     * service.
+     *
+     * @param letsEncrypt if true, letsencrypt trusted roots are added to the trust object.
+     * @param system if true, all system roots are added to the trust object.
+     * @param additionalRoots  input stream of additional trusted roots in PEM format, concatenated. May be null.
+     */
     public EBAdditionalTrust(boolean letsEncrypt, boolean system, InputStream additionalRoots) {
+        init(letsEncrypt, system, additionalRoots);
+    }
+
+    protected void init(boolean letsEncrypt, boolean system, InputStream additionalRoots) {
         try {
             LinkedList<TrustManager> managers = new LinkedList<TrustManager>();
             if (letsEncrypt) {
@@ -279,7 +307,7 @@ public class EBAdditionalTrust {
     }
 
     /**
-     * Tries to load default system trust manager with system CA list.
+     * Tries to load default system trust managers with system CA list.
      *
      * @return array of a system trust managers.
      */
@@ -307,5 +335,11 @@ public class EBAdditionalTrust {
         }
     }
 
+    public TrustManager[] getTrustManagers() {
+        return trustManagers;
+    }
 
+    public SSLSocketFactory getSslSocketFactory() {
+        return sslSocketFactory;
+    }
 }
