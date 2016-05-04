@@ -1,5 +1,7 @@
 package com.enigmabridge.provider.parameters;
 
+import com.enigmabridge.EBEngine;
+import com.enigmabridge.EBOperationConfiguration;
 import com.enigmabridge.UserObjectKey;
 import com.enigmabridge.UserObjectKeyType;
 
@@ -22,6 +24,12 @@ public class EBRSAKeyParameter extends EBAsymmetricKeyParameter implements UserO
 
     public EBRSAKeyParameter(boolean privateKey, UserObjectKey uo, BigInteger modulus, BigInteger publicExponent) {
         super(privateKey, uo);
+        this.modulus = modulus;
+        this.publicExponent = publicExponent;
+    }
+
+    public EBRSAKeyParameter(boolean privateKey, UserObjectKey uo, EBEngine ebEngine, EBOperationConfiguration ebOperationConfig, BigInteger modulus, BigInteger publicExponent) {
+        super(privateKey, uo, ebEngine, ebOperationConfig);
         this.modulus = modulus;
         this.publicExponent = publicExponent;
     }

@@ -24,6 +24,9 @@ public class EBEngine {
     }
 
     public SecureRandom getRnd() {
+        if (rnd == null){
+            rnd = new SecureRandom();
+        }
         return rnd;
     }
 }

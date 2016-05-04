@@ -5,10 +5,17 @@ import com.enigmabridge.comm.EBConnectionSettings;
 import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
 
 /**
+ * Cipher parameter internally used in the provider.
+ * For asymmetric ciphers.
+ *
  * Created by dusanklinec on 26.04.16.
  */
-public class EBAsymmetricKeyParameter extends AsymmetricKeyParameter implements EBCipherParameters, UserObjectKey {
+public class EBAsymmetricKeyParameter extends AsymmetricKeyParameter
+        implements EBCipherParameters, UserObjectKey, EBEngineReference, EBOperationConfigurationReference
+{
     protected UserObjectKey uo;
+    protected EBEngine ebEngine;
+    protected EBOperationConfiguration ebOperationConfig;
 
     public EBAsymmetricKeyParameter(boolean privateKey) {
         super(privateKey);
@@ -17,6 +24,13 @@ public class EBAsymmetricKeyParameter extends AsymmetricKeyParameter implements 
     public EBAsymmetricKeyParameter(boolean privateKey, UserObjectKey uo) {
         super(privateKey);
         this.uo = uo;
+    }
+
+    public EBAsymmetricKeyParameter(boolean privateKey, UserObjectKey uo, EBEngine ebEngine, EBOperationConfiguration ebOperationConfig) {
+        super(privateKey);
+        this.uo = uo;
+        this.ebEngine = ebEngine;
+        this.ebOperationConfig = ebOperationConfig;
     }
 
     @Override
@@ -72,5 +86,15 @@ public class EBAsymmetricKeyParameter extends AsymmetricKeyParameter implements 
     @Override
     public EBConnectionSettings getConnectionSettings() {
         return uo.getConnectionSettings();
+    }
+
+    @Override
+    public EBEngine getEBEngine() {
+        return ebEngine;
+    }
+
+    @Override
+    public EBOperationConfiguration getOperationConfiguration() {
+        return ebOperationConfig;
     }
 }

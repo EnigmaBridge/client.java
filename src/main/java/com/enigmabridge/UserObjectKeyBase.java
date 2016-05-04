@@ -1,6 +1,5 @@
 package com.enigmabridge;
 
-import com.enigmabridge.comm.EBConnectionSettings;
 import org.json.JSONObject;
 
 import java.net.MalformedURLException;

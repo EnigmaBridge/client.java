@@ -1,9 +1,6 @@
 package com.enigmabridge.comm;
 
-import com.enigmabridge.EBEndpointInfo;
-import com.enigmabridge.EBEngine;
-import com.enigmabridge.EBUtils;
-import com.enigmabridge.UserObjectInfo;
+import com.enigmabridge.*;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,6 +64,23 @@ public class EBProcessDataCall extends EBAPICall {
                 }
                 if(uo.getConnectionSettings() != null && obj.getSettings() == null){
                     obj.setSettings(uo.getConnectionSettings());
+                }
+            }
+            return getThisBuilder();
+        }
+
+        public B setKey(UserObjectKey key){
+            final T obj = getObj();
+            getThisBuilder().setUo(key);
+
+            if (key != null){
+                if (key instanceof EBEngineReference && obj.getEngine() == null){
+                    obj.setEngine(((EBEngineReference) key).getEBEngine());
+                }
+
+                final EBRequestTypes tmpReqType = obj.getRequestTypeForKey(key);
+                if (tmpReqType != null && obj.getProcessFunction() == null){
+                    obj.setProcessFunction(tmpReqType.toString());
                 }
             }
             return getThisBuilder();
@@ -168,6 +182,29 @@ public class EBProcessDataCall extends EBAPICall {
                     pdRequest.getRequest()
                     ));
         }
+    }
+
+    /**
+     * Determines a ProcessData() request type for the given key.
+     * @param key
+     * @return
+     */
+    public EBRequestTypes getRequestTypeForKey(UserObjectKey key){
+        final String algorithm = key.getAlgorithm();
+        final int bitLength = key.length();
+        if ("AES".equalsIgnoreCase(algorithm)){
+            return EBRequestTypes.PLAINAES;
+        }
+
+        if ("RSA".equalsIgnoreCase(algorithm)){
+            if (bitLength == 1024){
+                return EBRequestTypes.RSA1024;
+            } else if (bitLength == 2048){
+                return EBRequestTypes.RSA2048;
+            }
+        }
+
+        return null;
     }
 
     /**
