@@ -93,6 +93,18 @@ public class EBProcessDataCall extends EBAPICall {
 
         public B setEngine(EBEngine engine){
             getObj().setEngine(engine);
+            final EBSettings settings = engine == null ? null : engine.getDefaultSettings();
+            if (settings != null){
+                if (settings.getApiKey() != null && getObj().getApiKey() == null){
+                    getObj().setApiKey(settings.getApiKey());
+                }
+                if (settings.getEndpointInfo() != null && getObj().getEndpoint() == null){
+                    getObj().setEndpoint(settings.getEndpointInfo());
+                }
+                if(settings.getConnectionSettings() != null && getObj().getSettings() == null){
+                    getObj().setSettings(settings.getConnectionSettings());
+                }
+            }
             return getThisBuilder();
         }
 
