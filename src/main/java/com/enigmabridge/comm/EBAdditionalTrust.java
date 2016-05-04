@@ -24,6 +24,12 @@ import java.util.LinkedList;
  * Created by dusanklinec on 03.05.16.
  */
 public class EBAdditionalTrust {
+    // Flags for serialization.
+    protected final boolean letsEncryptFlag;
+    protected final boolean systemFlag;
+    protected Collection<Certificate> customRoots;
+
+    // Runtime
     protected TrustManager[] trustManagers;
     protected SSLSocketFactory sslSocketFactory;
 
@@ -31,7 +37,9 @@ public class EBAdditionalTrust {
      * Initializes trust in a default way - with letsencrypt & system roots included.
      */
     public EBAdditionalTrust() {
-        init(true, true, null);
+        letsEncryptFlag = true;
+        systemFlag = true;
+        init(letsEncryptFlag, systemFlag, null);
     }
 
     /**
@@ -40,7 +48,9 @@ public class EBAdditionalTrust {
      * @param additionalRoots input stream of additional trusted roots in PEM format, concatenated. May be null.
      */
     public EBAdditionalTrust(InputStream additionalRoots) {
-        init(true, true, additionalRoots);
+        letsEncryptFlag = true;
+        systemFlag = true;
+        init(letsEncryptFlag, systemFlag, additionalRoots);
     }
 
     /**
@@ -52,6 +62,8 @@ public class EBAdditionalTrust {
      * @param additionalRoots  input stream of additional trusted roots in PEM format, concatenated. May be null.
      */
     public EBAdditionalTrust(boolean letsEncrypt, boolean system, InputStream additionalRoots) {
+        letsEncryptFlag = letsEncrypt;
+        systemFlag = system;
         init(letsEncrypt, system, additionalRoots);
     }
 
@@ -59,7 +71,7 @@ public class EBAdditionalTrust {
         try {
             LinkedList<TrustManager> managers = new LinkedList<TrustManager>();
             if (letsEncrypt) {
-                managers.add(trustManagerForCertificates(letsEncryptCertificatesInputStream()));
+                managers.add(trustManagerForCertificates(letsEncryptCertificatesInputStream(), null));
             }
 
             if (system){
@@ -72,7 +84,8 @@ public class EBAdditionalTrust {
             }
 
             if (additionalRoots != null){
-                managers.add(trustManagerForCertificates(additionalRoots));
+                customRoots = new LinkedList<Certificate>();
+                managers.add(trustManagerForCertificates(additionalRoots, customRoots));
             }
 
             trustManagers = managers.toArray(new TrustManager[managers.size()]);
@@ -277,11 +290,19 @@ public class EBAdditionalTrust {
      * not use custom trusted certificates in production without the blessing of your server's TLS
      * administrator.
      */
-    public static X509TrustManager trustManagerForCertificates(InputStream in) throws GeneralSecurityException {
+    public static X509TrustManager trustManagerForCertificates(
+            InputStream in,
+            Collection<Certificate> certificatesCollection)
+            throws GeneralSecurityException
+    {
         CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
         Collection<? extends Certificate> certificates = certificateFactory.generateCertificates(in);
         if (certificates.isEmpty()) {
             throw new IllegalArgumentException("expected non-empty set of trusted certificates");
+        }
+
+        if (certificatesCollection != null){
+            certificatesCollection.addAll(certificates);
         }
 
         // Put the certificates a key store.
