@@ -1,16 +1,24 @@
 package com.enigmabridge;
 
 import com.enigmabridge.comm.*;
+import com.enigmabridge.misc.EBTestingUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.*;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import java.io.IOException;
+import java.math.BigInteger;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
 import java.security.Security;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.*;
 
 /**
  * Test for basic ProcessData() calls.
@@ -30,6 +38,12 @@ public class EBProcessDataCallIT {
 
     // Trust object for accepting Let's Encrypt certificates
     private EBAdditionalTrust trust;
+
+    // Default settings - POST method
+    private EBConnectionSettings settings;
+
+    // EBSettings - defaults.
+    private EBSettingsBase defaultSettings;
 
     // AES UOs comm keys
     private EBCommKeys ckAES;
@@ -54,7 +68,18 @@ public class EBProcessDataCallIT {
     @BeforeMethod(alwaysRun = true, groups = {"integration"})
     public void setUpMethod() throws Exception {
         endpoint = new EBEndpointInfo("https://site2.enigmabridge.com:11180");
+
         trust = new EBAdditionalTrust(true, true, null);
+
+        settings = new EBConnectionSettings()
+                .setMethod(EBCommUtils.METHOD_POST)
+                .setTrust(trust);
+
+        defaultSettings = new EBSettingsBase.Builder()
+                .setApiKey(apiKey)
+                .setEndpointInfo(endpoint)
+                .setConnectionSettings(settings)
+                .build();
 
         ckAES = new EBCommKeys()
                 .setEncKey("e134567890123456789012345678901234567890123456789012345678901234")
@@ -121,7 +146,7 @@ public class EBProcessDataCallIT {
                     .setMacKey("f224262820223456789012345678901234567890123456789012345678901234");
 
             final UserObjectInfoBase uo = new UserObjectInfoBase.Builder()
-                    .setUoid(0xEE01L)
+                    .setUoid(EBTestingUtils.UOID_AES)
                     .setUserObjectType(1)
                     .setApiKey(apiKey)
                     .setEndpointInfo(endpoint)
@@ -150,6 +175,71 @@ public class EBProcessDataCallIT {
     }
 
     @Test(groups = {"integration"}) //, timeOut = 100000
+    public void testAESInvalidPadding() throws Exception {
+        LOG.trace("### UT ## EBProcessDataCallIT::testAESInvalidPadding ## BEGIN ###");
+
+        try {
+            final UserObjectInfoBase uo = new UserObjectInfoBase.Builder()
+                    .setUoid(EBTestingUtils.UOID_AES)
+                    .setUserObjectType(1)
+                    .setApiKey(apiKey)
+                    .setEndpointInfo(endpoint)
+                    .setCommKeys(ckAES)
+                    .build();
+
+            final EBProcessDataCall call = new EBProcessDataCall.Builder()
+                    .setEngine(engine)
+                    .setSettings(settings)
+                    .setUo(uo)
+                    .setProcessFunction(EBRequestTypes.PLAINAES)
+                    .build();
+
+            // Test not-padded input data.
+            final EBProcessDataResponse response = call.doRequest(EBUtils.hex2byte("00"));
+            assertNotNull(response, "Response is null");
+            assertNotNull(response.getRawResponse(), "Raw response is null");
+            assertTrue(response.getRawResponse().isSuccessful(), "HTTP request was not successful");
+            assertEquals(response.getStatusCode(), EBCommStatus.ERROR_CLASS_ERR_CHECK_ERRORS_6f, "Status code does not match");
+
+        } catch (Exception ex){
+            LOG.error("Exception in ProcessData(PLAINAES, data)", ex);
+            assertTrue(false);
+        }
+
+        LOG.trace("### UT ## EBProcessDataCallIT::testAESInvalidPadding ## END ###");
+    }
+
+    @Test(groups = {"integration"}) //, timeOut = 100000
+    public void testAESDefaultSettings() throws Exception {
+        LOG.trace("### UT ## EBProcessDataCallIT::testAESDefaultSettings ## BEGIN ###");
+
+        try {
+            final UserObjectInfoBase uo = new UserObjectInfoBase.Builder()
+                    .setUoid(EBTestingUtils.UOID_AES)
+                    .setUserObjectType(1)
+                    .setCommKeys(ckAES)
+                    .setSettings(defaultSettings)
+                    .build();
+
+            final EBProcessDataCall call = new EBProcessDataCall.Builder()
+                    .setUo(uo)
+                    .setEngine(engine)
+                    .setProcessFunction(EBRequestTypes.PLAINAES)
+                    .build();
+
+            final EBProcessDataResponse response = call.doRequest(EBUtils.hex2byte("6bc1bee22e409f96e93d7e117393172a"));
+            testResponse(response);
+            assertEquals(response.getProtectedData(), EBUtils.hex2byte("95c6bb9b6a1c3835f98cc56087a03e82"));
+
+        } catch (Exception ex){
+            LOG.error("Exception in ProcessData(PLAINAES, data)", ex);
+            assertTrue(false);
+        }
+
+        LOG.trace("### UT ## EBProcessDataCallIT::testAESDefaultSettings ## END ###");
+    }
+
+    @Test(groups = {"integration"}) //, timeOut = 100000
     public void testAES() throws Exception {
         LOG.trace("### UT ## EBProcessDataCallIT::testAES ## BEGIN ###");
 
@@ -159,7 +249,7 @@ public class EBProcessDataCallIT {
                     .setTrust(trust);
 
             final UserObjectInfoBase uo = new UserObjectInfoBase.Builder()
-                    .setUoid(0xEE01L)
+                    .setUoid(EBTestingUtils.UOID_AES)
                     .setUserObjectType(1)
                     .setApiKey(apiKey)
                     .setEndpointInfo(endpoint)
@@ -190,13 +280,6 @@ public class EBProcessDataCallIT {
             testResponse(response2);
             assertEquals(response2.getProtectedData(), EBUtils.hex2byte("95c6bb9b6a1c3835f98cc56087a03e82"));
 
-            // Test not-padded input data.
-            final EBProcessDataResponse response3 = call2.doRequest(EBUtils.hex2byte("00"));
-            assertNotNull(response3, "Response is null");
-            assertNotNull(response3.getRawResponse(), "Raw response is null");
-            assertTrue(response3.getRawResponse().isSuccessful(), "HTTP request was not successful");
-            assertEquals(response3.getStatusCode(), EBCommStatus.ERROR_CLASS_ERR_CHECK_ERRORS_6f, "Status code does not match");
-
         } catch (Exception ex){
             LOG.error("Exception in ProcessData(PLAINAES, data)", ex);
             assertTrue(false);
@@ -206,109 +289,157 @@ public class EBProcessDataCallIT {
     }
 
     @Test(groups = {"integration"}) //, timeOut = 100000
-    public void testRSA1k() throws Exception {
-        LOG.trace("### UT ## EBProcessDataCallIT::testRSA1k ## BEGIN ###");
-
-        try {
-            final EBConnectionSettings settings = new EBConnectionSettings()
-                    .setMethod(EBCommUtils.METHOD_POST)
-                    .setTrust(trust);
-
-            final UserObjectInfoBase uo = new UserObjectInfoBase.Builder()
-                    .setUoid(0x7654L)
-                    .setUserObjectType(1)
-                    .setApiKey(apiKey)
-                    .setEndpointInfo(endpoint)
-                    .setCommKeys(ckRSA)
-                    .build();
-
-            final EBProcessDataCall call = new EBProcessDataCall.Builder()
-                    .setEngine(engine)
-                    .setSettings(settings)
-                    .setUo(uo)
-                    .setProcessFunction(EBRequestTypes.RSA1024)
-                    .build();
-
-            // Test RSA_DEC(1) == 1 as (1^d) mod N = 1
-            final String input  = "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001";
-            final String output = "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001";
-            final EBProcessDataResponse response = call.doRequest(EBUtils.hex2byte(input));
-            testResponse(response);
-            assertEquals(response.getProtectedData(), EBUtils.hex2byte(output));
-
-            // Test RSA_DEC(0) == 0
-            final String input2  = "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
-            final String output2 = "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
-            final EBProcessDataResponse response2 = call.doRequest(EBUtils.hex2byte(input2));
-            testResponse(response2);
-            assertEquals(response2.getProtectedData(), EBUtils.hex2byte(output2));
-
-            // Test RSA_DEC(knownInput) == knownOutput
-            final String input3  = "1122334455667788112233445566778811223344556677881122334455667788112233445566778811223344556677881122334455667788112233445566778811223344556677881122334455667788112233445566778811223344556677881122334455667788112233445566778811223344556677881122334455667788";
-            final String output3 = "04ba15d03874c5bee4f5a6ef8e90bc422bb2ee347ef119d39368d3277ab5204ca68db721c0ef59906c2fa56986a83bdc0987dd4f7c1e1f46d0e577c9af04d5ab2ca019358e9d17604443b626700bbf7ad5efd052340864c6374800ec6d835fd00de320e40e6b21a2dfe9e3d995f8135d63801b7c7932e18069a8f91080b06ca8";
-            final EBProcessDataResponse response3 = call.doRequest(EBUtils.hex2byte(input3));
-            testResponse(response3);
-            assertEquals(response3.getProtectedData(), EBUtils.hex2byte(output3));
-
-        } catch (Exception ex){
-            LOG.error("Exception in ProcessData(RSA1024, data)", ex);
-            assertTrue(false);
-        }
-
-        LOG.trace("### UT ## EBProcessDataCallIT::testRSA1k ## END ###");
+    public void testRSA1kBasic() throws Exception {
+        basicRSATest(EBTestingUtils.UOID_RSA1k, 1024);
     }
 
     @Test(groups = {"integration"}) //, timeOut = 100000
-    public void testRSA2k() throws Exception {
-        LOG.trace("### UT ## EBProcessDataCallIT::testRSA2k ## BEGIN ###");
+    public void testRSA2kBasic() throws Exception {
+        basicRSATest(EBTestingUtils.UOID_RSA2k, 2048);
+    }
 
+    @Test(groups = {"integration"}) //, timeOut = 100000
+    public void testRSA1kKnownBasic() throws Exception {
+        basicRSATest(EBTestingUtils.UOID_RSA1k_KNOWN, 1024);
+    }
+
+    @Test(groups = {"integration"}) //, timeOut = 100000
+    public void testRSA2kKnownBasic() throws Exception {
+        basicRSATest(EBTestingUtils.UOID_RSA2k_KNOWN, 2048);
+    }
+
+    @Test(groups = {"integration"}) //, timeOut = 100000
+    public void testRSA1kKnown() throws Exception {
+        LOG.trace("### UT ## EBProcessDataCallIT::testRSA1known ## BEGIN ###");
+
+        final BigInteger mod = new BigInteger(EBUtils.hex2byte(EBTestingUtils.RSA1k_MODULUS));
+        final PublicKey pub = EBTestingUtils.createRSAPublicKey1k();
         try {
-            final EBConnectionSettings settings = new EBConnectionSettings()
-                    .setMethod(EBCommUtils.METHOD_POST)
-                    .setTrust(trust);
-
-            final UserObjectInfoBase uo = new UserObjectInfoBase.Builder()
-                    .setUoid(0x9876L)
-                    .setUserObjectType(1)
-                    .setApiKey(apiKey)
-                    .setEndpointInfo(endpoint)
-                    .setCommKeys(ckRSA)
-                    .build();
-
-            final EBProcessDataCall call = new EBProcessDataCall.Builder()
-                    .setEngine(engine)
-                    .setSettings(settings)
-                    .setUo(uo)
-                    .setProcessFunction(EBRequestTypes.RSA2048)
-                    .build();
-
-            // Test RSA_DEC(1) == 1 as (1^d) mod N = 1
-            final String input  = "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001";
-            final String output = "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001";
-            final EBProcessDataResponse response = call.doRequest(EBUtils.hex2byte(input));
-            testResponse(response);
-            assertEquals(response.getProtectedData(), EBUtils.hex2byte(output));
-
-            // Test RSA_DEC(0) == 0
-            final String input2  = "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
-            final String output2 = "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
-            final EBProcessDataResponse response2 = call.doRequest(EBUtils.hex2byte(input2));
-            testResponse(response2);
-            assertEquals(response2.getProtectedData(), EBUtils.hex2byte(output2));
-
-            // Test RSA_DEC(knownInput) == knownOutput
-            final String input3  = "11223344556677881122334455667788112233445566778811223344556677881122334455667788112233445566778811223344556677881122334455667788112233445566778811223344556677881122334455667788112233445566778811223344556677881122334455667788112233445566778811223344556677881122334455667788112233445566778811223344556677881122334455667788112233445566778811223344556677881122334455667788112233445566778811223344556677881122334455667788112233445566778811223344556677881122334455667788112233445566778811223344556677881122334455667788";
-            final String output3 = "02b4abc60a5d79881720d3af7cf3d672ec44528fdb11b0aafb55126cc9a238c9608e8986b8f4d730fc4d148e790a0ca1500799cfd22c1fb920629f617345bee33aac794cdeae991b4f24593ef1083abd44d8735b3161e463842567495dcfc2b2209e9cd425315e54fc9ae624066b1b88837d355f263d93d425c0198eb132adc8d14dad27cb4bffe836288b50e390ef3c2c4d07a3fcc5a6f9a0eeff81c0f77de54e1a3bf459cc538bfed7f777906e2127ccb818b6ba52e9b8feb1f97db1c6aa873f4640fd892543d5f99c7a34c066c9ebfebcf78cf7eb1ce289cbfc92d2b2c4bb427090a72d57e53410293e5d9b07dd5a0fa0e4fde89dad7af401adad6bae6d53";
-            final EBProcessDataResponse response3 = call.doRequest(EBUtils.hex2byte(input3));
-            testResponse(response3);
-            assertEquals(response3.getProtectedData(), EBUtils.hex2byte(output3));
+            knownRSATest(EBTestingUtils.UOID_RSA1k_KNOWN, mod, pub);
 
         } catch (Exception ex){
-            LOG.error("Exception in ProcessData(RSA2048, data)", ex);
-            assertTrue(false);
+            LOG.error("Exception in ProcessData(RSA1024, data)", ex);
+            assertTrue(false, ex.getMessage());
         }
 
-        LOG.trace("### UT ## EBProcessDataCallIT::testRSA2k ## END ###");
+        LOG.trace("### UT ## EBProcessDataCallIT::testRSA1known ## END ###");
+    }
+
+    @Test(groups = {"integration"}) //, timeOut = 100000
+    public void testRSA2kKnown() throws Exception {
+        LOG.trace("### UT ## EBProcessDataCallIT::testRSA1known ## BEGIN ###");
+
+        final BigInteger mod = new BigInteger(EBUtils.hex2byte(EBTestingUtils.RSA2k_MODULUS));
+        final PublicKey pub = EBTestingUtils.createRSAPublicKey2k();
+        try {
+            knownRSATest(EBTestingUtils.UOID_RSA2k_KNOWN, mod, pub);
+
+        } catch (Exception ex){
+            LOG.error("Exception in ProcessData(RSA1024, data)", ex);
+            assertTrue(false, ex.getMessage());
+        }
+
+        LOG.trace("### UT ## EBProcessDataCallIT::testRSA1known ## END ###");
+    }
+
+    /**
+     * Extended remote RSA decryption test when public part of the key is known.
+     * Static pattern & random patterns are tested added.
+     *
+     * @param uoid
+     * @param mod
+     * @param pub
+     * @throws NoSuchPaddingException
+     * @throws NoSuchAlgorithmException
+     * @throws InvalidKeyException
+     * @throws BadPaddingException
+     * @throws IllegalBlockSizeException
+     * @throws IOException
+     * @throws EBCorruptedException
+     */
+    private void knownRSATest(long uoid, BigInteger mod, PublicKey pub) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException, IOException, EBCorruptedException {
+        final int bitLength = mod.bitLength();
+        final Cipher rsaEnc = Cipher.getInstance("RSA");
+        rsaEnc.init(Cipher.ENCRYPT_MODE, pub);
+
+        final UserObjectInfoBase uo = new UserObjectInfoBase.Builder()
+                .setUoid(uoid)
+                .setUserObjectType(1)
+                .setSettings(defaultSettings)
+                .setCommKeys(ckRSA)
+                .build();
+
+        final EBProcessDataCall call = new EBProcessDataCall.Builder()
+                .setEngine(engine)
+                .setUo(uo)
+                .setProcessFunction(bitLength == 1024 ? EBRequestTypes.RSA1024 : EBRequestTypes.RSA2048)
+                .build();
+
+        // Test RSA_DEC(knownInput) == knownOutput
+        final byte[] output3 = EBUtils.hex2byte("01 23 45 67 89 ff ff ff", true);
+        final byte[] input3 = rsaEnc.doFinal(output3);
+
+        final EBProcessDataResponse response3 = call.doRequest(input3);
+        testResponse(response3);
+        assertEquals(PKCS1Padding.unpad(response3.getProtectedData(), mod.bitLength()), output3);
+
+        // Test with random input, 3 times.
+        byte[] output4 = new byte[mod.bitLength()/8-20];
+        for(int i=0; i<3; i++){
+            // Generate random input
+            engine.getRnd().nextBytes(output4);
+            // Encrypt it with public key
+            final byte[] input4 = rsaEnc.doFinal(output4);
+
+            // Call remote decryption
+            final EBProcessDataResponse response4 = call.doRequest(input4);
+            testResponse(response4);
+            assertEquals(PKCS1Padding.unpad(response4.getProtectedData(), mod.bitLength()), output4);
+        }
+    }
+
+    /**
+     * Performs very simple RSA OU test.
+     * @param uoid
+     * @throws IOException
+     * @throws EBCorruptedException
+     */
+    private void basicRSATest(long uoid, int bitLength) throws IOException, EBCorruptedException {
+        final UserObjectInfoBase uo = new UserObjectInfoBase.Builder()
+                .setUoid(uoid)
+                .setUserObjectType(1)
+                .setApiKey(apiKey)
+                .setEndpointInfo(endpoint)
+                .setCommKeys(ckRSA)
+                .build();
+
+        final EBProcessDataCall call = new EBProcessDataCall.Builder()
+                .setEngine(engine)
+                .setSettings(settings)
+                .setUo(uo)
+                .setProcessFunction(bitLength == 1024 ? EBRequestTypes.RSA1024 : EBRequestTypes.RSA2048)
+                .build();
+
+        // Test RSA_DEC(1) == 1 as (1^d) mod N = 1
+        final String input  = EBUtils.repeat("00", bitLength/8-1) + "01";
+        final String output = EBUtils.repeat("00", bitLength/8-1) + "01";
+        final EBProcessDataResponse response = call.doRequest(EBUtils.hex2byte(input));
+        testResponse(response);
+        assertEquals(response.getProtectedData(), EBUtils.hex2byte(output));
+
+        // Test RSA_DEC(0) == 0
+        final String input2  = EBUtils.repeat("00", bitLength/8);
+        final String output2 = EBUtils.repeat("00", bitLength/8);
+        final EBProcessDataResponse response2 = call.doRequest(EBUtils.hex2byte(input2));
+        testResponse(response2);
+        assertEquals(response2.getProtectedData(), EBUtils.hex2byte(output2));
+
+        // Test RSA_DEC(2) != 2
+        final String input3  = EBUtils.repeat("00", bitLength/8-1) + "02";
+        final String output3 = EBUtils.repeat("00", bitLength/8-1) + "02";
+        final EBProcessDataResponse response3 = call.doRequest(EBUtils.hex2byte(input3));
+        testResponse(response3);
+        assertNotEquals(response3.getProtectedData(), EBUtils.hex2byte(output2));
     }
 
     /**
