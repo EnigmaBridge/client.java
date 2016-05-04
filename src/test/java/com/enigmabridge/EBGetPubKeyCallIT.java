@@ -45,10 +45,8 @@ public class EBGetPubKeyCallIT {
             final EBEndpointInfo endpoint = new EBEndpointInfo("https://site2.enigmabridge.com:11180");
             final String apiKey = "TEST_API";
 
-            final EBAdditionalTrust trust = new EBAdditionalTrust(true, true, null);
             final EBConnectionSettings settings = new EBConnectionSettings()
-                    .setMethod(EBCommUtils.METHOD_GET)
-                    .setTrust(trust);
+                    .setMethod(EBCommUtils.METHOD_GET);
 
             final EBGetPubKeyCall call = new EBGetPubKeyCall.Builder()
                    .setApiKey(apiKey)
