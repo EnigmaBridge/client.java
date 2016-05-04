@@ -23,6 +23,11 @@ public class EBConnector {
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
     /**
+     * Default trust object, with letsencrypt certificates included
+     */
+    public static final EBAdditionalTrust DEFAULT_TRUST = new EBAdditionalTrust(true, true, null);
+
+    /**
      * Request settings.
      */
     protected EBConnectionSettings settings;
@@ -41,6 +46,8 @@ public class EBConnector {
      */
     public EBRawResponse request() throws IOException {
         final OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder();
+        boolean trustInstalled = false;
+
         if (settings != null) {
             clientBuilder
                     .connectTimeout(settings.getConnectTimeoutMilli(), TimeUnit.MILLISECONDS)
@@ -50,7 +57,13 @@ public class EBConnector {
             final EBAdditionalTrust trust = settings.getTrust();
             if (trust != null){
                 trust.install(clientBuilder);
+                trustInstalled = true;
             }
+        }
+
+        // We are using mainly letsencrypt and if there is no trust object provided, we initialize a default one.
+        if (!trustInstalled){
+            DEFAULT_TRUST.install(clientBuilder);
         }
 
         final OkHttpClient client = clientBuilder.build();
