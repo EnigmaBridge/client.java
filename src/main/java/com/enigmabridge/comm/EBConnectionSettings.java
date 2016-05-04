@@ -1,10 +1,17 @@
 package com.enigmabridge.comm;
 
+import com.enigmabridge.EBJSONSerializable;
+import org.json.JSONObject;
+
+import java.io.Serializable;
+
 /**
  * Misc connection preferences for connectors.
  * Created by dusanklinec on 26.04.16.
  */
-public class EBConnectionSettings {
+public class EBConnectionSettings implements Serializable, EBJSONSerializable {
+    public static final long serialVersionUID = 1L;
+
     /**
      * Timeout for connecting to the endpoint in milliseconds.
      */
@@ -29,6 +36,20 @@ public class EBConnectionSettings {
      * Custom trust roots for SSL/TLS.
      */
     protected EBAdditionalTrust trust;
+
+    public EBConnectionSettings() {
+    }
+
+    public EBConnectionSettings(JSONObject json) {
+        // TODO: implement
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    @Override
+    public JSONObject toJSON(JSONObject json) {
+        // TODO: implement
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
 
     public int getConnectTimeoutMilli() {
         return connectTimeoutMilli;

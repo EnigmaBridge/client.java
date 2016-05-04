@@ -1,12 +1,11 @@
 package com.enigmabridge.comm;
 
+import com.enigmabridge.EBJSONSerializable;
 import okhttp3.OkHttpClient;
+import org.json.JSONObject;
 
 import javax.net.ssl.*;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.security.GeneralSecurityException;
@@ -23,15 +22,17 @@ import java.util.LinkedList;
  * Initializes additional trust roots.
  * Created by dusanklinec on 03.05.16.
  */
-public class EBAdditionalTrust {
+public class EBAdditionalTrust implements EBJSONSerializable, Serializable {
+    public static final long serialVersionUID = 1L;
+
     // Flags for serialization.
     protected final boolean letsEncryptFlag;
     protected final boolean systemFlag;
     protected Collection<Certificate> customRoots;
 
     // Runtime
-    protected TrustManager[] trustManagers;
-    protected SSLSocketFactory sslSocketFactory;
+    protected transient TrustManager[] trustManagers;
+    protected transient SSLSocketFactory sslSocketFactory;
 
     /**
      * Initializes trust in a default way - with letsencrypt & system roots included.
@@ -65,6 +66,15 @@ public class EBAdditionalTrust {
         letsEncryptFlag = letsEncrypt;
         systemFlag = system;
         init(letsEncrypt, system, additionalRoots);
+    }
+
+    /**
+     * Constructs object from its JSON serialized version.
+     * @param json
+     */
+    public EBAdditionalTrust(JSONObject json){
+        // TODO: implement
+        throw new UnsupportedOperationException("Not implemented yet");
     }
 
     protected void init(boolean letsEncrypt, boolean system, InputStream additionalRoots) {
@@ -106,6 +116,12 @@ public class EBAdditionalTrust {
     public EBAdditionalTrust install(OkHttpClient.Builder builder){
         builder.sslSocketFactory(sslSocketFactory);
         return this;
+    }
+
+    @Override
+    public JSONObject toJSON(JSONObject json) {
+        // TODO: implement
+        throw new UnsupportedOperationException("Not implemented yet");
     }
 
     /**
