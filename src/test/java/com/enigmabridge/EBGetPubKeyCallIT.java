@@ -1,6 +1,7 @@
 package com.enigmabridge;
 
 import com.enigmabridge.comm.*;
+import com.enigmabridge.misc.EBTestingUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.*;
@@ -42,8 +43,8 @@ public class EBGetPubKeyCallIT {
 
         try {
             final EBEngine engine = new EBEngine();
-            final EBEndpointInfo endpoint = new EBEndpointInfo("https://site2.enigmabridge.com:11180");
-            final String apiKey = "TEST_API";
+            final EBEndpointInfo endpoint = new EBEndpointInfo(EBTestingUtils.CONNECTION_STRING);
+            final String apiKey = EBTestingUtils.API_KEY;
 
             final EBConnectionSettings settings = new EBConnectionSettings()
                     .setMethod(EBCommUtils.METHOD_GET);

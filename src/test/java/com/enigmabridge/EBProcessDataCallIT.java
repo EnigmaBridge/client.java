@@ -31,7 +31,7 @@ public class EBProcessDataCallIT {
     private final EBEngine engine = new EBEngine();
 
     // TEST API key
-    private final String apiKey = "TEST_API";
+    private final String apiKey = EBTestingUtils.API_KEY;
 
     // Testing endpoint
     private EBEndpointInfo endpoint;
@@ -67,7 +67,7 @@ public class EBProcessDataCallIT {
 
     @BeforeMethod(alwaysRun = true, groups = {"integration"})
     public void setUpMethod() throws Exception {
-        endpoint = new EBEndpointInfo("https://site2.enigmabridge.com:11180");
+        endpoint = new EBEndpointInfo(EBTestingUtils.CONNECTION_STRING);
 
         trust = new EBAdditionalTrust(true, true, null);
 
