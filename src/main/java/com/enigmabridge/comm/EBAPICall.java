@@ -151,14 +151,24 @@ public class EBAPICall {
         return null;
     }
 
+    /**
+     * Returns true if HTTP POST method should be used for this service call.
+     * @return
+     */
     public boolean isMethodGet(){
         final String method = getRequestMethod();
-        return method == null || "GET".equalsIgnoreCase(method);
+        return (method == null && EBCommUtils.METHOD_DEFAULT.equals(EBCommUtils.METHOD_GET))
+                || "POST".equalsIgnoreCase(method);
     }
 
+    /**
+     * Returns true if HTTP POST method should be used for this service call.
+     * @return
+     */
     public boolean isMethodPost(){
         final String method = getRequestMethod();
-        return method == null || "POST".equalsIgnoreCase(method);
+        return (method == null && EBCommUtils.METHOD_DEFAULT.equals(EBCommUtils.METHOD_POST))
+                || "POST".equalsIgnoreCase(method);
     }
 
 //    /**
