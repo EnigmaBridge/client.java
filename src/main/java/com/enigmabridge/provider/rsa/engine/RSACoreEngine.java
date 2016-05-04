@@ -1,5 +1,9 @@
 package com.enigmabridge.provider.rsa.engine;
 
+import com.enigmabridge.EBCryptoException;
+import com.enigmabridge.EBUtils;
+import com.enigmabridge.UserObjectInfoBase;
+import com.enigmabridge.comm.*;
 import com.enigmabridge.provider.parameters.EBCipherParameters;
 import com.enigmabridge.provider.parameters.EBRSAKeyParameter;
 import com.enigmabridge.provider.rsa.EBRSAKey;
@@ -10,6 +14,7 @@ import org.bouncycastle.crypto.params.ParametersWithRandom;
 import org.bouncycastle.crypto.params.RSAKeyParameters;
 import org.bouncycastle.crypto.params.RSAPrivateCrtKeyParameters;
 
+import java.io.IOException;
 import java.math.BigInteger;
 
 /**
@@ -162,7 +167,23 @@ class RSACoreEngine
 
     public BigInteger processBlock(BigInteger input)
     {
-        // TODO: call EB with given private key parameters.
-        return null;
+        final EBProcessDataCall call = new EBProcessDataCall.Builder()
+                .setKey(key)
+                .build();
+
+        try {
+            final EBProcessDataResponse response = call.doRequest(convertOutput(input));
+            if (!response.isCodeOk()){
+                throw new EBCryptoException("Server returned invalid response");
+            }
+
+            final byte[] respData = response.getProtectedData();
+            return convertInput(respData, 0, respData.length);
+
+        } catch (IOException e) {
+            throw new EBCryptoException(e);
+        } catch (EBCorruptedException e) {
+            throw new EBCryptoException(e);
+        }
     }
 }
