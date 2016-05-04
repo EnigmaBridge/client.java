@@ -97,6 +97,42 @@ public class EBConnectionSettings implements Serializable, EBJSONSerializable {
         return json;
     }
 
+    @Override
+    public String toString() {
+        return "EBConnectionSettings{" +
+                "connectTimeoutMilli=" + connectTimeoutMilli +
+                ", readTimeoutMilli=" + readTimeoutMilli +
+                ", writeTimeoutMilli=" + writeTimeoutMilli +
+                ", method='" + method + '\'' +
+                ", trust=" + trust +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        EBConnectionSettings that = (EBConnectionSettings) o;
+
+        if (connectTimeoutMilli != that.connectTimeoutMilli) return false;
+        if (readTimeoutMilli != that.readTimeoutMilli) return false;
+        if (writeTimeoutMilli != that.writeTimeoutMilli) return false;
+        if (method != null ? !method.equals(that.method) : that.method != null) return false;
+        return trust != null ? trust.equals(that.trust) : that.trust == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = connectTimeoutMilli;
+        result = 31 * result + readTimeoutMilli;
+        result = 31 * result + writeTimeoutMilli;
+        result = 31 * result + (method != null ? method.hashCode() : 0);
+        result = 31 * result + (trust != null ? trust.hashCode() : 0);
+        return result;
+    }
+
     public int getConnectTimeoutMilli() {
         return connectTimeoutMilli;
     }

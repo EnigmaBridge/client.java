@@ -398,6 +398,17 @@ public class EBAdditionalTrust implements EBJSONSerializable, Serializable {
         }
     }
 
+    @Override
+    public String toString() {
+        return "EBAdditionalTrust{" +
+                "letsEncryptFlag=" + letsEncryptFlag +
+                ", systemFlag=" + systemFlag +
+                ", customRoots=" + customRoots +
+                ", trustManagers=" + Arrays.toString(trustManagers) +
+                ", sslSocketFactory=" + sslSocketFactory +
+                '}';
+    }
+
     public TrustManager[] getTrustManagers() {
         return trustManagers;
     }
