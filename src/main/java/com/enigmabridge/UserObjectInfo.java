@@ -10,7 +10,7 @@ import java.io.Serializable;
  *
  * Created by dusanklinec on 26.04.16.
  */
-public interface UserObjectInfo extends Serializable {
+public interface UserObjectInfo extends EBSettings, Serializable {
     /**
      * Returns User object handle / ID.
      * @return UO ID
@@ -30,26 +30,5 @@ public interface UserObjectInfo extends Serializable {
       * @return EBCommKeys
       */
      EBCommKeys getCommKeys();
-
-    /**
-     * Returns API key to EB API access.
-     * API key can be shared among several UOs.
-     * Not UO specific.
-     * @return API key
-     */
-     String getApiKey();
-
-    /**
-     * EB Endpoint identification.
-     * Not UO specific.
-     * @return endpoint info
-     */
-    EBEndpointInfo getEndpointInfo();
-
-    /**
-     * Returns connection settings for the EB call.
-     * @return connection settings
-     */
-    EBConnectionSettings getConnectionSettings();
 }
 
