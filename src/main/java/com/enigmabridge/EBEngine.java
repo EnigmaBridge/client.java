@@ -14,7 +14,15 @@ public class EBEngine {
      */
     protected EBConnectorManager conMgr;
 
+    /**
+     * Shared secure random instance
+     */
     protected SecureRandom rnd;
+
+    /**
+     * Default EB settings for using EB service.
+     */
+    protected EBSettings defaultSettings;
 
     public EBConnectorManager getConMgr() {
         if (conMgr == null){
@@ -28,5 +36,13 @@ public class EBEngine {
             rnd = new SecureRandom();
         }
         return rnd;
+    }
+
+    public EBSettings getDefaultSettings() {
+        return defaultSettings;
+    }
+
+    public void setDefaultSettings(EBSettings defaultSettings) {
+        this.defaultSettings = defaultSettings;
     }
 }
