@@ -16,8 +16,6 @@ public class UserObjectInfoBase implements UserObjectInfo, EBJSONSerializable {
     public static final String FIELD_UOID = "uoid";
     public static final String FIELD_UOTYPE = "uotype";
     public static final String FIELD_COMMKEYS = "commKeys";
-    public static final String FIELD_APIKEY = "apiKey";
-    public static final String FIELD_ENDPOINT = "endpoint";
     public static final String FIELD_SETTINGS = "settings";
 
     /**
@@ -37,20 +35,9 @@ public class UserObjectInfoBase implements UserObjectInfo, EBJSONSerializable {
     protected EBCommKeys commKeys = new EBCommKeys();
 
     /**
-     * API key for using EB service.
+     * Settings required for UO use.
      */
-    protected String apiKey;
-
-    /**
-     * Connection string to the EB endpoint
-     * https://site1.enigmabridge.com:11180
-     */
-    protected EBEndpointInfo endpointInfo;
-
-    /**
-     * Connection settings for UO operation.
-     */
-    protected EBConnectionSettings connectionSettings;
+    protected EBSettingsBase settings;
 
     public static abstract class AbstractUOBaseBuilder<T extends UserObjectInfoBase, B extends AbstractUOBaseBuilder> {
         public B setUoid(long a) {
@@ -63,6 +50,29 @@ public class UserObjectInfoBase implements UserObjectInfo, EBJSONSerializable {
             return getThisBuilder();
         }
 
+        public B setCommKeys(EBCommKeys ck){
+            getObj().setCommKeys(ck);
+            return getThisBuilder();
+        }
+
+        public B setSettings(EBSettings settings){
+            if (settings.getApiKey() != null){
+                getObj().setApiKey(settings.getApiKey());
+            }
+            if (settings.getEndpointInfo() != null){
+                getObj().setEndpointInfo(settings.getEndpointInfo());
+            }
+            if (settings.getConnectionSettings() != null){
+                getObj().setConnectionSettings(settings.getConnectionSettings());
+            }
+            return getThisBuilder();
+        }
+
+        public B useSettings(EBSettingsBase settings){
+            getObj().setSettings(settings);
+            return getThisBuilder();
+        }
+
         public B setApiKey(String apiKey){
             getObj().setApiKey(apiKey);
             return getThisBuilder();
@@ -70,11 +80,6 @@ public class UserObjectInfoBase implements UserObjectInfo, EBJSONSerializable {
 
         public B setEndpointInfo(EBEndpointInfo info){
             getObj().setEndpointInfo(info);
-            return getThisBuilder();
-        }
-
-        public B setCommKeys(EBCommKeys ck){
-            getObj().setCommKeys(ck);
             return getThisBuilder();
         }
 
@@ -129,15 +134,17 @@ public class UserObjectInfoBase implements UserObjectInfo, EBJSONSerializable {
         this.uoid = uoid;
         this.commKeys.encKey = encKey;
         this.commKeys.macKey = macKey;
-        this.apiKey = apiKey;
+        this.settings = new EBSettingsBase();
+        this.settings.setApiKey(apiKey);
     }
 
     public UserObjectInfoBase(long uoid, byte[] encKey, byte[] macKey, String apiKey, EBEndpointInfo endpointInfo) {
         this.uoid = uoid;
         this.commKeys.encKey = encKey;
         this.commKeys.macKey = macKey;
-        this.apiKey = apiKey;
-        this.endpointInfo = endpointInfo;
+        this.settings = new EBSettingsBase();
+        this.settings.setApiKey(apiKey);
+        this.settings.setEndpointInfo(endpointInfo);
     }
 
     /**
@@ -228,22 +235,19 @@ public class UserObjectInfoBase implements UserObjectInfo, EBJSONSerializable {
             throw new IllegalArgumentException("Invalid JSON format");
         }
 
+        // UO ID
         setUoid(EBUtils.getAsLong(json, FIELD_UOID, 16));
 
+        // UO type
         final Integer uotype = EBUtils.tryGetAsInteger(json, FIELD_UOTYPE, 16);
         setUserObjectType(uotype == null ? -1 : uotype);
 
-        setApiKey(EBUtils.getAsStringOrNull(json, FIELD_APIKEY));
-
-        final String endpointStr = EBUtils.getAsStringOrNull(json, FIELD_ENDPOINT);
-        if (endpointStr != null){
-            setEndpointInfo(new EBEndpointInfo(endpointStr));
-        }
-
+        // Comm keys
         setCommKeys(new EBCommKeys(json.getJSONObject(FIELD_COMMKEYS)));
 
+        // EB Settings
         if (json.has(FIELD_SETTINGS)){
-            setConnectionSettings(new EBConnectionSettings(json.getJSONObject(FIELD_SETTINGS)));
+            setSettings(new EBSettingsBase(json.getJSONObject(FIELD_SETTINGS)));
         }
     }
 
@@ -259,10 +263,8 @@ public class UserObjectInfoBase implements UserObjectInfo, EBJSONSerializable {
 
         json.put(FIELD_UOID, this.getUoid());
         json.put(FIELD_UOTYPE, this.getUserObjectType());
-        json.put(FIELD_APIKEY, this.getApiKey());
-        json.put(FIELD_ENDPOINT, getEndpointInfo() == null ? null : getEndpointInfo().getConnectionString());
         json.put(FIELD_COMMKEYS, getCommKeys() == null ? null : getCommKeys().toJSON(null));
-        json.put(FIELD_SETTINGS, getConnectionSettings() == null ? null : getConnectionSettings().toJSON(null));
+        json.put(FIELD_SETTINGS, getSettings() == null ? null : getSettings().toJSON(null));
         return json;
     }
 
@@ -272,9 +274,7 @@ public class UserObjectInfoBase implements UserObjectInfo, EBJSONSerializable {
                 "uoid=" + uoid +
                 ", userObjectType=" + userObjectType +
                 ", commKeys=" + commKeys +
-                ", apiKey='" + apiKey + '\'' +
-                ", endpointInfo=" + endpointInfo +
-                ", connectionSettings=" + connectionSettings +
+                ", settings=" + settings +
                 '}';
     }
 
@@ -288,9 +288,7 @@ public class UserObjectInfoBase implements UserObjectInfo, EBJSONSerializable {
         if (uoid != that.uoid) return false;
         if (userObjectType != that.userObjectType) return false;
         if (commKeys != null ? !commKeys.equals(that.commKeys) : that.commKeys != null) return false;
-        if (apiKey != null ? !apiKey.equals(that.apiKey) : that.apiKey != null) return false;
-        if (endpointInfo != null ? !endpointInfo.equals(that.endpointInfo) : that.endpointInfo != null) return false;
-        return connectionSettings != null ? connectionSettings.equals(that.connectionSettings) : that.connectionSettings == null;
+        return settings != null ? settings.equals(that.settings) : that.settings == null;
 
     }
 
@@ -299,9 +297,7 @@ public class UserObjectInfoBase implements UserObjectInfo, EBJSONSerializable {
         int result = (int) (uoid ^ (uoid >>> 32));
         result = 31 * result + userObjectType;
         result = 31 * result + (commKeys != null ? commKeys.hashCode() : 0);
-        result = 31 * result + (apiKey != null ? apiKey.hashCode() : 0);
-        result = 31 * result + (endpointInfo != null ? endpointInfo.hashCode() : 0);
-        result = 31 * result + (connectionSettings != null ? connectionSettings.hashCode() : 0);
+        result = 31 * result + (settings != null ? settings.hashCode() : 0);
         return result;
     }
 
@@ -309,24 +305,24 @@ public class UserObjectInfoBase implements UserObjectInfo, EBJSONSerializable {
         return uoid;
     }
 
-    public String getApiKey() {
-        return apiKey;
+    public int getUserObjectType() {
+        return userObjectType;
     }
 
     public EBCommKeys getCommKeys() {
         return commKeys;
     }
 
-    public int getUserObjectType() {
-        return userObjectType;
+    public String getApiKey() {
+        return getSettings() == null ? null : getSettings().apiKey;
     }
 
     public EBEndpointInfo getEndpointInfo() {
-        return endpointInfo;
+        return getSettings() == null ? null : getSettings().endpointInfo;
     }
 
     public EBConnectionSettings getConnectionSettings() {
-        return connectionSettings;
+        return getSettings() == null ? null : getSettings().connectionSettings;
     }
 
     public byte[] getEncKey() {
@@ -335,6 +331,10 @@ public class UserObjectInfoBase implements UserObjectInfo, EBJSONSerializable {
 
     public byte[] getMacKey() {
         return commKeys.macKey;
+    }
+
+    public EBSettingsBase getSettings() {
+        return settings;
     }
 
     // Protected setters - object can be created only with builders.
@@ -353,11 +353,6 @@ public class UserObjectInfoBase implements UserObjectInfo, EBJSONSerializable {
         return this;
     }
 
-    protected UserObjectInfoBase setApiKey(String apiKey) {
-        this.apiKey = apiKey;
-        return this;
-    }
-
     protected void setCommKeys(EBCommKeys commKeys) {
         this.commKeys = commKeys;
     }
@@ -366,13 +361,31 @@ public class UserObjectInfoBase implements UserObjectInfo, EBJSONSerializable {
         this.userObjectType = userObjectType;
     }
 
+    protected UserObjectInfoBase setApiKey(String apiKey) {
+        if (getSettings() == null){
+            settings = new EBSettingsBase();
+        }
+        getSettings().setApiKey(apiKey);
+        return this;
+    }
+
     protected UserObjectInfoBase setEndpointInfo(EBEndpointInfo endpointInfo) {
-        this.endpointInfo = endpointInfo;
+        if (getSettings() == null){
+            settings = new EBSettingsBase();
+        }
+        getSettings().setEndpointInfo(endpointInfo);
         return this;
     }
 
     protected UserObjectInfoBase setConnectionSettings(EBConnectionSettings connectionSettings) {
-        this.connectionSettings = connectionSettings;
+        if (getSettings() == null){
+            settings = new EBSettingsBase();
+        }
+        getSettings().setConnectionSettings(connectionSettings);
         return this;
+    }
+
+    protected void setSettings(EBSettingsBase settings) {
+        this.settings = settings;
     }
 }
