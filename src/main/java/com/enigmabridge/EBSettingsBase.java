@@ -32,7 +32,7 @@ public class EBSettingsBase implements EBSettings, Serializable {
      */
     protected EBConnectionSettings connectionSettings;
 
-    public static abstract class AbstractSettingsBuilder<T extends EBSettingsBase, B extends AbstractSettingsBuilder> {
+    public static abstract class AbstractBuilder<T extends EBSettingsBase, B extends AbstractBuilder> {
         public B setApiKey(String apiKey){
             getObj().setApiKey(apiKey);
             return getThisBuilder();
@@ -58,7 +58,7 @@ public class EBSettingsBase implements EBSettings, Serializable {
         public abstract T getObj();
     }
 
-    public static class Builder extends AbstractSettingsBuilder<EBSettingsBase, Builder> {
+    public static class Builder extends AbstractBuilder<EBSettingsBase, Builder> {
         private final EBSettingsBase parent = new EBSettingsBase();
 
         @Override
