@@ -48,6 +48,6 @@ public class RSAUtil
     public static EBRSAKeyParameter generatePrivateKeyParameter(
         EBRSAKey key)
     {
-        return new EBRSAKeyParameter(false, key.getUserObjectKey(), key.getModulus(), key.getPublicExponent());
+        return new EBRSAKeyParameter(true, key.getUserObjectKey(), key.getModulus(), key.getPublicExponent());
     }
 }
