@@ -11,4 +11,23 @@ import java.security.interfaces.RSAPublicKey;
  */
 public class EBRSAPublicKey extends EBRSAKey implements RSAPublicKey {
     static final long serialVersionUID = 1;
+
+    public static class Builder extends EBRSAKey.AbstractBuilder<EBRSAPublicKey, Builder> {
+        private final EBRSAPublicKey parent = new EBRSAPublicKey();
+
+        @Override
+        public Builder getThisBuilder() {
+            return this;
+        }
+
+        @Override
+        public EBRSAPublicKey getObj() {
+            return parent;
+        }
+
+        @Override
+        public EBRSAPublicKey build() {
+            return parent;
+        }
+    }
 }

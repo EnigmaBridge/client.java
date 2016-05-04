@@ -9,4 +9,23 @@ package com.enigmabridge.provider.rsa;
  */
 public class EBRSAPrivateKey extends EBRSAKey {
     static final long serialVersionUID = 1;
+
+    public static class Builder extends EBRSAKey.AbstractBuilder<EBRSAPrivateKey, Builder> {
+        private final EBRSAPrivateKey parent = new EBRSAPrivateKey();
+
+        @Override
+        public Builder getThisBuilder() {
+            return this;
+        }
+
+        @Override
+        public EBRSAPrivateKey getObj() {
+            return parent;
+        }
+
+        @Override
+        public EBRSAPrivateKey build() {
+            return parent;
+        }
+    }
 }
