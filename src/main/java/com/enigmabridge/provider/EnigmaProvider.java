@@ -1,5 +1,6 @@
 package com.enigmabridge.provider;
 
+import com.enigmabridge.EBEngine;
 import com.enigmabridge.provider.rsa.RSA;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.jcajce.provider.config.ConfigurableProvider;
@@ -26,6 +27,7 @@ import java.util.Map;
 public class EnigmaProvider extends Provider implements ConfigurableProvider {
 
     public static final String PROVIDER_NAME = "EB";
+    public static final String PROVIDER_DESC = "JCA/JCE provider for " + PROVIDER_NAME;
 
     public static final double VERSION = 0.1;
 
@@ -34,9 +36,20 @@ public class EnigmaProvider extends Provider implements ConfigurableProvider {
 
     private static final Map keyInfoConverters = new HashMap();
 
-    public EnigmaProvider() {
-        super(PROVIDER_NAME, VERSION, "JCA/JCE provider for " + PROVIDER_NAME);
+    private EBEngine engine;
 
+    public EnigmaProvider(EBEngine engine) {
+        super(PROVIDER_NAME, VERSION, PROVIDER_DESC);
+        initProvider(engine);
+    }
+
+    public EnigmaProvider() {
+        super(PROVIDER_NAME, VERSION, PROVIDER_DESC);
+        initProvider(null);
+    }
+
+    private void initProvider(EBEngine engine){
+        this.engine = engine;
         AccessController.doPrivileged(new PrivilegedAction()
         {
             public Object run()
@@ -53,8 +66,10 @@ public class EnigmaProvider extends Provider implements ConfigurableProvider {
         new RSA.Mappings().configure(this);
     }
 
-    // we have our own ServiceDescription implementation that overrides newInstance()
-    // that calls the (Provider, String) constructor instead of the no-args constructor
+    /**
+     * We have our own ServiceDescription implementation that overrides newInstance()
+     * that calls the (Provider, String) constructor instead of the no-args constructor
+     */
     private static class MyService extends Service {
         private static final Class[] paramTypes = {Provider.class, String.class};
 
@@ -84,7 +99,9 @@ public class EnigmaProvider extends Provider implements ConfigurableProvider {
         }
     }
 
-    // custom ServiceDescription class for Cipher objects. See supportsParameter() below
+    /**
+     * Custom ServiceDescription class for Cipher objects. See supportsParameter() below
+     */
     private static class MyCipherService extends MyService {
         MyCipherService(Provider provider, String type, String algorithm, String className) {
             super(provider, type, algorithm, className);
@@ -94,12 +111,12 @@ public class EnigmaProvider extends Provider implements ConfigurableProvider {
         // keys we can support. We support instances of MySecretKey, if they
         // are stored in our provider backend, plus SecretKeys with a RAW encoding.
         public boolean supportsParameter(Object obj) {
-            if (obj instanceof EBUOKey == false) {
+            if (!(obj instanceof EBUOKey)) {
                 return false;
             }
 
             EBUOKey key = (EBUOKey)obj;
-            if (key.getAlgorithm().equals(getAlgorithm()) == false) {
+            if (!key.getAlgorithm().equals(getAlgorithm())) {
                 return false;
             }
 
