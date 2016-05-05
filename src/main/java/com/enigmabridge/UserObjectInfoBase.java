@@ -27,7 +27,7 @@ public class UserObjectInfoBase implements UserObjectInfo, EBJSONSerializable {
      * Type of the user object.
      * Required for API token build.
      */
-    protected long userObjectType = -1;
+    protected UserObjectType userObjectType = UserObjectType.INVALID;
 
     /**
      * Communication keys.
@@ -45,8 +45,13 @@ public class UserObjectInfoBase implements UserObjectInfo, EBJSONSerializable {
             return getThisBuilder();
         }
 
-        public B setUserObjectType(long b) {
+        public B setUserObjectType(UserObjectType b) {
             getObj().setUserObjectType(b);
+            return getThisBuilder();
+        }
+
+        public B setUserObjectType(long b) {
+            getObj().setUserObjectType(UserObjectType.valueOf(b));
             return getThisBuilder();
         }
 
@@ -239,8 +244,7 @@ public class UserObjectInfoBase implements UserObjectInfo, EBJSONSerializable {
         setUoid(EBUtils.getAsLong(json, FIELD_UOID, 16));
 
         // UO type
-        final Long uotype = EBUtils.tryGetAsLong(json, FIELD_UOTYPE, 16);
-        setUserObjectType(uotype == null ? -1 : uotype);
+        setUserObjectType(UserObjectType.fromJSON(json, FIELD_UOTYPE));
 
         // Comm keys
         setCommKeys(new EBCommKeys(json.getJSONObject(FIELD_COMMKEYS)));
@@ -261,8 +265,12 @@ public class UserObjectInfoBase implements UserObjectInfo, EBJSONSerializable {
             json = new JSONObject();
         }
 
+        final UserObjectType type = this.getUserObjectType();
         json.put(FIELD_UOID, this.getUoid());
-        json.put(FIELD_UOTYPE, this.getUserObjectType());
+        if (type != null){
+            type.toJSON(json, FIELD_UOTYPE);
+        }
+
         json.put(FIELD_COMMKEYS, getCommKeys() == null ? null : getCommKeys().toJSON(null));
         json.put(FIELD_SETTINGS, getSettings() == null ? null : getSettings().toJSON(null));
         return json;
@@ -295,7 +303,7 @@ public class UserObjectInfoBase implements UserObjectInfo, EBJSONSerializable {
     @Override
     public int hashCode() {
         int result = (int) (uoid ^ (uoid >>> 32));
-        result = 31 * result + (int) (userObjectType ^ (userObjectType >>> 32));
+        result = 31 * result + (userObjectType != null ? userObjectType.hashCode() : 0);
         result = 31 * result + (commKeys != null ? commKeys.hashCode() : 0);
         result = 31 * result + (settings != null ? settings.hashCode() : 0);
         return result;
@@ -305,7 +313,7 @@ public class UserObjectInfoBase implements UserObjectInfo, EBJSONSerializable {
         return uoid;
     }
 
-    public long getUserObjectType() {
+    public UserObjectType getUserObjectType() {
         return userObjectType;
     }
 
@@ -357,7 +365,7 @@ public class UserObjectInfoBase implements UserObjectInfo, EBJSONSerializable {
         this.commKeys = commKeys;
     }
 
-    protected void setUserObjectType(long userObjectType) {
+    protected void setUserObjectType(UserObjectType userObjectType) {
         this.userObjectType = userObjectType;
     }
 

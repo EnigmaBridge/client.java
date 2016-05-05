@@ -74,9 +74,6 @@ public class EBEnigmaProviderIT {
     public void setUpMethod() throws Exception {
         endpoint = new EBEndpointInfo(EBTestingUtils.CONNECTION_STRING);
 
-        settings = new EBConnectionSettings()
-                .setMethod(EBCommUtils.METHOD_POST);
-
         defaultSettings = new EBSettingsBase.Builder()
                 .setApiKey(apiKey)
                 .setEndpointInfo(endpoint)
@@ -104,11 +101,8 @@ public class EBEnigmaProviderIT {
         final UserObjectKeyBase key = new UserObjectKeyBase.Builder()
                 .setSettings(defaultSettings)
                 .setUoid(EBTestingUtils.UOID_RSA2k_KNOWN)
-                .setUserObjectType(0x1)
+                .setUserObjectType(UserObjectType.TYPE_RSA2048)
                 .setCommKeys(ckRSA)
-                .setAlgorithm("RSA")
-                .setKeyLength(mod.bitLength())
-                .setKeyType(UserObjectKeyType.PRIVATE)
                 .build();
 
         LOG.debug("UO: " + key.toJSON(null).toString());

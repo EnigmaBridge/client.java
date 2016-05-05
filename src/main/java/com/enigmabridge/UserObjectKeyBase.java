@@ -136,4 +136,20 @@ public class UserObjectKeyBase extends UserObjectInfoBase implements UserObjectK
     protected void setKeyType(UserObjectKeyType keyType) {
         this.keyType = keyType;
     }
+
+    @Override
+    protected void setUserObjectType(UserObjectType userObjectType) {
+        super.setUserObjectType(userObjectType);
+        if (userObjectType != null){
+            if (getAlgorithm() == null){
+                setAlgorithm(userObjectType.getAlgorithm());
+            }
+            if (getKeyType() == null){
+                setKeyType(userObjectType.getKeyType());
+            }
+            if (length() <= 0){
+                setKeyLength(userObjectType.keyLength());
+            }
+        }
+    }
 }
