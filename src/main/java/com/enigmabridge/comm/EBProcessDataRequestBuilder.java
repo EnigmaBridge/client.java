@@ -111,7 +111,7 @@ public class EBProcessDataRequestBuilder {
         return this;
     }
 
-    public EBProcessDataRequestBuilder setRequestType(EBRequestTypes requestType) {
+    public EBProcessDataRequestBuilder setRequestType(EBRequestType requestType) {
         this.requestType = requestType.toString();
         return this;
     }

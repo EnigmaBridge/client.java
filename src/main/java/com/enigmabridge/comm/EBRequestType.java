@@ -4,7 +4,7 @@ package com.enigmabridge.comm;
  * All known request types.
  * Created by dusanklinec on 27.04.16.
  */
-public enum EBRequestTypes {
+public enum EBRequestType {
     PLAINAES("PLAINAES"),
     RSA1024("RSA1024"),
     RSA2048("RSA2048"),
@@ -18,7 +18,7 @@ public enum EBRequestTypes {
     /**
      * @param text
      */
-    private EBRequestTypes(final String text) {
+    private EBRequestType(final String text) {
         this.text = text;
     }
 

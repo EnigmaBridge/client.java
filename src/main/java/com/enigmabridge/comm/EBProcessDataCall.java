@@ -46,7 +46,7 @@ public class EBProcessDataCall extends EBAPICall {
             return getThisBuilder();
         }
 
-        public B setProcessFunction(EBRequestTypes b) {
+        public B setProcessFunction(EBRequestType b) {
             getObj().setProcessFunction(b.toString());
             return getThisBuilder();
         }
@@ -83,7 +83,7 @@ public class EBProcessDataCall extends EBAPICall {
                     obj.setEngine(((EBEngineReference) key).getEBEngine());
                 }
 
-                final EBRequestTypes tmpReqType = obj.getRequestTypeForKey(key);
+                final EBRequestType tmpReqType = obj.getRequestTypeForKey(key);
                 if (tmpReqType != null && obj.getProcessFunction() == null){
                     obj.setProcessFunction(tmpReqType.toString());
                 }
@@ -206,18 +206,18 @@ public class EBProcessDataCall extends EBAPICall {
      * @param key
      * @return
      */
-    public EBRequestTypes getRequestTypeForKey(UserObjectKey key){
+    public EBRequestType getRequestTypeForKey(UserObjectKey key){
         final String algorithm = key.getAlgorithm();
         final int bitLength = key.length();
         if ("AES".equalsIgnoreCase(algorithm)){
-            return EBRequestTypes.PLAINAES;
+            return EBRequestType.PLAINAES;
         }
 
         if ("RSA".equalsIgnoreCase(algorithm)){
             if (bitLength == 1024){
-                return EBRequestTypes.RSA1024;
+                return EBRequestType.RSA1024;
             } else if (bitLength == 2048){
-                return EBRequestTypes.RSA2048;
+                return EBRequestType.RSA2048;
             }
         }
 
