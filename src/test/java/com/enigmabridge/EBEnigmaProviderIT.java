@@ -80,6 +80,8 @@ public class EBEnigmaProviderIT {
                 .setConnectionSettings(settings)
                 .build();
 
+        engine.setDefaultSettings(defaultSettings);
+
         ckRSA = new EBCommKeys()
                 .setEncKey("1234567890123456789012345678901234567890123456789012345678901234")
                 .setMacKey("2224262820223456789012345678901234567890123456789012345678901234");
@@ -99,7 +101,6 @@ public class EBEnigmaProviderIT {
 
         // Create UOKey
         final UserObjectKeyBase key = new UserObjectKeyBase.Builder()
-                .setSettings(defaultSettings)
                 .setUoid(EBTestingUtils.UOID_RSA2k_KNOWN)
                 .setUserObjectType(UserObjectType.TYPE_RSA2048)
                 .setCommKeys(ckRSA)
