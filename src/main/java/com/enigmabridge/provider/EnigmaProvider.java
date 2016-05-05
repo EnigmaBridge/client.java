@@ -49,6 +49,10 @@ public class EnigmaProvider extends Provider implements ConfigurableProvider {
     }
 
     private void initProvider(EBEngine engine){
+        if (engine == null){
+            engine = new EBEngine();
+        }
+
         this.engine = engine;
         AccessController.doPrivileged(new PrivilegedAction()
         {
@@ -171,5 +175,9 @@ public class EnigmaProvider extends Provider implements ConfigurableProvider {
     public void addKeyInfoConverter(ASN1ObjectIdentifier oid, AsymmetricKeyInfoConverter keyInfoConverter)
     {
         keyInfoConverters.put(oid, keyInfoConverter);
+    }
+
+    public EBEngine getEngine() {
+        return engine;
     }
 }
