@@ -28,7 +28,7 @@ public class EBProcessDataCallIT {
     private static final Logger LOG = LoggerFactory.getLogger(EBProcessDataCallIT.class);
 
     // General engine - common
-    private final EBEngine engine = new EBEngine();
+    private EBEngine engine;
 
     // TEST API key
     private final String apiKey = EBTestingUtils.API_KEY;
@@ -88,6 +88,9 @@ public class EBProcessDataCallIT {
         ckRSA = new EBCommKeys()
                 .setEncKey("1234567890123456789012345678901234567890123456789012345678901234")
                 .setMacKey("2224262820223456789012345678901234567890123456789012345678901234");
+
+        engine = new EBEngine();
+        engine.setDefaultSettings(defaultSettings);
     }
 
     @AfterMethod(alwaysRun = true, groups = {"integration"}, enabled = false)
@@ -216,15 +219,13 @@ public class EBProcessDataCallIT {
         try {
             final UserObjectInfoBase uo = new UserObjectInfoBase.Builder()
                     .setUoid(EBTestingUtils.UOID_AES)
-                    .setUserObjectType(1)
+                    .setUserObjectType(UserObjectType.TYPE_PLAINAES)
                     .setCommKeys(ckAES)
-                    .setSettings(defaultSettings)
                     .build();
 
             final EBProcessDataCall call = new EBProcessDataCall.Builder()
                     .setUo(uo)
                     .setEngine(engine)
-                    .setProcessFunction(EBRequestType.PLAINAES)
                     .build();
 
             final EBProcessDataResponse response = call.doRequest(EBUtils.hex2byte("6bc1bee22e409f96e93d7e117393172a"));

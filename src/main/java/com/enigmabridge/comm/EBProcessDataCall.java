@@ -47,7 +47,7 @@ public class EBProcessDataCall extends EBAPICall {
         }
 
         public B setProcessFunction(EBRequestType b) {
-            getObj().setProcessFunction(b.toString());
+            getObj().setProcessFunction(b);
             return getThisBuilder();
         }
 
@@ -70,7 +70,14 @@ public class EBProcessDataCall extends EBAPICall {
 
             if (uo != null){
                 getThisBuilder().setSettings(uo);
+
+                final UserObjectType uot = uo.getUserObjectType();
+                final EBRequestType tmpReqType2 = uot == null ? null : uot.getRequestType();
+                if (tmpReqType2 != null && obj.getProcessFunction() == null){
+                    obj.setProcessFunction(tmpReqType2);
+                }
             }
+
             return getThisBuilder();
         }
 
@@ -85,7 +92,7 @@ public class EBProcessDataCall extends EBAPICall {
 
                 final EBRequestType tmpReqType = obj.getRequestTypeForKey(key);
                 if (tmpReqType != null && obj.getProcessFunction() == null){
-                    obj.setProcessFunction(tmpReqType.toString());
+                    obj.setProcessFunction(tmpReqType);
                 }
             }
             return getThisBuilder();
@@ -141,7 +148,7 @@ public class EBProcessDataCall extends EBAPICall {
                 throw new NullPointerException("Endpoint info is null");
             }
 
-            if (child.processFunction == null){
+            if (child.getProcessFunction() == null){
                 throw new NullPointerException("Process function is null");
             }
 
@@ -307,5 +314,12 @@ public class EBProcessDataCall extends EBAPICall {
 
     protected void setProcessFunction(String processFunction) {
         this.processFunction = processFunction;
+    }
+
+    protected void setProcessFunction(EBRequestType processFunction) {
+        if (processFunction == null){
+            return;
+        }
+        this.processFunction = processFunction.toString();
     }
 }
