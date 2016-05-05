@@ -14,6 +14,13 @@ import java.util.Map;
 
 /**
  * Testing implementation.
+ * http://docs.oracle.com/javase/7/docs/technotes/guides/security/crypto/HowToImplAProvider.html#Step6
+ * http://docs.oracle.com/javase/7/docs/technotes/guides/security/crypto/CryptoSpec.html#KeySpecs
+ *
+ * Provider can be configurable with config file / EB config.
+ * This approach is used in PKCS11 Provider - config file is passed in the constructor.
+ * http://javaandcryptosmartcards.blogspot.cz/2009/05/java-and-cryptographic-smartcards-this.html
+ *
  * Created by dusanklinec on 21.04.16.
  */
 public class EnigmaProvider extends Provider implements ConfigurableProvider {

@@ -18,6 +18,8 @@ import java.security.Key;
  * registered by our provider accepts this key. The key is usually the only one argument passed to the cipher
  * so it usually contains all required information for using EB UserObjects.
  *
+ * Opaque key representation of the key.
+ *
  * Created by dusanklinec on 26.04.16.
  */
 public interface EBKey extends Key, Length {

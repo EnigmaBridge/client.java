@@ -15,7 +15,7 @@ public interface UserObjectKey extends EBUOKeyReference, UserObjectInfo, Length{
     String getAlgorithm();
 
     /**
-     * Type of the key. (private/public/secter=symmetric).
+     * Type of the key. (private/public/secret=symmetric).
      * @return key type.
      */
     UserObjectKeyType getKeyType();
