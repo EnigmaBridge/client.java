@@ -22,7 +22,7 @@ public interface UserObjectInfo extends EBSettings, Serializable {
      * Required for API Token generation.
      * @return UO type
      */
-    int getUserObjectType();
+    long getUserObjectType();
 
      /**
       * Communication encryption&MAC keys.

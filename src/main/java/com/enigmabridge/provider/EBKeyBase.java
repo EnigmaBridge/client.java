@@ -93,7 +93,7 @@ public abstract class EBKeyBase implements EBUOKey {
     }
 
     @Override
-    public int getUserObjectType() {
+    public long getUserObjectType() {
         return uo.getUserObjectType();
     }
 

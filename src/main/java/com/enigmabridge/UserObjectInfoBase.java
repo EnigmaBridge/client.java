@@ -27,7 +27,7 @@ public class UserObjectInfoBase implements UserObjectInfo, EBJSONSerializable {
      * Type of the user object.
      * Required for API token build.
      */
-    protected int userObjectType = -1;
+    protected long userObjectType = -1;
 
     /**
      * Communication keys.
@@ -45,7 +45,7 @@ public class UserObjectInfoBase implements UserObjectInfo, EBJSONSerializable {
             return getThisBuilder();
         }
 
-        public B setUserObjectType(int b) {
+        public B setUserObjectType(long b) {
             getObj().setUserObjectType(b);
             return getThisBuilder();
         }
@@ -239,7 +239,7 @@ public class UserObjectInfoBase implements UserObjectInfo, EBJSONSerializable {
         setUoid(EBUtils.getAsLong(json, FIELD_UOID, 16));
 
         // UO type
-        final Integer uotype = EBUtils.tryGetAsInteger(json, FIELD_UOTYPE, 16);
+        final Long uotype = EBUtils.tryGetAsLong(json, FIELD_UOTYPE, 16);
         setUserObjectType(uotype == null ? -1 : uotype);
 
         // Comm keys
@@ -295,7 +295,7 @@ public class UserObjectInfoBase implements UserObjectInfo, EBJSONSerializable {
     @Override
     public int hashCode() {
         int result = (int) (uoid ^ (uoid >>> 32));
-        result = 31 * result + userObjectType;
+        result = 31 * result + (int) (userObjectType ^ (userObjectType >>> 32));
         result = 31 * result + (commKeys != null ? commKeys.hashCode() : 0);
         result = 31 * result + (settings != null ? settings.hashCode() : 0);
         return result;
@@ -305,7 +305,7 @@ public class UserObjectInfoBase implements UserObjectInfo, EBJSONSerializable {
         return uoid;
     }
 
-    public int getUserObjectType() {
+    public long getUserObjectType() {
         return userObjectType;
     }
 
@@ -357,7 +357,7 @@ public class UserObjectInfoBase implements UserObjectInfo, EBJSONSerializable {
         this.commKeys = commKeys;
     }
 
-    protected void setUserObjectType(int userObjectType) {
+    protected void setUserObjectType(long userObjectType) {
         this.userObjectType = userObjectType;
     }
 
