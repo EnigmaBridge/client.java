@@ -22,10 +22,19 @@ public class UserObjectType implements Serializable{
     protected static final int REQ_AUTH_HOTP = 5;
     protected static final int REQ_AUTH_PASSWD = 6;
     protected static final int REQ_AUTH_UPDATEUSERCTX = 7;
+    protected static final int REQ_HMAC = 8;
+    protected static final int REQ_SCRAMBLE = 9;
+    protected static final int REQ_ENSCRAMBLE = 10;
+    protected static final int REQ_FP192SIGN = 11;
+    protected static final int REQ_TOKENIZE = 12;
+    protected static final int REQ_DETOKENIZE = 13;
+    protected static final int REQ_TOKENIZEWRAP = 14;
+    protected static final int REQ_RANDOMDATA = 15;
 
     public static final UserObjectType TYPE_PLAINAES = UserObjectType.valueOf(REQ_PLAINAES);
     public static final UserObjectType TYPE_RSA1024 = UserObjectType.valueOf(REQ_RSA1024);
     public static final UserObjectType TYPE_RSA2048 = UserObjectType.valueOf(REQ_RSA2048);
+    public static final UserObjectType TYPE_RANDOM = UserObjectType.valueOf(REQ_RANDOMDATA);
 
     /**
      * Serialized information goes here.
@@ -241,6 +250,22 @@ public class UserObjectType implements Serializable{
                 return EBRequestType.AUTH_PASSWD;
             case REQ_AUTH_UPDATEUSERCTX:
                 return EBRequestType.AUTH_UPDATEUSERCTX;
+            case REQ_HMAC:
+                return EBRequestType.HMAC;
+            case REQ_SCRAMBLE:
+                return EBRequestType.SCRAMBLE;
+            case REQ_ENSCRAMBLE:
+                return EBRequestType.ENSCRAMBLE;
+            case REQ_FP192SIGN:
+                return EBRequestType.FP192SIGN;
+            case REQ_TOKENIZE:
+                return EBRequestType.TOKENIZE;
+            case REQ_DETOKENIZE:
+                return EBRequestType.DETOKENIZE;
+            case REQ_TOKENIZEWRAP:
+                return EBRequestType.TOKENIZEWRAP;
+            case REQ_RANDOMDATA:
+                return EBRequestType.RANDOMDATA;
             default: return null;
         }
     }
@@ -261,15 +286,29 @@ public class UserObjectType implements Serializable{
                 return REQ_AUTH_PASSWD;
             case AUTH_UPDATEUSERCTX:
                 return REQ_AUTH_UPDATEUSERCTX;
+            case HMAC:
+                return REQ_HMAC;
+            case SCRAMBLE:
+                return REQ_SCRAMBLE;
+            case ENSCRAMBLE:
+                return REQ_ENSCRAMBLE;
+            case FP192SIGN:
+                return REQ_FP192SIGN;
+            case TOKENIZE:
+                return REQ_TOKENIZE;
+            case DETOKENIZE:
+                return REQ_DETOKENIZE;
+            case TOKENIZEWRAP:
+                return REQ_TOKENIZEWRAP;
+            case RANDOMDATA:
+                return REQ_RANDOMDATA;
             default: return -1;
         }
     }
 
     @Override
     public String toString() {
-        return "UserObjectType{" +
-                "backingBuffer=" + backingBuffer +
-                '}';
+        return "{" + backingBuffer + "}";
     }
 
     @Override
