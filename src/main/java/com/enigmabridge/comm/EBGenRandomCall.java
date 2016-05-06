@@ -113,6 +113,12 @@ public class EBGenRandomCall {
      */
     public byte[] genRandomData(int length) throws IOException, EBException {
         lastResponse = genRandom(length);
+        final EBRawResponse raw = lastResponse.getRawResponse();
+
+        if (raw == null || !raw.isSuccessful()){
+            throw new IOException("Could not generate random data - network error");
+        }
+
         if (!lastResponse.isCodeOk()){
             throw new EBException("Could not generate random data");
         }
