@@ -1,7 +1,8 @@
 package com.enigmabridge.provider.rsa;
 
 /**
- * RSA private key in EB.
+ * Non-extractable RSA private key in EB.
+ * All private key operations need to be done in EB. Key does not leave EB.
  * Conforms to general Java Key interface.
  *
  * Inspiration: bcprov-jdk15on-1.54-sources.jar!/org/bouncycastle/jcajce/provider/asymmetric/rsa/BCRSAPrivateKey.java

@@ -18,13 +18,13 @@ import java.security.interfaces.RSAKey;
  */
 public class EBRSAKey extends EBKeyBase implements PrivateKey, RSAKey {
     static final long serialVersionUID = 1;
-    protected BigInteger modulus;
 
     /**
      * If null for encryption operation -> operation fails.
      * If null for decryption operation -> operation runs without blinding.
      */
     protected BigInteger publicExponent;
+    protected BigInteger modulus;
 
     public static abstract class AbstractBuilder<T extends EBRSAKey, B extends AbstractBuilder> extends EBKeyBase.AbstractBuilder<T,B>{
         public B setModulus(BigInteger mod) {
