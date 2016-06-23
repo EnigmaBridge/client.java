@@ -14,8 +14,8 @@ import java.security.spec.RSAPublicKeySpec;
  * Created by dusanklinec on 04.05.16.
  */
 public class EBTestingUtils {
-    public static final String CONNECTION_STRING = "https://site2.enigmabridge.com:11180";
-    public static final String API_KEY = "TETS_API";
+    public static final String CONNECTION_STRING = "https://site1.enigmabridge.com:11180";
+    public static final String API_KEY = "TEST_API";
 
     public static final long UOID_RANDOM = 0x77ee;
     public static final long UOID_AES = 0xEE01L;
