@@ -1,8 +1,6 @@
 package com.enigmabridge;
 
-import com.enigmabridge.comm.EBCommUtils;
 import com.enigmabridge.comm.EBConnectionSettings;
-import com.enigmabridge.comm.EBProcessDataResponse;
 import com.enigmabridge.misc.EBTestingUtils;
 import com.enigmabridge.provider.EnigmaProvider;
 import com.enigmabridge.provider.rsa.EBRSAPrivateKey;
@@ -15,8 +13,6 @@ import javax.crypto.Cipher;
 import java.math.BigInteger;
 import java.security.PublicKey;
 import java.security.Security;
-
-import static org.testng.Assert.assertEquals;
 
 /**
  * Basic tests of Enigma Bridge crypto provider.
