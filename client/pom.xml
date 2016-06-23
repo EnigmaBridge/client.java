@@ -302,7 +302,7 @@
                 <version>1.4</version>
                 <executions>
                     <execution>
-                        <phase>compile</phase>
+                        <phase>verify</phase>
                         <id>sign</id>
                         <goals>
                             <goal>sign</goal>
