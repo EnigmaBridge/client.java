@@ -39,6 +39,8 @@ public class RSABlindedEngine
             ParametersWithRandom rParam = (ParametersWithRandom) param;
             random = rParam.getRandom();
             param = rParam.getParameters();
+        } else {
+            random = new SecureRandom();
         }
 
         key = (EBRSAKeyParameter)param;
