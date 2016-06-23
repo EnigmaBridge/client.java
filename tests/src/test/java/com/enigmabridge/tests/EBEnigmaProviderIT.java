@@ -1,5 +1,6 @@
-package com.enigmabridge;
+package com.enigmabridge.tests;
 
+import com.enigmabridge.*;
 import com.enigmabridge.comm.EBConnectionSettings;
 import com.enigmabridge.misc.EBTestingUtils;
 import com.enigmabridge.provider.EnigmaProvider;

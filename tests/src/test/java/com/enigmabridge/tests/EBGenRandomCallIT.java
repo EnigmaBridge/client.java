@@ -1,5 +1,8 @@
-package com.enigmabridge;
+package com.enigmabridge.tests;
 
+import com.enigmabridge.*;
+import com.enigmabridge.comm.EBGenRandomCall;
+import com.enigmabridge.comm.EBGenRandomResponse;
 import com.enigmabridge.misc.EBTestingUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
