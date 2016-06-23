@@ -87,12 +87,12 @@ public class EBProcessDataCall extends EBAPICall {
 
             if (key != null){
                 if (key instanceof EBEngineReference && obj.getEngine() == null){
-                    obj.setEngine(((EBEngineReference) key).getEBEngine());
+                    getThisBuilder().setEngine(((EBEngineReference) key).getEBEngine());
                 }
 
                 final EBRequestType tmpReqType = obj.getRequestTypeForKey(key);
                 if (tmpReqType != null && obj.getProcessFunction() == null){
-                    obj.setProcessFunction(tmpReqType);
+                    getThisBuilder().setProcessFunction(tmpReqType);
                 }
             }
             return getThisBuilder();
