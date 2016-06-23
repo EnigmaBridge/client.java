@@ -75,7 +75,8 @@ public class EnigmaProvider extends Provider implements ConfigurableProvider {
      * that calls the (Provider, String) constructor instead of the no-args constructor
      */
     private static class MyService extends Service {
-        private static final Class[] paramTypes = {Provider.class, String.class};
+        //private static final Class[] paramTypes = {Provider.class, String.class};
+        private static final Class[] paramTypes = {};
 
         MyService(Provider provider, String type, String algorithm, String className) {
             super(provider, type, algorithm, className, null, null);
@@ -95,7 +96,8 @@ public class EnigmaProvider extends Provider implements ConfigurableProvider {
                 // fetch the (Provider, String) constructor
                 Constructor cons = clazz.getConstructor(paramTypes);
                 // invoke constructor and return the SPI object
-                Object obj = cons.newInstance(new Object[] {provider, getAlgorithm()});
+                //Object obj = cons.newInstance(new Object[] {provider, getAlgorithm()});
+                Object obj = cons.newInstance();
                 return obj;
             } catch (Exception e) {
                 throw new NoSuchAlgorithmException("Could not instantiate service", e);
