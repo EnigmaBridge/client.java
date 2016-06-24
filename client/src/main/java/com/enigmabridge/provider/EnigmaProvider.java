@@ -28,7 +28,6 @@ public class EnigmaProvider extends Provider implements ConfigurableProvider {
 
     public static final String PROVIDER_NAME = "EB";
     public static final String PROVIDER_DESC = "JCA/JCE provider for " + PROVIDER_NAME;
-
     public static final double VERSION = 0.1;
 
     // TODO: store EBEndpoint, ApiKey, Connection Settings and general info to the provider configuration.
@@ -72,7 +71,6 @@ public class EnigmaProvider extends Provider implements ConfigurableProvider {
 
     /**
      * We have our own ServiceDescription implementation that overrides newInstance()
-     * that calls the (Provider, String) constructor instead of the no-args constructor
      */
     private static class MyService extends Service {
         //private static final Class[] paramTypes = {Provider.class, String.class};
@@ -88,6 +86,7 @@ public class EnigmaProvider extends Provider implements ConfigurableProvider {
                 Class clazz;
                 Provider provider = getProvider();
                 ClassLoader loader = provider.getClass().getClassLoader();
+                final String reqType = this.getType();
                 if (loader == null) {
                     clazz = Class.forName(getClassName());
                 } else {
