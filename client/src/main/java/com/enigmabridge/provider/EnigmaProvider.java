@@ -73,17 +73,25 @@ public class EnigmaProvider extends Provider implements ConfigurableProvider {
      * We have our own ServiceDescription implementation that overrides newInstance()
      */
     private static class MyService extends Service {
-        //private static final Class[] paramTypes = {Provider.class, String.class};
-        private static final Class[] paramTypes = {};
+        private static final Class[] paramTypes = {EnigmaProvider.class};
+        private static final Class[] paramTypesAlg = {EnigmaProvider.class, String.class};
+        private final boolean withAlg;
 
         MyService(Provider provider, String type, String algorithm, String className) {
             super(provider, type, algorithm, className, null, null);
+            this.withAlg = false;
+        }
+
+        MyService(Provider provider, String type, String algorithm, String className, boolean withAlg) {
+            super(provider, type, algorithm, className, null, null);
+            this.withAlg = withAlg;
         }
 
         public Object newInstance(Object param) throws NoSuchAlgorithmException {
             try {
                 // get the Class object for the implementation class
                 Class clazz;
+
                 Provider provider = getProvider();
                 ClassLoader loader = provider.getClass().getClassLoader();
                 final String reqType = this.getType();
@@ -92,12 +100,21 @@ public class EnigmaProvider extends Provider implements ConfigurableProvider {
                 } else {
                     clazz = loader.loadClass(getClassName());
                 }
-                // fetch the (Provider, String) constructor
-                Constructor cons = clazz.getConstructor(paramTypes);
-                // invoke constructor and return the SPI object
-                //Object obj = cons.newInstance(new Object[] {provider, getAlgorithm()});
-                Object obj = cons.newInstance();
-                return obj;
+
+                if (withAlg){
+                    // fetch the (Provider, String) constructor
+                    Constructor cons = clazz.getConstructor(paramTypesAlg);
+                    // invoke constructor and return the SPI object
+                    Object obj = cons.newInstance(new Object[]{provider, getAlgorithm()});
+                    return obj;
+
+                } else {
+                    // fetch the (Provider, String) constructor
+                    Constructor cons = clazz.getConstructor(paramTypes);
+                    // invoke constructor and return the SPI object
+                    Object obj = cons.newInstance(new Object[]{provider});
+                    return obj;
+                }
             } catch (Exception e) {
                 throw new NoSuchAlgorithmException("Could not instantiate service", e);
             }
@@ -110,6 +127,9 @@ public class EnigmaProvider extends Provider implements ConfigurableProvider {
     private static class MyCipherService extends MyService {
         MyCipherService(Provider provider, String type, String algorithm, String className) {
             super(provider, type, algorithm, className);
+        }
+        MyCipherService(Provider provider, String type, String algorithm, String className, boolean withAlg) {
+            super(provider, type, algorithm, className, withAlg);
         }
 
         // we override supportsParameter() to let the framework know which
@@ -149,7 +169,11 @@ public class EnigmaProvider extends Provider implements ConfigurableProvider {
         return containsKey(type + "." + name) || containsKey("Alg.Alias." + type + "." + name);
     }
 
-    public void addAlgorithm(String key, String value)
+    public void addAlgorithm(String key, String value){
+        addAlgorithm(key, value, false);
+    }
+
+    public void addAlgorithm(String key, String value, boolean withAlg)
     {
         if (containsKey(key))
         {
@@ -163,7 +187,7 @@ public class EnigmaProvider extends Provider implements ConfigurableProvider {
         if (dotIdx != -1){
             final String type = keyShort.substring(0, dotIdx);
             final String name = keyShort.substring(dotIdx+1);
-            putService(new MyCipherService(this, type, name, value));
+            putService(new MyCipherService(this, type, name, value, withAlg));
         }
     }
 

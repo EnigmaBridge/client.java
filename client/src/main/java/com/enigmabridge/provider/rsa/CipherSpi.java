@@ -1,5 +1,6 @@
 package com.enigmabridge.provider.rsa;
 
+import com.enigmabridge.provider.EnigmaProvider;
 import com.enigmabridge.provider.rsa.engine.RSABlindedEngine;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.crypto.AsymmetricBlockCipher;
@@ -36,6 +37,7 @@ public class CipherSpi
 {
     private final JcaJceHelper helper = new BCJcaJceHelper();
 
+    private EnigmaProvider provider;
     private AsymmetricBlockCipher cipher;
     private AlgorithmParameterSpec paramSpec;
     private AlgorithmParameters engineParams;
@@ -44,16 +46,24 @@ public class CipherSpi
     private ByteArrayOutputStream bOut = new ByteArrayOutputStream();
 
     public CipherSpi(
-        AsymmetricBlockCipher engine)
+            EnigmaProvider provider)
     {
+        this.provider = provider;
+    }
+
+    public CipherSpi(
+        AsymmetricBlockCipher engine, EnigmaProvider provider)
+    {
+        this.provider = provider;
         cipher = engine;
     }
 
     public CipherSpi(
-        OAEPParameterSpec pSpec)
+        OAEPParameterSpec pSpec, EnigmaProvider provider)
     {
         try
         {
+            this.provider = provider;
             initFromSpec(pSpec);
         }
         catch (NoSuchPaddingException e)
@@ -65,11 +75,13 @@ public class CipherSpi
     public CipherSpi(
         boolean publicKeyOnly,
         boolean privateKeyOnly,
-        AsymmetricBlockCipher engine)
+        AsymmetricBlockCipher engine,
+        EnigmaProvider provider)
     {
         this.publicKeyOnly = publicKeyOnly;
         this.privateKeyOnly = privateKeyOnly;
         cipher = engine;
+        this.provider = provider;
     }
      
     private void initFromSpec(
@@ -514,6 +526,14 @@ public class CipherSpi
         return out.length;
     }
 
+    public void setProvider(EnigmaProvider provider) {
+        if (this.provider != null){
+            throw new IllegalArgumentException("Provider already set");
+        }
+
+        this.provider = provider;
+    }
+
     /**
      * classes that inherit from us.
      */
@@ -523,7 +543,11 @@ public class CipherSpi
     {
         public NoPadding()
         {
-            super(new RSABlindedEngine());
+            this(null);
+        }
+        public NoPadding(EnigmaProvider provider)
+        {
+            super(new RSABlindedEngine(), provider);
         }
     }
 
@@ -532,7 +556,11 @@ public class CipherSpi
     {
         public PKCS1v1_5Padding()
         {
-            super(new PKCS1Encoding(new RSABlindedEngine()));
+            this(null);
+        }
+        public PKCS1v1_5Padding(EnigmaProvider provider)
+        {
+            super(new PKCS1Encoding(new RSABlindedEngine()), provider);
         }
     }
 
@@ -541,7 +569,11 @@ public class CipherSpi
     {
         public PKCS1v1_5Padding_PrivateOnly()
         {
-            super(false, true, new PKCS1Encoding(new RSABlindedEngine()));
+            this(null);
+        }
+        public PKCS1v1_5Padding_PrivateOnly(EnigmaProvider provider)
+        {
+            super(false, true, new PKCS1Encoding(new RSABlindedEngine()), provider);
         }
     }
 
@@ -550,7 +582,11 @@ public class CipherSpi
     {
         public PKCS1v1_5Padding_PublicOnly()
         {
-            super(true, false, new PKCS1Encoding(new RSABlindedEngine()));
+            this(null);
+        }
+        public PKCS1v1_5Padding_PublicOnly(EnigmaProvider provider)
+        {
+            super(true, false, new PKCS1Encoding(new RSABlindedEngine()), provider);
         }
     }
 
@@ -559,7 +595,11 @@ public class CipherSpi
     {
         public OAEPPadding()
         {
-            super(OAEPParameterSpec.DEFAULT);
+            this(null);
+        }
+        public OAEPPadding(EnigmaProvider provider)
+        {
+            super(OAEPParameterSpec.DEFAULT, provider);
         }
     }
     
@@ -568,7 +608,11 @@ public class CipherSpi
     {
         public ISO9796d1Padding()
         {
-            super(new ISO9796d1Encoding(new RSABlindedEngine()));
+            this(null);
+        }
+        public ISO9796d1Padding(EnigmaProvider provider)
+        {
+            super(new ISO9796d1Encoding(new RSABlindedEngine()), provider);
         }
     }
 }
