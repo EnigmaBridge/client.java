@@ -5,6 +5,9 @@ package com.enigmabridge.create;
  * Created by dusanklinec on 28.06.16.
  */
 public class Constants {
+    public static final String YES = "yes";
+    public static final String NO = "no";
+
     public static final String ENV_DEV = "dev";
     public static final String ENV_TEST = "test";
     public static final String ENV_PROD = "prod";
