@@ -3,6 +3,9 @@ package com.enigmabridge.provider;
 import com.enigmabridge.EBEngine;
 import com.enigmabridge.provider.rsa.RSA;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
+import org.bouncycastle.jcajce.provider.asymmetric.rsa.*;
 import org.bouncycastle.jcajce.provider.config.ConfigurableProvider;
 import org.bouncycastle.jcajce.provider.config.ProviderConfiguration;
 import org.bouncycastle.jcajce.provider.util.AsymmetricKeyInfoConverter;
@@ -67,6 +70,13 @@ public class EnigmaProvider extends Provider implements ConfigurableProvider {
     {
         // Register our RSA engine.
         new RSA.Mappings().configure(this);
+
+        // RSA keygen
+        addAlgorithm("KeyPairGenerator.RSA", "com.enigmabridge.provider.EBKeyPairGenerator", true);
+        addAlgorithm("Alg.Alias.KeyPairGenerator." + PKCSObjectIdentifiers.rsaEncryption, "RSA", true);
+        addAlgorithm("Alg.Alias.KeyPairGenerator." + X509ObjectIdentifiers.id_ea_rsa, "RSA", true);
+        addAlgorithm("Alg.Alias.KeyPairGenerator." + PKCSObjectIdentifiers.id_RSAES_OAEP, "RSA", true);
+        addAlgorithm("Alg.Alias.KeyPairGenerator." + PKCSObjectIdentifiers.id_RSASSA_PSS, "RSA", true);
     }
 
     /**

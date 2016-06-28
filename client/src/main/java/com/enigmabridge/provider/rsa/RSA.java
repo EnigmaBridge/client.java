@@ -69,13 +69,13 @@ public class RSA
             // TODO: implement.
 //            provider.addAlgorithm("KeyFactory.RSA", PREFIX + "KeyFactorySpi");
 //            provider.addAlgorithm("KeyPairGenerator.RSA", PREFIX + "KeyPairGeneratorSpi");
-
-            AsymmetricKeyInfoConverter keyFact = new KeyFactorySpi();
-
-            registerOid(provider, PKCSObjectIdentifiers.rsaEncryption, "RSA", keyFact);
-            registerOid(provider, X509ObjectIdentifiers.id_ea_rsa, "RSA", keyFact);
-            registerOid(provider, PKCSObjectIdentifiers.id_RSAES_OAEP, "RSA", keyFact);
-            registerOid(provider, PKCSObjectIdentifiers.id_RSASSA_PSS, "RSA", keyFact);
+//
+//            AsymmetricKeyInfoConverter keyFact = new KeyFactorySpi();
+//
+//            registerOid(provider, PKCSObjectIdentifiers.rsaEncryption, "RSA", keyFact);
+//            registerOid(provider, X509ObjectIdentifiers.id_ea_rsa, "RSA", keyFact);
+//            registerOid(provider, PKCSObjectIdentifiers.id_RSAES_OAEP, "RSA", keyFact);
+//            registerOid(provider, PKCSObjectIdentifiers.id_RSASSA_PSS, "RSA", keyFact);
 
             registerOidAlgorithmParameters(provider, PKCSObjectIdentifiers.rsaEncryption, "RSA");
             registerOidAlgorithmParameters(provider, X509ObjectIdentifiers.id_ea_rsa, "RSA");
