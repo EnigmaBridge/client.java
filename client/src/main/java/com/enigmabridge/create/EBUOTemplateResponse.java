@@ -1,12 +1,14 @@
 package com.enigmabridge.create;
 
+import com.enigmabridge.comm.EBResponse;
+
 import java.util.List;
 
 /**
  * Response on GetUO template request
  * Created by dusanklinec on 28.06.16.
  */
-public class EBUOTemplateResponse {
+public class EBUOTemplateResponse extends EBResponse {
     private long objectId;
     private int version;            //<integer>,
     private int protocol;           //<integer>,
@@ -21,7 +23,9 @@ public class EBUOTemplateResponse {
     private List<EBUOTemplateImportKey> importKeys;
     private String authorization;
 
-    public static abstract class AbstractBuilder<T extends EBUOTemplateResponse, B extends EBUOTemplateResponse.AbstractBuilder> {
+    public static abstract class ABuilder<T extends EBUOTemplateResponse, B extends ABuilder>
+            extends EBResponse.ABuilder<T,B>
+    {
         public B setObjectId(long objectId) {
             getObj().setObjectId(objectId);
             return getThisBuilder();
@@ -82,12 +86,13 @@ public class EBUOTemplateResponse {
             return getThisBuilder();
         }
 
+
         public abstract T build();
         public abstract B getThisBuilder();
         public abstract T getObj();
     }
 
-    public static class Builder extends EBUOTemplateResponse.AbstractBuilder<EBUOTemplateResponse, EBUOTemplateResponse.Builder> {
+    public static class Builder extends ABuilder<EBUOTemplateResponse, Builder> {
         private final EBUOTemplateResponse parent = new EBUOTemplateResponse();
 
         @Override

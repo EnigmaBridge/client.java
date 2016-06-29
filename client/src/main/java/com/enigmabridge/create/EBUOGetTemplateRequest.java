@@ -1,12 +1,13 @@
 package com.enigmabridge.create;
 
 import com.enigmabridge.UserObjectType;
+import com.enigmabridge.comm.EBRawRequest;
 
 /**
  * GetTemplateUO request.
  * Created by dusanklinec on 28.06.16.
  */
-public class EBUOGetTemplateRequest {
+public class EBUOGetTemplateRequest extends EBRawRequest {
     protected int format = 1;        //<integer, starting with 1>,
     protected int protocol = 1;      //<integer, starting with 1>,
     protected long type = UserObjectType.TYPE_PLAINAES.getBackingBuffer(); //<32bit integer>,
@@ -50,6 +51,11 @@ public class EBUOGetTemplateRequest {
 
     public EBUOGetTemplateRequest setType(long type) {
         this.type = type;
+        return this;
+    }
+
+    public EBUOGetTemplateRequest setType(UserObjectType type) {
+        this.type = type.getBackingBuffer();
         return this;
     }
 

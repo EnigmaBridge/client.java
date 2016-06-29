@@ -15,12 +15,12 @@ import java.net.MalformedURLException;
  * Created by dusanklinec on 28.06.16.
  */
 public class EBUOTemplateImportKey {
-    private long id;
+    private String id;
     private String type;
     private byte[] publicKey;
 
     public static abstract class AbstractBuilder<T extends EBUOTemplateImportKey, B extends EBUOTemplateImportKey.AbstractBuilder> {
-        public B setId(long id) {
+        public B setId(String id) {
             getObj().setId(id);
             return getThisBuilder();
         }
@@ -61,7 +61,7 @@ public class EBUOTemplateImportKey {
 
     // Setters
 
-    protected void setId(long id) {
+    protected void setId(String id) {
         this.id = id;
     }
 
@@ -75,7 +75,7 @@ public class EBUOTemplateImportKey {
 
     // Getters
 
-    public long getId() {
+    public String getId() {
         return id;
     }
 
