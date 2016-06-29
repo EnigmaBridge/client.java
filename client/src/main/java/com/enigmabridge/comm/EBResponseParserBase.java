@@ -21,7 +21,7 @@ public class EBResponseParserBase implements EBResponseParser{
      * @param data
      * @returns {eb.comm.response}
      */
-    public EBResponse parseCommonHeaders(EBResponse resp, JSONObject data){
+    public EBResponse.ABuilder parseCommonHeaders(EBResponse.ABuilder resp, JSONObject data){
         if (data == null || !data.has(FIELD_STATUS) || !data.has(FIELD_FUNCTION)){
             throw new IllegalArgumentException();
         }
@@ -42,9 +42,9 @@ public class EBResponseParserBase implements EBResponseParser{
      * @param options
      * @returns request unwrapped response.
      */
-    public EBResponse parseResponse(JSONObject data, EBResponse resp, EBResponseParserOptions options) throws EBCorruptedException{
+    public EBResponse.ABuilder parseResponse(JSONObject data, EBResponse.ABuilder resp, EBResponseParserOptions options) throws EBCorruptedException{
         if (resp == null){
-            resp = new EBResponse();
+            resp = new EBResponse.Builder();
         }
 
         this.parseCommonHeaders(resp, data);

@@ -171,27 +171,29 @@ public class EBGetPubKeyCall extends EBAPICall implements EBResponseParser{
         this.rawResponse = this.connector.request();
 
         // Empty response to parse data to.
-        pkResponse = new EBGetPubKeyResponse();
-        pkResponse.setRawResponse(rawResponse);
+        EBGetPubKeyResponse.Builder builder = new EBGetPubKeyResponse.Builder();
+        builder.setRawResponse(rawResponse);
         if (!rawResponse.isSuccessful()){
             LOG.info("Response was not successful: " + rawResponse.toString());
+            pkResponse = builder.build();
             return pkResponse;
         }
 
         // Parse process data response.
         final EBResponseParserBase parser = new EBResponseParserBase();
         parser.setSubParser(this);
-        parser.parseResponse(new JSONObject(rawResponse.getBody()), pkResponse, null);
+        parser.parseResponse(new JSONObject(rawResponse.getBody()), builder, null);
 
         // Return connector.
         engine.getConMgr().doneWithConnector(connector);
         this.connector = null;
 
+        pkResponse = builder.build();
         return pkResponse;
     }
 
     @Override
-    public EBResponse parseResponse(JSONObject data, EBResponse resp, EBResponseParserOptions options) throws EBCorruptedException {
+    public EBResponse.ABuilder parseResponse(JSONObject data, EBResponse.ABuilder resp, EBResponseParserOptions options) throws EBCorruptedException {
         /**
          * Response:
          * {"function":"GetImportPublicKey","result":[
@@ -204,10 +206,10 @@ public class EBGetPubKeyCall extends EBAPICall implements EBResponseParser{
         }
 
         if (resp == null){
-            resp = new EBGetPubKeyResponse();
+            resp = new EBGetPubKeyResponse.Builder();
         }
 
-        final EBGetPubKeyResponse resp2ret = (EBGetPubKeyResponse) resp;
+        final EBGetPubKeyResponse.Builder resp2ret = (EBGetPubKeyResponse.Builder) resp;
         final JSONArray results = data.getJSONArray(FIELD_RESULT);
         final int resLen = results.length();
 
@@ -238,7 +240,7 @@ public class EBGetPubKeyCall extends EBAPICall implements EBResponseParser{
                 }
             }
 
-            resp2ret.getImportKeys().add(cKey);
+            resp2ret.addImportKey(cKey);
         }
 
         return resp2ret;

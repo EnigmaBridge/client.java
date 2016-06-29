@@ -26,19 +26,20 @@ public class EBProcessDataResponseParser extends EBResponseParserBase{
      * @param options
      * @returns request unwrapped response.
      */
-    public EBResponse parseResponse(JSONObject data, EBResponse resp, EBResponseParserOptions options) throws EBCorruptedException{
+    public EBResponse.ABuilder parseResponse(JSONObject data, EBResponse.ABuilder resp, EBResponseParserOptions options) throws EBCorruptedException{
         if (resp == null){
-            resp = new EBProcessDataResponse();
+            resp = new EBProcessDataResponse.Builder();
         }
 
         this.parseCommonHeaders(resp, data);
-        if (!resp.isCodeOk()){
-            LOG.debug(String.format("Error in processing, status: %04X, message: %s", (long)resp.getStatusCode(), resp.getStatusDetail()));
+        if (!resp.getObj().isCodeOk()){
+            LOG.debug(String.format("Error in processing, status: %04X, message: %s",
+                    (long)resp.getObj().getStatusCode(), resp.getObj().getStatusDetail()));
             return resp;
         }
 
-        final EBProcessDataResponse pdResp = (EBProcessDataResponse) resp;
-        final String resultBuffer = (String)resp.getResult();
+        final EBProcessDataResponse.ABuilder pdResp = (EBProcessDataResponse.ABuilder) resp;
+        final String resultBuffer = (String)resp.getObj().getResult();
         final byte[] baResult = EBUtils.hex2byte(resultBuffer.substring(0, resultBuffer.indexOf('_')));
 
         short offset = 0;

@@ -33,6 +33,53 @@ public class EBProcessDataResponse extends EBResponse {
      */
     protected byte[] nonce;
 
+    public static abstract class ABuilder<T extends EBProcessDataResponse, B extends ABuilder>
+            extends EBResponse.ABuilder<T,B>
+    {
+        protected B setPlainData(byte[] plainData) {
+            getObj().setPlainData(plainData);
+            return getThisBuilder();
+        }
+
+        protected B setProtectedData(byte[] protectedData) {
+            getObj().setProtectedData(protectedData);
+            return getThisBuilder();
+        }
+
+        protected B setUserObjectId(long userObjectId) {
+            getObj().setUserObjectId(userObjectId);
+            return getThisBuilder();
+        }
+
+        protected B setNonce(byte[] nonce) {
+            getObj().setNonce(nonce);
+            return getThisBuilder();
+        }
+
+        public abstract T build();
+        public abstract B getThisBuilder();
+        public abstract T getObj();
+    }
+
+    public static class Builder extends ABuilder<EBProcessDataResponse, Builder> {
+        private final EBProcessDataResponse parent = new EBProcessDataResponse();
+
+        @Override
+        public EBProcessDataResponse.Builder getThisBuilder() {
+            return this;
+        }
+
+        @Override
+        public EBProcessDataResponse getObj() {
+            return parent;
+        }
+
+        @Override
+        public EBProcessDataResponse build() {
+            return parent;
+        }
+    }
+
     public String toString(){
         return String.format("ProcessDataResponse{statusCode=0x%4X, statusDetail=[%s], userObjectId: 0x%08X, function: [%s], " +
                         "nonce: [%s], protectedData: [%s], plainData: [%s]",
@@ -62,22 +109,22 @@ public class EBProcessDataResponse extends EBResponse {
         return nonce;
     }
 
-    EBProcessDataResponse setPlainData(byte[] plainData) {
+    protected EBProcessDataResponse setPlainData(byte[] plainData) {
         this.plainData = plainData;
         return this;
     }
 
-    EBProcessDataResponse setProtectedData(byte[] protectedData) {
+    protected EBProcessDataResponse setProtectedData(byte[] protectedData) {
         this.protectedData = protectedData;
         return this;
     }
 
-    EBProcessDataResponse setUserObjectId(long userObjectId) {
+    protected EBProcessDataResponse setUserObjectId(long userObjectId) {
         this.userObjectId = userObjectId;
         return this;
     }
 
-    EBProcessDataResponse setNonce(byte[] nonce) {
+    protected EBProcessDataResponse setNonce(byte[] nonce) {
         this.nonce = nonce;
         return this;
     }

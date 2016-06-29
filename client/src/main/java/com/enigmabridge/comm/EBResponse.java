@@ -11,7 +11,7 @@ import java.io.Serializable;
  */
 public class EBResponse implements Serializable {
     public static final long serialVersionUID = 1L;
-    
+
     /**
      * Parsed status code. 0x9000 = OK.
      * @output
@@ -50,6 +50,56 @@ public class EBResponse implements Serializable {
         this.function = function;
     }
 
+    public static abstract class ABuilder<T extends EBResponse, B extends ABuilder> {
+        public B setStatusCode(short statusCode) {
+            getObj().setStatusCode(statusCode);
+            return getThisBuilder();
+        }
+
+        public B setStatusDetail(String statusDetail) {
+            getObj().setStatusDetail(statusDetail);
+            return getThisBuilder();
+        }
+
+        public B setFunction(String function) {
+            getObj().setFunction(function);
+            return getThisBuilder();
+        }
+
+        public B setResult(Object result) {
+            getObj().setResult(result);
+            return getThisBuilder();
+        }
+
+        public B setRawResponse(EBRawResponse rawResponse) {
+            getObj().setRawResponse(rawResponse);
+            return getThisBuilder();
+        }
+
+        public abstract T build();
+        public abstract B getThisBuilder();
+        public abstract T getObj();
+    }
+
+    public static class Builder extends ABuilder<EBResponse, Builder> {
+        private final EBResponse parent = new EBResponse();
+
+        @Override
+        public EBResponse.Builder getThisBuilder() {
+            return this;
+        }
+
+        @Override
+        public EBResponse getObj() {
+            return parent;
+        }
+
+        @Override
+        public EBResponse build() {
+            return parent;
+        }
+    }
+
     /**
      * Returns true if after parsing, code is OK.
      * @returns {boolean}
@@ -71,7 +121,7 @@ public class EBResponse implements Serializable {
         return statusCode;
     }
 
-    public void setStatusCode(short statusCode) {
+    protected void setStatusCode(short statusCode) {
         this.statusCode = statusCode;
     }
 
@@ -79,7 +129,7 @@ public class EBResponse implements Serializable {
         return statusDetail;
     }
 
-    public void setStatusDetail(String statusDetail) {
+    protected void setStatusDetail(String statusDetail) {
         this.statusDetail = statusDetail;
     }
 
@@ -87,7 +137,7 @@ public class EBResponse implements Serializable {
         return function;
     }
 
-    public void setFunction(String function) {
+    protected void setFunction(String function) {
         this.function = function;
     }
 
@@ -95,7 +145,7 @@ public class EBResponse implements Serializable {
         return result;
     }
 
-    public void setResult(Object result) {
+    protected void setResult(Object result) {
         this.result = result;
     }
 
@@ -103,7 +153,7 @@ public class EBResponse implements Serializable {
         return rawResponse;
     }
 
-    public void setRawResponse(EBRawResponse rawResponse) {
+    protected void setRawResponse(EBRawResponse rawResponse) {
         this.rawResponse = rawResponse;
     }
 }

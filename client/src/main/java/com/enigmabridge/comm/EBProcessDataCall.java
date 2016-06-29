@@ -261,23 +261,25 @@ public class EBProcessDataCall extends EBAPICall {
         this.rawResponse = this.connector.request();
 
         // Empty response to parse data to.
-        pdResponse = new EBProcessDataResponse();
-        pdResponse.setRawResponse(rawResponse);
+        EBProcessDataResponse.Builder builder = new EBProcessDataResponse.Builder();
+        builder.setRawResponse(rawResponse);
 
         if (!rawResponse.isSuccessful()){
             LOG.info("Response was not successful: " + rawResponse.toString());
+            pdResponse = builder.build();
             return pdResponse;
         }
 
         // Parse process data response.
         pdResponseParser = new EBProcessDataResponseParser();
         pdResponseParser.setUo(getUo());
-        pdResponseParser.parseResponse(new JSONObject(rawResponse.getBody()), pdResponse, null);
+        pdResponseParser.parseResponse(new JSONObject(rawResponse.getBody()), builder, null);
 
         // Return connector.
         engine.getConMgr().doneWithConnector(connector);
         this.connector = null;
 
+        pdResponse = builder.build();
         return pdResponse;
     }
 
