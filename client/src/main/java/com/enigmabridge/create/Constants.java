@@ -70,4 +70,12 @@ public class Constants {
     public static final String GENKEY_COMP1 = "2";
     public static final String GENKEY_COMP2 = "3";
     public static final String GENKEY_COMP3 = "4";
+
+    public static final String KEY_COMM = "commk";
+    public static final String KEY_COMM_ENC = "comenc";
+    public static final String KEY_COMM_MAC = "commac";
+    public static final String KEY_BILLING = "billing";
+    public static final String KEY_COMM_ENC_NEXT = "comnextenc";
+    public static final String KEY_COMM_MAC_NEXT = "conextmac";
+    public static final String KEY_APP = "app";
 }
