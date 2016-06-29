@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
  *
  * Created by dusanklinec on 26.04.16.
  */
-public class EBEndpointInfo implements Serializable {
+public class EBEndpointInfo implements Serializable, Cloneable {
     public static final long serialVersionUID = 1L;
 
     private static final int DEFAULT_PORT = 11180;
@@ -119,5 +119,9 @@ public class EBEndpointInfo implements Serializable {
                 ", hostname='" + hostname + '\'' +
                 ", port=" + port +
                 '}';
+    }
+
+    public EBEndpointInfo copy(){
+        return new EBEndpointInfo(scheme, hostname, port);
     }
 }
