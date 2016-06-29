@@ -231,6 +231,12 @@ public class EBGetUOTemplateCall extends EBAPICall implements EBResponseParser {
             resp = new EBGetPubKeyResponse.Builder();
         }
 
+        if (!resp.getObj().isCodeOk()){
+            LOG.debug(String.format("Error in processing, status: %04X, message: %s",
+                    (long)resp.getObj().getStatusCode(), resp.getObj().getStatusDetail()));
+            return resp;
+        }
+
         final EBUOTemplateResponse.ABuilder resp2ret = (EBUOTemplateResponse.ABuilder) resp;
         final JSONObject res = data.getJSONObject(FIELD_DATA);
 
