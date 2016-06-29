@@ -6,6 +6,7 @@ import com.enigmabridge.comm.EBConnectionSettings;
 import org.json.JSONObject;
 
 import java.net.MalformedURLException;
+import java.util.Arrays;
 
 /**
  * Asymmetric public import key - for encryption for smartcard.
@@ -85,5 +86,35 @@ public class EBUOTemplateImportKey {
 
     public byte[] getPublicKey() {
         return publicKey;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        EBUOTemplateImportKey that = (EBUOTemplateImportKey) o;
+
+        if (id != null ? !id.equals(that.id) : that.id != null) return false;
+        if (type != null ? !type.equals(that.type) : that.type != null) return false;
+        return Arrays.equals(publicKey, that.publicKey);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + (type != null ? type.hashCode() : 0);
+        result = 31 * result + Arrays.hashCode(publicKey);
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "EBUOTemplateImportKey{" +
+                "id='" + id + '\'' +
+                ", type='" + type + '\'' +
+                ", publicKey=" + Arrays.toString(publicKey) +
+                '}';
     }
 }

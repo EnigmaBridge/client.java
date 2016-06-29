@@ -98,4 +98,37 @@ public class EBUOTemplateKeyOffset {
     public int getTlvtype() {
         return tlvtype;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        EBUOTemplateKeyOffset that = (EBUOTemplateKeyOffset) o;
+
+        if (offset != that.offset) return false;
+        if (length != that.length) return false;
+        if (tlvtype != that.tlvtype) return false;
+        return type != null ? type.equals(that.type) : that.type == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = type != null ? type.hashCode() : 0;
+        result = 31 * result + (int) (offset ^ (offset >>> 32));
+        result = 31 * result + (int) (length ^ (length >>> 32));
+        result = 31 * result + tlvtype;
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "EBUOTemplateKeyOffset{" +
+                "type='" + type + '\'' +
+                ", offset=" + offset +
+                ", length=" + length +
+                ", tlvtype=" + tlvtype +
+                '}';
+    }
 }
