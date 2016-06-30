@@ -79,7 +79,8 @@ public class EBProcessDataCipher {
             }
 
             // Initialize CBC MAC.
-            // There is no AES-CBC-MAC in the BouncyCastle provider.
+            // There is no AES-CBC-MAC in the BouncyCastle JCA/JCE provider.
+            // We need to use BouncyCastle directly for this.
             final BlockCipher cipher = new AESLightEngine();
             final CBCBlockCipherMac mac = new CBCBlockCipherMac(cipher, cipher.getBlockSize() * 8);
             mac.init(new KeyParameter(keys.getMacKey()));
