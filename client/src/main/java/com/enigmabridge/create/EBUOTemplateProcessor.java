@@ -1,13 +1,23 @@
 package com.enigmabridge.create;
 
+import com.enigmabridge.EBCommKeys;
 import com.enigmabridge.EBCryptoException;
 import com.enigmabridge.EBException;
 import com.enigmabridge.EBInvalidException;
 import com.enigmabridge.comm.EBCorruptedException;
 import com.enigmabridge.comm.EBProcessDataCall;
+import com.enigmabridge.comm.EBProcessDataCipher;
+import com.enigmabridge.comm.PKCS7Padding;
+import org.bouncycastle.crypto.Mac;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.ShortBufferException;
+import java.nio.ByteBuffer;
+import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -24,6 +34,7 @@ public class EBUOTemplateProcessor {
 
     protected EBUOTemplateResponse template;
     protected List<EBUOTemplateKey> keys;
+    protected SecureRandom rand;
 
     public EBUOTemplateProcessor() {
     }
@@ -38,17 +49,57 @@ public class EBUOTemplateProcessor {
      */
     public void build(){
         // Template to fill in.
-        byte[] template = this.template.getTemplate();
+        byte[] tplSrc = this.template.getTemplate();
+        byte[] tpl = new byte[tplSrc.length + 4*32];
+        System.arraycopy(tplSrc, 0, tpl, 0, tplSrc.length);
 
         // Fill in template keys
-        template = fillInKeys(template);
+        fillInKeys(tpl);
 
-        // TODO: encrypt.
-        
+        // Encrypt.
+        final int encOffset = (int)template.getEncryptionOffset();
+        if ((encOffset % 7) != 0){
+            throw new EBInvalidException("Encryption offset position has to be byte aligned");
+        }
 
+        if (rand == null){
+            rand = new SecureRandom();
+        }
+
+        byte[] tek = new byte[32];
+        byte[] tmk = new byte[32];
+        rand.nextBytes(tek);
+        rand.nextBytes(tmk);
+
+        final EBProcessDataCipher ebCipher = EBProcessDataCipher.initCipher(true, new EBCommKeys(tek, tmk));
+        final Cipher aes = ebCipher.getEnc();
+        final Mac mac = ebCipher.getMac();
+        int encLen = 0;
+        int paddedLen = 0;
+        int macLen = 0;
+        int encryptedTplLen = 0;
+
+        try {
+            encLen = aes.doFinal(tpl, encOffset, tpl.length - encOffset, tpl, encOffset);
+
+        } catch (ShortBufferException ex){
+            throw new EBCryptoException("ShortBufferException - should not happen", ex);
+        } catch (BadPaddingException e) {
+            throw new EBCryptoException("BadPaddingException - should not happen", e);
+        } catch (IllegalBlockSizeException e) {
+            throw new EBCryptoException("IllegalBlockSizeException - should not happen", e);
+        }
+
+        // Pad for MAC - scheme design.
+        paddedLen = PKCS7Padding.pad(tpl, 0, encOffset + encLen, 16);
+
+        // MAC.
+        mac.update(tpl, 0, paddedLen);
+        macLen = mac.doFinal(tpl, paddedLen);
+        encryptedTplLen = paddedLen + macLen;
     }
 
-    protected byte[] fillInKeys(byte[] template){
+    protected void fillInKeys(byte[] template){
         // Map keyType -> key.
         final List<EBUOTemplateKey> keys = getKeys();
         final Map<String, EBUOTemplateKey> keyMap = new HashMap<String, EBUOTemplateKey>();
@@ -94,6 +145,10 @@ public class EBUOTemplateProcessor {
         return keys;
     }
 
+    public SecureRandom getRand() {
+        return rand;
+    }
+
     public EBUOTemplateProcessor setTemplate(EBUOTemplateResponse template) {
         this.template = template;
         return this;
@@ -106,6 +161,11 @@ public class EBUOTemplateProcessor {
 
     public EBUOTemplateProcessor addKey(EBUOTemplateKey key) {
         getKeys().add(key);
+        return this;
+    }
+
+    public EBUOTemplateProcessor setRand(SecureRandom rand) {
+        this.rand = rand;
         return this;
     }
 }
