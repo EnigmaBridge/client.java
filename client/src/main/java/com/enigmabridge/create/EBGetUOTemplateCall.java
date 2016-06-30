@@ -56,24 +56,6 @@ public class EBGetUOTemplateCall extends EBAPICall implements EBResponseParser {
             return getThisBuilder();
         }
 
-        public B setUo(UserObjectInfo uo){
-            final T obj = getObj();
-            obj.setUo(uo);
-
-            if (uo != null){
-                if (uo.getApiKey() != null && obj.getApiKey() == null){
-                    getObj().setApiKey(uo.getApiKey());
-                }
-                if (uo.getEndpointInfo() != null && obj.getEndpoint() == null){
-                    getObj().setEndpoint(uo.getEndpointInfo());
-                }
-                if(uo.getConnectionSettings() != null && obj.getSettings() == null){
-                    getObj().setSettings(uo.getConnectionSettings());
-                }
-            }
-            return getThisBuilder();
-        }
-
         public B setEngine(EBEngine engine){
             getObj().setEngine(engine);
             final EBSettings settings = engine == null ? null : engine.getDefaultSettings();

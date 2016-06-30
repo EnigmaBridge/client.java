@@ -14,7 +14,7 @@ import java.io.IOException;
  *
  * Created by dusanklinec on 30.06.16.
  */
-public class EBCreateUOCall  extends EBAPICall implements EBResponseParser {
+public class EBCreateUOCall extends EBAPICall implements EBResponseParser {
     private static final Logger LOG = LoggerFactory.getLogger(EBCreateUOCall.class);
     public static final String FIELD_DATA = "data";
 
@@ -52,24 +52,6 @@ public class EBCreateUOCall  extends EBAPICall implements EBResponseParser {
 
         public B setApiKey(String apiKey){
             getObj().setApiKey(apiKey);
-            return getThisBuilder();
-        }
-
-        public B setUo(UserObjectInfo uo){
-            final T obj = getObj();
-            obj.setUo(uo);
-
-            if (uo != null){
-                if (uo.getApiKey() != null && obj.getApiKey() == null){
-                    getObj().setApiKey(uo.getApiKey());
-                }
-                if (uo.getEndpointInfo() != null && obj.getEndpoint() == null){
-                    getObj().setEndpoint(uo.getEndpointInfo());
-                }
-                if(uo.getConnectionSettings() != null && obj.getSettings() == null){
-                    getObj().setSettings(uo.getConnectionSettings());
-                }
-            }
             return getThisBuilder();
         }
 
