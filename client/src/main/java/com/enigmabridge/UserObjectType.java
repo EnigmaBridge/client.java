@@ -126,7 +126,7 @@ public class UserObjectType implements Serializable{
         return uoType;
     }
 
-    public String getUoTypeFunctionString(){
+    public static String getUoTypeFunctionString(int uoType){
         switch(uoType) {
             case TYPE_HMAC:
                 return "HMAC";
@@ -169,6 +169,10 @@ public class UserObjectType implements Serializable{
             default:
                 return "PROCESSDATA";
         }
+    }
+
+    public String getUoTypeFunctionString(){
+        return getUoTypeFunctionString(uoType);
     }
 
     /**
