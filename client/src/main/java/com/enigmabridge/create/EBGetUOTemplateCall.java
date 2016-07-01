@@ -244,7 +244,10 @@ public class EBGetUOTemplateCall extends EBAPICall implements EBResponseParser {
             offBld.setType(offset.getString("type"));
             offBld.setOffset(EBUtils.getAsLong(offset, "offset", 10));
             offBld.setLength(EBUtils.getAsLong(offset, "length", 10));
-            offBld.setTlvtype(EBUtils.getAsInteger(offset, "tlvtype", 10));
+
+            if (offset.has("tlvtype")) {
+                offBld.setTlvtype(EBUtils.getAsInteger(offset, "tlvtype", 10));
+            }
 
             offsets.add(offBld.build());
         }
