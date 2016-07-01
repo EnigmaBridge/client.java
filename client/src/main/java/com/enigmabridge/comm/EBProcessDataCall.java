@@ -72,9 +72,9 @@ public class EBProcessDataCall extends EBAPICall {
                 getThisBuilder().setSettings(uo);
 
                 final UserObjectType uot = uo.getUserObjectType();
-                final EBRequestType tmpReqType2 = uot == null ? null : uot.getRequestType();
-                if (tmpReqType2 != null && obj.getProcessFunction() == null){
-                    obj.setProcessFunction(tmpReqType2);
+                final String fction = uot == null ? null : uot.getUoTypeFunctionString();
+                if (fction != null){
+                    obj.setProcessFunction(fction);
                 }
             }
 

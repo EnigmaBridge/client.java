@@ -6,6 +6,7 @@ package com.enigmabridge.comm;
  */
 public enum EBRequestType {
     PLAINAES("PLAINAES"),
+    PLAINAESDECRYPT("PLAINAESDECRYPT"),
     RSA1024("RSA1024"),
     RSA2048("RSA2048"),
     AUTH_NEWUSERCTX("AUTH_NEWUSERCTX"),

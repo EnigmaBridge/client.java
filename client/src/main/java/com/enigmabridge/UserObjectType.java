@@ -15,72 +15,59 @@ public class UserObjectType implements Serializable{
     protected static final int TYPE_MASK = 0xffff;
 
     // Request type from the lower bytes.
-    protected static final int REQ_PLAINAES = 1;
-    protected static final int REQ_RSA1024 = 2;
-    protected static final int REQ_RSA2048 = 3;
-    protected static final int REQ_AUTH_NEWUSERCTX = 4;
-    protected static final int REQ_AUTH_HOTP = 5;
-    protected static final int REQ_AUTH_PASSWD = 6;
-    protected static final int REQ_AUTH_UPDATEUSERCTX = 7;
-    protected static final int REQ_HMAC = 8;
-    protected static final int REQ_SCRAMBLE = 9;
-    protected static final int REQ_ENSCRAMBLE = 10;
-    protected static final int REQ_FP192SIGN = 11;
-    protected static final int REQ_TOKENIZE = 12;
-    protected static final int REQ_DETOKENIZE = 13;
-    protected static final int REQ_TOKENIZEWRAP = 14;
-    protected static final int REQ_RANDOMDATA = 15;
+    public static final int TYPE_HMAC = 0x0001;
+    public static final int TYPE_SCRAMBLE = 0x0002;
+    public static final int TYPE_ENSCRAMBLE = 0x0003;
+    public static final int TYPE_PLAINAES = 0x0004;
+    public static final int TYPE_RSA1024DECRYPT_NOPAD = 0x0005;
+    public static final int TYPE_RSA2048DECRYPT_NOPAD = 0x0006;
+    public static final int TYPE_EC_FP192SIGN = 0x0007;
+    public static final int TYPE_AUTH_HOTP = 0x0008;
+    public static final int TYPE_AUTH_NEW_USER_CTX = 0x0009;
+    public static final int TYPE_AUTH_PASSWORD = 0x000a;
+    public static final int TYPE_AUTH_UPDATE_USER_CTX = 0x000b;
+    public static final int TYPE_TOKENIZE = 0x000c;
+    public static final int TYPE_DETOKENIZE = 0x000d;
+    public static final int TYPE_TOKENIZEWRAP = 0x000e;
+    public static final int TYPE_PLAINAESDECRYPT = 0x000f;
+    public static final int TYPE_RANDOMDATA = 0x0010;
+    public static final int TYPE_CREATENEWUO = 0x0011;
+    public static final int TYPE_RSA1024ENCRYPT_NOPAD = 0x0012;
+    public static final int TYPE_RSA2048ENCRYPT_NOPAD = 0x0013;
 
-    public static final UserObjectType TYPE_PLAINAES = UserObjectType.valueOf(REQ_PLAINAES);
-    public static final UserObjectType TYPE_RSA1024 = UserObjectType.valueOf(REQ_RSA1024);
-    public static final UserObjectType TYPE_RSA2048 = UserObjectType.valueOf(REQ_RSA2048);
-    public static final UserObjectType TYPE_RANDOM = UserObjectType.valueOf(REQ_RANDOMDATA);
-
-    /**
-     * Serialized information goes here.
-     */
-    protected long backingBuffer = INVALID_TYPE;
+    public static final UserObjectType OBJ_PLAINAES = UserObjectType.valueOf(TYPE_PLAINAES);
+    public static final UserObjectType OBJ_PLAINAESDECRYPT = UserObjectType.valueOf(TYPE_PLAINAESDECRYPT);
+    public static final UserObjectType OBJ_RSA1024 = UserObjectType.valueOf(TYPE_RSA1024DECRYPT_NOPAD);
+    public static final UserObjectType OBJ_RSA2048 = UserObjectType.valueOf(TYPE_RSA2048DECRYPT_NOPAD);
+    public static final UserObjectType OBJ_RANDOM = UserObjectType.valueOf(TYPE_RANDOMDATA);
     public static final UserObjectType INVALID = UserObjectType.valueOf(INVALID_TYPE);
 
+    protected int uoType;
+    protected boolean appKeyClientGenerated = false;
+    protected boolean comKeyClientGenerated = false;
+
     public static abstract class AbstractBuilder<T extends UserObjectType, B extends AbstractBuilder> {
-        String alg;
-        int keyLen;
-
-        public B setRequestType(EBRequestType a) {
-            getObj().backingBuffer = getCodeFromRequestType(a);
+        public B setUoTypeFunction(int type) {
+            getObj().uoType = type;
             return getThisBuilder();
         }
 
-        public B setAlgorithm(String alg) {
-            this.alg = alg;
+        public B setAppKeyClientGenerated(boolean gen) {
+            getObj().appKeyClientGenerated = gen;
             return getThisBuilder();
         }
 
-        public B setKeyLen(int keyLen){
-            this.keyLen = keyLen;
+        public B setComKeyClientGenerated(boolean gen) {
+            getObj().comKeyClientGenerated = gen;
             return getThisBuilder();
         }
 
-        public B setType(long buffer){
-            getObj().backingBuffer = buffer;
+        public B setUoType(long buffer){
+            getObj().setValue(buffer);
             return getThisBuilder();
         }
 
         public T build(){
-            if (getObj().backingBuffer == INVALID_TYPE){
-                if ("AES".equals(alg) && keyLen == 256){
-                    getObj().backingBuffer = getCodeFromRequestType(EBRequestType.PLAINAES);
-                } else if ("RSA".equals(alg) && keyLen == 1024){
-                    getObj().backingBuffer = getCodeFromRequestType(EBRequestType.RSA1024);
-                } else if ("RSA".equals(alg) && keyLen == 2048){
-                    getObj().backingBuffer = getCodeFromRequestType(EBRequestType.RSA2048);
-                }
-            }
-
-            if (getObj().backingBuffer == INVALID_TYPE){
-                throw new IllegalArgumentException("Invalid type");
-            }
-
             return getObj();
         }
 
@@ -111,12 +98,14 @@ public class UserObjectType implements Serializable{
     UserObjectType() {
     }
 
-    UserObjectType(long backingBuffer) {
-        this.backingBuffer = backingBuffer;
+    public UserObjectType(long serialized) {
+        setValue(serialized);
     }
 
-    UserObjectType(EBRequestType type) {
-        this.backingBuffer = getCodeFromRequestType(type);
+    public UserObjectType(int function, boolean appKeyClientGenerated, boolean comKeyClientGenerated){
+        this.uoType = function;
+        this.appKeyClientGenerated = appKeyClientGenerated;
+        this.comKeyClientGenerated = comKeyClientGenerated;
     }
 
     /**
@@ -129,39 +118,73 @@ public class UserObjectType implements Serializable{
     }
 
     /**
-     * Builder from the backing buffer.
-     * @param type
-     * @return
+     * Returns request type encoded in the UO.
+     *
+     * @return uo type function
      */
-    public static UserObjectType valueOf(EBRequestType type){
-        return new UserObjectType(type);
+    public int getUoTypeFunction(){
+        return uoType;
     }
 
-    /**
-     * Returns request type encoded in the UO.
-     * TODO: more requests for one UOType?
-     * @return
-     */
-    public EBRequestType getRequestType(){
-        if (backingBuffer == INVALID_TYPE){
-            return null;
+    public String getUoTypeFunctionString(){
+        switch(uoType) {
+            case TYPE_HMAC:
+                return "HMAC";
+            case TYPE_SCRAMBLE:
+                return "SCRAMBLE";
+            case TYPE_ENSCRAMBLE:
+                return "ENSCRAMBLE";
+            case TYPE_PLAINAES:
+                return "PLAINAES";
+            case TYPE_RSA1024DECRYPT_NOPAD:
+                return "RSA1024DECRYPT_NOPAD";
+            case TYPE_RSA2048DECRYPT_NOPAD:
+                return "RSA2048DECRYPT_NOPAD";
+            case TYPE_EC_FP192SIGN:
+                return "EC_FP192SIGN";
+            case TYPE_AUTH_HOTP:
+                return "AUTH_HOTP";
+            case TYPE_AUTH_NEW_USER_CTX:
+                return "AUTH_NEW_USER_CTX";
+            case TYPE_AUTH_PASSWORD:
+                return "AUTH_PASSWORD";
+            case TYPE_AUTH_UPDATE_USER_CTX:
+                return "AUTH_UPDATE_USER_CTX";
+            case TYPE_TOKENIZE:
+                return "TOKENIZE";
+            case TYPE_DETOKENIZE:
+                return "DETOKENIZE";
+            case TYPE_TOKENIZEWRAP:
+                return "TOKENIZEWRAP";
+            case TYPE_PLAINAESDECRYPT:
+                return "PLAINAESDECRYPT";
+            case TYPE_RANDOMDATA:
+                return "RANDOMDATA";
+            case TYPE_CREATENEWUO:
+                return "CREATENEWUO";
+            case TYPE_RSA1024ENCRYPT_NOPAD:
+                return "RSA1024ENCRYPT_NOPAD";
+            case TYPE_RSA2048ENCRYPT_NOPAD:
+                return "RSA2048ENCRYPT_NOPAD";
+            default:
+                return "PROCESSDATA";
         }
-
-        return getRequestTypeFromCode((int) (backingBuffer & TYPE_MASK));
     }
 
     /**
      * Returns algorithm for given UO.
      * May Return AES, RSA, ... null if undefined for this user object.
-     * @return
+     * @return key algorithm, if key
      */
     public String getAlgorithm(){
-        final EBRequestType requestType = getRequestType();
-        switch (requestType){
-            case PLAINAES:
+        switch (uoType){
+            case TYPE_PLAINAES:
+            case TYPE_PLAINAESDECRYPT:
                 return "AES";
-            case RSA1024:
-            case RSA2048:
+            case TYPE_RSA1024DECRYPT_NOPAD:
+            case TYPE_RSA1024ENCRYPT_NOPAD:
+            case TYPE_RSA2048DECRYPT_NOPAD:
+            case TYPE_RSA2048ENCRYPT_NOPAD:
                 return "RSA";
             default:
                 return null;
@@ -170,15 +193,17 @@ public class UserObjectType implements Serializable{
 
     /**
      * Returns key type, if represents key.
-     * @return
+     * @return key type (secret/public/private)
      */
     public UserObjectKeyType getKeyType(){
-        final EBRequestType requestType = getRequestType();
-        switch (requestType){
-            case PLAINAES:
+        switch (uoType){
+            case TYPE_PLAINAES:
+            case TYPE_PLAINAESDECRYPT:
                 return UserObjectKeyType.SECRET;
-            case RSA1024:
-            case RSA2048:
+            case TYPE_RSA1024DECRYPT_NOPAD:
+            case TYPE_RSA1024ENCRYPT_NOPAD:
+            case TYPE_RSA2048DECRYPT_NOPAD:
+            case TYPE_RSA2048ENCRYPT_NOPAD:
                 return UserObjectKeyType.PRIVATE;
             default:
                 return null;
@@ -190,25 +215,36 @@ public class UserObjectType implements Serializable{
      * @return key lenght in bits, 0 if not applicable.
      */
     public int keyLength(){
-        final EBRequestType requestType = getRequestType();
-        switch (requestType){
-            case PLAINAES:
+        switch (uoType){
+            case TYPE_PLAINAES:
+            case TYPE_PLAINAESDECRYPT:
                 return 256;
-            case RSA1024:
+            case TYPE_RSA1024DECRYPT_NOPAD:
+            case TYPE_RSA1024ENCRYPT_NOPAD:
                 return 1024;
-            case RSA2048:
+            case TYPE_RSA2048DECRYPT_NOPAD:
+            case TYPE_RSA2048ENCRYPT_NOPAD:
                 return 2048;
             default:
                 return 0;
         }
     }
 
-    public long getBackingBuffer() {
-        return backingBuffer;
+    public static long getValue(int function, boolean appKeyClientGenerated, boolean comKeyClientGenerated){
+        long type = function;
+        type |= appKeyClientGenerated ? 1L<<21 : 0;
+        type |= comKeyClientGenerated ? 1L<<20 : 0;
+        return type;
     }
 
-    void setBackingBuffer(long backingBuffer) {
-        this.backingBuffer = backingBuffer;
+    public long getValue() {
+        return getValue(uoType, appKeyClientGenerated, comKeyClientGenerated);
+    }
+
+    protected void setValue(long value){
+        uoType = (int) (value & TYPE_MASK);
+        appKeyClientGenerated = (value & (1L << 21)) > 0;
+        comKeyClientGenerated = (value & (1L << 20)) > 0;
     }
 
     /**
@@ -219,11 +255,11 @@ public class UserObjectType implements Serializable{
      */
     public Object toJSON(JSONObject parent, String key){
         if (parent == null){
-            return getBackingBuffer();
+            return getValue();
         }
 
-        parent.put(key, getBackingBuffer());
-        return getBackingBuffer();
+        parent.put(key, getValue());
+        return getValue();
     }
 
     public static UserObjectType fromJSON(JSONObject parent, String key){
@@ -234,81 +270,9 @@ public class UserObjectType implements Serializable{
         return valueOf(parent.getLong(key));
     }
 
-    private static EBRequestType getRequestTypeFromCode(int code){
-        switch(code){
-            case REQ_PLAINAES:
-                return EBRequestType.PLAINAES;
-            case REQ_RSA1024:
-                return EBRequestType.RSA1024;
-            case REQ_RSA2048:
-                return EBRequestType.RSA2048;
-            case REQ_AUTH_NEWUSERCTX:
-                return EBRequestType.AUTH_NEWUSERCTX;
-            case REQ_AUTH_HOTP:
-                return EBRequestType.AUTH_HOTP;
-            case REQ_AUTH_PASSWD:
-                return EBRequestType.AUTH_PASSWD;
-            case REQ_AUTH_UPDATEUSERCTX:
-                return EBRequestType.AUTH_UPDATEUSERCTX;
-            case REQ_HMAC:
-                return EBRequestType.HMAC;
-            case REQ_SCRAMBLE:
-                return EBRequestType.SCRAMBLE;
-            case REQ_ENSCRAMBLE:
-                return EBRequestType.ENSCRAMBLE;
-            case REQ_FP192SIGN:
-                return EBRequestType.FP192SIGN;
-            case REQ_TOKENIZE:
-                return EBRequestType.TOKENIZE;
-            case REQ_DETOKENIZE:
-                return EBRequestType.DETOKENIZE;
-            case REQ_TOKENIZEWRAP:
-                return EBRequestType.TOKENIZEWRAP;
-            case REQ_RANDOMDATA:
-                return EBRequestType.RANDOMDATA;
-            default: return null;
-        }
-    }
-
-    private static int getCodeFromRequestType(EBRequestType request){
-        switch(request){
-            case PLAINAES:
-                return REQ_PLAINAES;
-            case RSA1024:
-                return REQ_RSA1024;
-            case RSA2048:
-                return REQ_RSA2048;
-            case AUTH_NEWUSERCTX:
-                return REQ_AUTH_NEWUSERCTX;
-            case AUTH_HOTP:
-                return REQ_AUTH_HOTP;
-            case AUTH_PASSWD:
-                return REQ_AUTH_PASSWD;
-            case AUTH_UPDATEUSERCTX:
-                return REQ_AUTH_UPDATEUSERCTX;
-            case HMAC:
-                return REQ_HMAC;
-            case SCRAMBLE:
-                return REQ_SCRAMBLE;
-            case ENSCRAMBLE:
-                return REQ_ENSCRAMBLE;
-            case FP192SIGN:
-                return REQ_FP192SIGN;
-            case TOKENIZE:
-                return REQ_TOKENIZE;
-            case DETOKENIZE:
-                return REQ_DETOKENIZE;
-            case TOKENIZEWRAP:
-                return REQ_TOKENIZEWRAP;
-            case RANDOMDATA:
-                return REQ_RANDOMDATA;
-            default: return -1;
-        }
-    }
-
     @Override
     public String toString() {
-        return "{" + backingBuffer + "}";
+        return "{" + getValue() + "}";
     }
 
     @Override
@@ -318,12 +282,17 @@ public class UserObjectType implements Serializable{
 
         UserObjectType that = (UserObjectType) o;
 
-        return backingBuffer == that.backingBuffer;
+        if (uoType != that.uoType) return false;
+        if (appKeyClientGenerated != that.appKeyClientGenerated) return false;
+        return comKeyClientGenerated == that.comKeyClientGenerated;
 
     }
 
     @Override
     public int hashCode() {
-        return (int) (backingBuffer ^ (backingBuffer >>> 32));
+        int result = uoType;
+        result = 31 * result + (appKeyClientGenerated ? 1 : 0);
+        result = 31 * result + (comKeyClientGenerated ? 1 : 0);
+        return result;
     }
 }

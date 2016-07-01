@@ -219,7 +219,7 @@ public class EBProcessDataCallIT {
         try {
             final UserObjectInfoBase uo = new UserObjectInfoBase.Builder()
                     .setUoid(EBTestingUtils.UOID_AES)
-                    .setUserObjectType(UserObjectType.TYPE_PLAINAES)
+                    .setUserObjectType(UserObjectType.OBJ_PLAINAES)
                     .setCommKeys(ckAES)
                     .build();
 

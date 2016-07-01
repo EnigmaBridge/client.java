@@ -10,7 +10,7 @@ import com.enigmabridge.comm.EBRawRequest;
 public class EBUOGetTemplateRequest extends EBRawRequest {
     protected int format = 1;        //<integer, starting with 1>,
     protected int protocol = 1;      //<integer, starting with 1>,
-    protected long type = UserObjectType.TYPE_PLAINAES.getBackingBuffer(); //<32bit integer>,
+    protected long type = UserObjectType.getValue(UserObjectType.TYPE_PLAINAES, true, false); //<32bit integer>,
     protected String environment = Constants.ENV_DEV; // shows whether the UO should be for production (live), test (pre-production testing), or dev (development)
     protected String maxtps = Constants.MAXTPS_UNLIMITED; // maximum guaranteed TPS
     protected String core = Constants.CORE_EMPTY; // how many cards have UO loaded permanently
@@ -24,8 +24,8 @@ public class EBUOGetTemplateRequest extends EBRawRequest {
     protected String resource = Constants.RESOURCE_GLOBAL;
     protected int credit = 256; // <1-32767>, a limit a seed card can provide to the EB service
     protected String generationCommKey = Constants.GENKEY_CLIENT;
-    protected String generationBillingKey = Constants.GENKEY_CLIENT;
-    protected String generationAppKey = Constants.GENKEY_CLIENT;
+    protected String generationBillingKey = Constants.GENKEY_ENROLL_RANDOM;
+    protected String generationAppKey = Constants.GENKEY_ENROLL_RANDOM;
 
     public int getFormat() {
         return format;
@@ -55,7 +55,7 @@ public class EBUOGetTemplateRequest extends EBRawRequest {
     }
 
     public EBUOGetTemplateRequest setType(UserObjectType type) {
-        this.type = type.getBackingBuffer();
+        this.type = type.getValue();
         return this;
     }
 

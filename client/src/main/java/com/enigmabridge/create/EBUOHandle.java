@@ -1,5 +1,7 @@
 package com.enigmabridge.create;
 
+import com.enigmabridge.UserObjectType;
+
 /**
  * User object handle.
  * Util method.
@@ -9,7 +11,7 @@ package com.enigmabridge.create;
 public class EBUOHandle {
     protected String apiKey;
     protected long uoId;
-    protected long uoType;
+    protected UserObjectType uoType;
 
     public EBUOHandle() {
     }
@@ -17,7 +19,7 @@ public class EBUOHandle {
     public EBUOHandle(String apiKey, long uoId, long uoType) {
         this.apiKey = apiKey;
         this.uoId = uoId;
-        this.uoType = uoType;
+        this.uoType = new UserObjectType(uoType);
     }
 
     // Setters
@@ -33,7 +35,7 @@ public class EBUOHandle {
     }
 
     public EBUOHandle setUoType(long uoType) {
-        this.uoType = uoType;
+        this.uoType = new UserObjectType(uoType);
         return this;
     }
 
@@ -47,12 +49,12 @@ public class EBUOHandle {
         return uoId;
     }
 
-    public long getUoType() {
+    public UserObjectType getUoType() {
         return uoType;
     }
 
     public String getHandle(){
-        return String.format("%s00%08x00%08x", apiKey, uoId, uoType);
+        return String.format("%s00%08x00%08x", apiKey, uoId, uoType.getValue());
     }
 
     @Override
@@ -63,8 +65,8 @@ public class EBUOHandle {
         EBUOHandle that = (EBUOHandle) o;
 
         if (uoId != that.uoId) return false;
-        if (uoType != that.uoType) return false;
-        return apiKey != null ? apiKey.equals(that.apiKey) : that.apiKey == null;
+        if (apiKey != null ? !apiKey.equals(that.apiKey) : that.apiKey != null) return false;
+        return uoType != null ? uoType.equals(that.uoType) : that.uoType == null;
 
     }
 
@@ -72,7 +74,7 @@ public class EBUOHandle {
     public int hashCode() {
         int result = apiKey != null ? apiKey.hashCode() : 0;
         result = 31 * result + (int) (uoId ^ (uoId >>> 32));
-        result = 31 * result + (int) (uoType ^ (uoType >>> 32));
+        result = 31 * result + (uoType != null ? uoType.hashCode() : 0);
         return result;
     }
 

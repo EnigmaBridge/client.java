@@ -6,8 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.*;
 
-import java.util.List;
-
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
@@ -65,7 +63,7 @@ public class EBGenRandomCallIT {
             // Create UOKey
             final UserObjectInfoBase uo = new UserObjectInfoBase.Builder()
                     .setUoid(EBTestingUtils.UOID_RANDOM)
-                    .setUserObjectType(UserObjectType.TYPE_RANDOM)
+                    .setUserObjectType(UserObjectType.OBJ_RANDOM)
                     .setCommKeys(ck)
                     .build();
 
