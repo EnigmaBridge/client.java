@@ -1,6 +1,5 @@
 package com.enigmabridge.create;
 
-import com.enigmabridge.EBUtils;
 import com.enigmabridge.comm.EBResponse;
 
 import java.util.Arrays;
@@ -13,15 +12,20 @@ import java.util.List;
  * Created by dusanklinec on 30.06.16.
  */
 public class EBCreateUOResponse extends EBResponse {
-    private long objectId;
+    private EBUOHandle handle;
     private byte[] certificate;
     private List<byte[]> certificateChain;
 
     public static abstract class ABuilder<T extends EBCreateUOResponse, B extends EBCreateUOResponse.ABuilder>
             extends EBResponse.ABuilder<T,B>
     {
-        public B setObjectId(long objectId) {
-            getObj().setObjectId(objectId);
+        public B setHandle(String handle) {
+            getObj().setHandle(EBCreateUtils.getHandleObj(handle));
+            return getThisBuilder();
+        }
+
+        public B setHandle(EBUOHandle handle) {
+            getObj().setHandle(handle);
             return getThisBuilder();
         }
 
@@ -61,8 +65,8 @@ public class EBCreateUOResponse extends EBResponse {
 
     // Setters
 
-    protected EBCreateUOResponse setObjectId(long objectId) {
-        this.objectId = objectId;
+    public EBCreateUOResponse setHandle(EBUOHandle handle) {
+        this.handle = handle;
         return this;
     }
 
@@ -78,8 +82,8 @@ public class EBCreateUOResponse extends EBResponse {
 
     // Getters
 
-    public long getObjectId() {
-        return objectId;
+    public EBUOHandle getHandle() {
+        return handle;
     }
 
     public byte[] getCertificate() {
@@ -93,6 +97,8 @@ public class EBCreateUOResponse extends EBResponse {
         return certificateChain;
     }
 
+    // hashCode, equals, toString
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -100,7 +106,7 @@ public class EBCreateUOResponse extends EBResponse {
 
         EBCreateUOResponse that = (EBCreateUOResponse) o;
 
-        if (objectId != that.objectId) return false;
+        if (handle != null ? !handle.equals(that.handle) : that.handle != null) return false;
         if (!Arrays.equals(certificate, that.certificate)) return false;
         return certificateChain != null ? certificateChain.equals(that.certificateChain) : that.certificateChain == null;
 
@@ -108,7 +114,7 @@ public class EBCreateUOResponse extends EBResponse {
 
     @Override
     public int hashCode() {
-        int result = (int) (objectId ^ (objectId >>> 32));
+        int result = handle != null ? handle.hashCode() : 0;
         result = 31 * result + Arrays.hashCode(certificate);
         result = 31 * result + (certificateChain != null ? certificateChain.hashCode() : 0);
         return result;
@@ -117,8 +123,8 @@ public class EBCreateUOResponse extends EBResponse {
     @Override
     public String toString() {
         return "EBCreateUOResponse{" +
-                "objectId=" + objectId +
-                ", certificate=" + EBUtils.byte2hex(certificate) +
+                "handle=" + handle +
+                ", certificate=" + Arrays.toString(certificate) +
                 ", certificateChain=" + certificateChain +
                 "} " + super.toString();
     }
