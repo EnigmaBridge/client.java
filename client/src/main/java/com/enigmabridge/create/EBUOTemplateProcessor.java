@@ -33,9 +33,9 @@ public class EBUOTemplateProcessor {
     protected SecureRandom rand;
 
     /**
-     * Key used in the last build.
+     * Import key used in the last build.
      */
-    protected EBUOTemplateKey keyUsed;
+    protected EBUOTemplateImportKey keyUsed;
 
     protected byte[] tek;
     protected byte[] tmk;
@@ -189,7 +189,7 @@ public class EBUOTemplateProcessor {
      * @param plain plain buffer to protect/encrypt
      * @return byte result of the operation, new buffer.
      */
-    protected byte[] encryptImportKey(EBUOTemplateKey key, byte[] plain) {
+    protected byte[] encryptImportKey(EBUOTemplateImportKey key, byte[] plain) {
         final Key rsaPubKey = readSerializedRSAPublicKey(key);
 
         try {
@@ -217,7 +217,7 @@ public class EBUOTemplateProcessor {
      * @param key RSA public key to deserialize.
      * @return java crypto key
      */
-    protected Key readSerializedRSAPublicKey(EBUOTemplateKey key){
+    protected Key readSerializedRSAPublicKey(EBUOTemplateImportKey key){
         // Read serialized import public key.
         BigInteger exp = null;
         BigInteger mod = null;
@@ -226,7 +226,7 @@ public class EBUOTemplateProcessor {
         }
 
         // TAG|len-2B|value. 81 = exponent, 82 = modulus
-        byte keyVal[] = key.getKey();
+        byte keyVal[] = key.getPublicKey();
         byte tmpDat[] = null;
         int tag, len, pos, ln = keyVal.length;
         for(pos = 0; pos < ln;){
@@ -276,12 +276,12 @@ public class EBUOTemplateProcessor {
      * Returns the best import key - strongest supported.
      * @return EBUOTemplateKey
      */
-    protected EBUOTemplateKey getBestImportKey(){
-        EBUOTemplateKey rsa1024 = null;
-        EBUOTemplateKey rsa2048 = null;
-        final List<EBUOTemplateKey> keys = getKeys();
+    protected EBUOTemplateImportKey getBestImportKey(){
+        EBUOTemplateImportKey rsa1024 = null;
+        EBUOTemplateImportKey rsa2048 = null;
+        final List<EBUOTemplateImportKey> keys = getTemplate().getImportKeys();
 
-        for(EBUOTemplateKey key : keys){
+        for(EBUOTemplateImportKey key : keys){
             if ("rsa1024".equalsIgnoreCase(key.getType())){
                 rsa1024 = key;
             }
@@ -308,7 +308,7 @@ public class EBUOTemplateProcessor {
         return rand;
     }
 
-    public EBUOTemplateKey getKeyUsed() {
+    public EBUOTemplateImportKey getKeyUsed() {
         return keyUsed;
     }
 
