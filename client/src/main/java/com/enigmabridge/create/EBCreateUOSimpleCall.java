@@ -3,10 +3,10 @@ package com.enigmabridge.create;
 import com.enigmabridge.EBEndpointInfo;
 import com.enigmabridge.EBEngine;
 import com.enigmabridge.EBSettings;
-import com.enigmabridge.UserObjectInfo;
-import com.enigmabridge.comm.EBAPICall;
 import com.enigmabridge.comm.EBConnectionSettings;
+import com.enigmabridge.comm.EBCorruptedException;
 
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -32,6 +32,9 @@ public class EBCreateUOSimpleCall {
 
     // Keys to set to UO.
     protected List<EBUOTemplateKey> keys = null;
+
+    // Response from creating new UO.
+    protected EBCreateUOResponse response;
 
     /**
      * Separate abstract builder, chain from EBApiCall broken on purpose, restrict setters of this builder, e.g. callFunction.
@@ -141,6 +144,41 @@ public class EBCreateUOSimpleCall {
         }
     }
 
+    /**
+     * Create User Object call.
+     *
+     * @return create UO response.
+     * @throws IOException
+     * @throws EBCorruptedException
+     */
+    public EBCreateUOResponse create() throws IOException, EBCorruptedException {
+        // Init request if none is initialized.
+        if (this.getTplRequest() == null){
+            this.setTplRequest(new EBUOGetTemplateRequest());
+        }
+
+        // Get template.
+        final EBUOTemplateResponse templateResponse = getTemplateCall.doRequest(tplRequest);
+
+        // Process template.
+        final EBUOTemplateProcessor processor = new EBUOTemplateProcessor(templateResponse, getKeys());
+        final byte[] template = processor.build();
+        final EBUOTemplateImportKey importKeyUsed = processor.getKeyUsed();
+
+        // Create UO.
+        final EBCreateUORequest createRequest = new EBCreateUORequest();
+        createRequest
+                .setObjectId(templateResponse.getObjectId())
+                .setObject(template)
+                .setImportKeyId(importKeyUsed.getId())
+                .setAuthorization(templateResponse.getAuthorization());
+
+        response = createUOcall.doRequest(createRequest);
+        return response;
+    }
+
+    // Setters
+
     protected EBCreateUOSimpleCall setTplRequest(EBUOGetTemplateRequest tplRequest) {
         this.tplRequest = tplRequest;
         return this;
@@ -151,6 +189,8 @@ public class EBCreateUOSimpleCall {
         return this;
     }
 
+    // Getters
+
     public EBUOGetTemplateRequest getTplRequest() {
         return tplRequest;
     }
@@ -160,5 +200,9 @@ public class EBCreateUOSimpleCall {
             this.keys = new LinkedList<EBUOTemplateKey>();
         }
         return keys;
+    }
+
+    public EBCreateUOResponse getResponse() {
+        return response;
     }
 }
