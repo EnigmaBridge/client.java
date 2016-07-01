@@ -130,9 +130,9 @@ public class EBGetUOTemplateCall extends EBAPICall implements EBResponseParser {
         final JSONObject jdat = new JSONObject();
         jreq.put("data", jdat);
 
-        jdat.put("format",      String.valueOf(request.getFormat()));        //<integer, starting with 1>,
-        jdat.put("protocol",    String.valueOf(request.getProtocol()));      //<integer, starting with 1>,
-        jdat.put("type",        String.valueOf(request.getType()));        //<32bit integer>,
+        jdat.put("format",      request.getFormat());        //<integer, starting with 1>,
+        jdat.put("protocol",    request.getProtocol());      //<integer, starting with 1>,
+        jdat.put("type",        Long.toHexString(request.getType()));        // "<32bit integer>" - hexcoded,
         jdat.put("environment", request.getEnvironment()); // shows whether the UO should be for production (live), test (pre-production testing), or dev (development)
         jdat.put("maxtps",      request.getMaxtps()); // maximum guaranteed TPS
         jdat.put("core",        request.getCore()); // how many cards have UO loaded permanently
@@ -144,12 +144,12 @@ public class EBGetUOTemplateCall extends EBAPICall implements EBResponseParser {
         jdat.put("clientiv",    request.getClientiv()); //  if "yes", we expect the data starts with an IV to initialize decryption of data - this is for communication security
         jdat.put("clientdiv",   request.getClientdiv()); // if "yes", we expect the data starting with a diversification 16B for communication keys
         jdat.put("resource",    request.getResource());
-        jdat.put("credit",      String.valueOf(request.getCredit())); // <1-32767>, a limit a seed card can provide to the EB service
+        jdat.put("credit",      request.getCredit()); // <1-32767>, a limit a seed card can provide to the EB service
 
         final JSONObject jgen = new JSONObject();
-        jgen.put("commkey", request.getGenerationCommKey());
-        jgen.put("billingkey", request.getGenerationBillingKey());
-        jgen.put("appkey", request.getGenerationAppKey());
+        jgen.put("commkey",     Integer.valueOf(request.getGenerationCommKey()));
+        jgen.put("billingkey",  Integer.valueOf(request.getGenerationBillingKey()));
+        jgen.put("appkey",      Integer.valueOf(request.getGenerationAppKey()));
         jdat.put("generation", jgen);
 
         // Build the rest of the request - headers.
