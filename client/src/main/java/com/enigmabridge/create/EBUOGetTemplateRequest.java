@@ -23,9 +23,9 @@ public class EBUOGetTemplateRequest extends EBRawRequest {
     protected String clientdiv = Constants.NO; // if "yes", we expect the data starting with a diversification 16B for communication keys
     protected String resource = Constants.RESOURCE_GLOBAL;
     protected int credit = 256; // <1-32767>, a limit a seed card can provide to the EB service
-    protected String generationCommKey = Constants.GENKEY_SERVER;
-    protected String generationBillingKey = Constants.GENKEY_SERVER;
-    protected String generationAppKey = Constants.GENKEY_SERVER;
+    protected String generationCommKey = Constants.GENKEY_CLIENT;
+    protected String generationBillingKey = Constants.GENKEY_CLIENT;
+    protected String generationAppKey = Constants.GENKEY_CLIENT;
 
     public int getFormat() {
         return format;
