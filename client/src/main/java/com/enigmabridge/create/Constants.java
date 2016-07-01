@@ -65,11 +65,13 @@ public class Constants {
     public static final String RESOURCE_CLUSTER = "cluster";
     public static final String RESOURCE_CARD = "card";
 
-    public static final String GENKEY_LOCAL = "0";
-    public static final String GENKEY_SERVER = "1";
+    public static final String GENKEY_LEGACY_ENROLL_RANDOM = "0";
+    public static final String GENKEY_CLIENT = "1";
     public static final String GENKEY_COMP1 = "2";
     public static final String GENKEY_COMP2 = "3";
     public static final String GENKEY_COMP3 = "4";
+    public static final String GENKEY_ENROLL_RANDOM = "5";
+    public static final String GENKEY_ENROLL_DERIVED = "6";
 
     public static final String KEY_COMM = "commk";
     public static final String KEY_COMM_ENC = "comenc";
