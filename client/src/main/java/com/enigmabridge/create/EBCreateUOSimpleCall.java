@@ -2,6 +2,7 @@ package com.enigmabridge.create;
 
 import com.enigmabridge.EBEndpointInfo;
 import com.enigmabridge.EBEngine;
+import com.enigmabridge.EBInvalidException;
 import com.enigmabridge.EBSettings;
 import com.enigmabridge.comm.EBConnectionSettings;
 import com.enigmabridge.comm.EBCorruptedException;
@@ -159,6 +160,9 @@ public class EBCreateUOSimpleCall {
 
         // Get template.
         final EBUOTemplateResponse templateResponse = getTemplateCall.doRequest(tplRequest);
+        if (!templateResponse.isCodeOk()){
+            throw new EBInvalidException("Get template call failed");
+        }
 
         // Process template.
         final EBUOTemplateProcessor processor = new EBUOTemplateProcessor(templateResponse, getKeys());
