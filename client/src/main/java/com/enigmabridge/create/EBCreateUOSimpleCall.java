@@ -37,6 +37,9 @@ public class EBCreateUOSimpleCall {
     // Response from creating new UO.
     protected EBCreateUOResponse response;
 
+    // Keys actually used when filling in the template.
+    protected List<EBUOTemplateKey> templateKeysUsed;
+
     /**
      * Separate abstract builder, chain from EBApiCall broken on purpose, restrict setters of this builder, e.g. callFunction.
      * @param <T>
@@ -168,6 +171,7 @@ public class EBCreateUOSimpleCall {
         final EBUOTemplateProcessor processor = new EBUOTemplateProcessor(templateResponse, getKeys());
         final byte[] template = processor.build();
         final EBUOTemplateImportKey importKeyUsed = processor.getKeyUsed();
+        this.templateKeysUsed = processor.getTemplateKeysUsed();
 
         // Create UO.
         final EBCreateUORequest createRequest = new EBCreateUORequest();
@@ -208,5 +212,12 @@ public class EBCreateUOSimpleCall {
 
     public EBCreateUOResponse getResponse() {
         return response;
+    }
+
+    public List<EBUOTemplateKey> getTemplateKeysUsed() {
+        if (templateKeysUsed == null){
+            templateKeysUsed = new LinkedList<EBUOTemplateKey>();
+        }
+        return templateKeysUsed;
     }
 }
