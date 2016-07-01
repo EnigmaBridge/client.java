@@ -75,7 +75,7 @@ public class EBUOTemplateProcessor {
             rand = new SecureRandom();
         }
 
-        int encryptedTplLen = encryptAndMac(tpl, encOffset, tplSrc.length - encOffset);
+        int encryptedTplLen = encryptAndMac(tpl, encOffset/8, tplSrc.length - encOffset/8);
 
         // RSA encryption: UOID-4B | TEK | TMK
         keyUsed = getBestImportKey();
@@ -167,8 +167,8 @@ public class EBUOTemplateProcessor {
                 throw new EBInvalidException("Key position has to be byte aligned");
             }
 
-            for(int idx=0, len=(int)offset.getLength(); idx < len; ++idx){
-                template[(int)cOffset + idx] = keyVal[idx];
+            for(int idx=0, len=(int)offset.getLength()/8; idx < len; ++idx){
+                template[(int)cOffset/8 + idx] = keyVal[idx];
             }
 
             getTemplateKeysUsed().add(keyToUse);
@@ -180,7 +180,7 @@ public class EBUOTemplateProcessor {
      * Encryption is performed in the buffer, so it has to be long enough.
      *
      * @param tpl buffer to protect
-     * @param offset offset to start
+     * @param offset offset to start, in bytes.
      * @param length length from the offset to protect
      * @return length of the result.
      */
