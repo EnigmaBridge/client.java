@@ -57,6 +57,10 @@ public class EBUOTemplateProcessor {
      * Builds user object from the template & provided keys.
      */
     public byte[] build(){
+        if (rand == null){
+            rand = new SecureRandom();
+        }
+        
         // Template to fill in.
         byte[] tplSrc = this.template.getTemplate();
         byte[] tpl = new byte[tplSrc.length + 4*32];
@@ -69,10 +73,6 @@ public class EBUOTemplateProcessor {
         final int encOffset = (int)template.getEncryptionOffset();
         if ((encOffset % 7) != 0){
             throw new EBInvalidException("Encryption offset position has to be byte aligned");
-        }
-
-        if (rand == null){
-            rand = new SecureRandom();
         }
 
         int encryptedTplLen = encryptAndMac(tpl, encOffset/8, tplSrc.length - encOffset/8);
