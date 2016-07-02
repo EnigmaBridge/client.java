@@ -100,7 +100,7 @@ public class EBUOTemplateProcessor {
         roff += importEncrypted.length;
 
         result[roff] = (byte)0xa2; roff+=1;
-        roff = EBCommUtils.setShort(result, roff, (short)importEncrypted.length);
+        roff = EBCommUtils.setShort(result, roff, (short)encryptedTplLen);
         System.arraycopy(tpl, 0, result, roff, encryptedTplLen);
 
         return result;
