@@ -276,14 +276,14 @@ public class EBUOTemplateProcessor {
                     tmpDat = new byte[len];
                     System.arraycopy(keyVal, pos, tmpDat, 0, len);
 
-                    exp = new BigInteger(tmpDat);
+                    exp = new BigInteger(1, tmpDat);
                     break;
 
                 case (byte)0x82:
                     tmpDat = new byte[len];
                     System.arraycopy(keyVal, pos, tmpDat, 0, len);
 
-                    mod = new BigInteger(tmpDat);
+                    mod = new BigInteger(1, tmpDat);
                     break;
                 default:
                     break;
