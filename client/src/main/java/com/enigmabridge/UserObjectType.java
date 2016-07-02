@@ -102,7 +102,7 @@ public class UserObjectType implements Serializable{
     }
 
     public UserObjectType(int function, boolean appKeyClientGenerated, boolean comKeyClientGenerated){
-        this.uoType = function;
+        this.uoType = function & TYPE_MASK;
         this.appKeyClientGenerated = appKeyClientGenerated;
         this.comKeyClientGenerated = comKeyClientGenerated;
     }
@@ -234,10 +234,22 @@ public class UserObjectType implements Serializable{
     }
 
     public static long getValue(int function, boolean appKeyClientGenerated, boolean comKeyClientGenerated){
-        long type = function;
+        long type = function & TYPE_MASK;
         type |= appKeyClientGenerated ? 1L<<21 : 0;
         type |= comKeyClientGenerated ? 1L<<20 : 0;
         return type;
+    }
+
+    public int getUoType() {
+        return uoType;
+    }
+
+    public boolean isAppKeyClientGenerated() {
+        return appKeyClientGenerated;
+    }
+
+    public boolean isComKeyClientGenerated() {
+        return comKeyClientGenerated;
     }
 
     public long getValue() {
