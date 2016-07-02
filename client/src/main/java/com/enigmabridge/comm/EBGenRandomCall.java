@@ -61,7 +61,7 @@ public class EBGenRandomCall {
         @Override
         public EBGenRandomCall build() {
             // Check if UO is set
-            getObj().getProcessDataBuilder().setProcessFunction(EBRequestType.RANDOMDATA);
+            getObj().getProcessDataBuilder().setProcessFunction(UserObjectType.getUoTypeFunctionString(UserObjectType.TYPE_RANDOMDATA));
             return child;
         }
 

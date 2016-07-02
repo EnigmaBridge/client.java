@@ -1,6 +1,5 @@
 package com.enigmabridge;
 
-import com.enigmabridge.comm.EBRequestType;
 import org.json.JSONObject;
 
 import java.io.Serializable;

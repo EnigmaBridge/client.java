@@ -118,7 +118,6 @@ public class EBProcessDataCallIT {
                     .setEngine(engine)
                     .setSettings(settings)
                     .setUo(uo)
-                    .setProcessFunction(EBRequestType.PLAINAES)
                     .build();
 
             final EBProcessDataResponse response = call.doRequest(EBUtils.hex2byte("6bc1bee22e409f96e93d7e117393172a"));
@@ -160,7 +159,6 @@ public class EBProcessDataCallIT {
                     .setEngine(engine)
                     .setSettings(settings)
                     .setUo(uo)
-                    .setProcessFunction(EBRequestType.PLAINAES)
                     .build();
 
             final EBProcessDataResponse response = call.doRequest(EBUtils.hex2byte("6bc1bee22e409f96e93d7e117393172a"));
@@ -194,7 +192,6 @@ public class EBProcessDataCallIT {
                     .setEngine(engine)
                     .setSettings(settings)
                     .setUo(uo)
-                    .setProcessFunction(EBRequestType.PLAINAES)
                     .build();
 
             // Test not-padded input data.
@@ -261,7 +258,6 @@ public class EBProcessDataCallIT {
                     .setEngine(engine)
                     .setSettings(settings)
                     .setUo(uo)
-                    .setProcessFunction(EBRequestType.PLAINAES)
                     .build();
 
             final EBProcessDataResponse response = call.doRequest(EBUtils.hex2byte("6bc1bee22e409f96e93d7e117393172a"));
@@ -274,7 +270,6 @@ public class EBProcessDataCallIT {
                     .setEngine(engine)
                     .setSettings(settings)
                     .setUo(uo)
-                    .setProcessFunction(EBRequestType.PLAINAES)
                     .build();
 
             final EBProcessDataResponse response2 = call2.doRequest(EBUtils.hex2byte("6bc1bee22e409f96e93d7e117393172a"));
@@ -373,7 +368,6 @@ public class EBProcessDataCallIT {
         final EBProcessDataCall call = new EBProcessDataCall.Builder()
                 .setEngine(engine)
                 .setUo(uo)
-                .setProcessFunction(bitLength == 1024 ? EBRequestType.RSA1024 : EBRequestType.RSA2048)
                 .build();
 
         // Test RSA_DEC(knownInput) == knownOutput
@@ -418,7 +412,6 @@ public class EBProcessDataCallIT {
                 .setEngine(engine)
                 .setSettings(settings)
                 .setUo(uo)
-                .setProcessFunction(bitLength == 1024 ? EBRequestType.RSA1024 : EBRequestType.RSA2048)
                 .build();
 
         // Test RSA_DEC(1) == 1 as (1^d) mod N = 1

@@ -111,11 +111,6 @@ public class EBProcessDataRequestBuilder {
         return this;
     }
 
-    public EBProcessDataRequestBuilder setRequestType(EBRequestType requestType) {
-        this.requestType = requestType.toString();
-        return this;
-    }
-
     public byte[] getNonce() {
         return nonce;
     }

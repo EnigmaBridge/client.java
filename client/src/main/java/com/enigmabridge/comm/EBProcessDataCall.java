@@ -46,11 +46,6 @@ public class EBProcessDataCall extends EBAPICall {
             return getThisBuilder();
         }
 
-        public B setProcessFunction(EBRequestType b) {
-            getObj().setProcessFunction(b);
-            return getThisBuilder();
-        }
-
         public B setSettings(EBSettings settings) {
             if (settings.getApiKey() != null){
                 getObj().setApiKey(settings.getApiKey());
@@ -90,9 +85,10 @@ public class EBProcessDataCall extends EBAPICall {
                     getThisBuilder().setEngine(((EBEngineReference) key).getEBEngine());
                 }
 
-                final EBRequestType tmpReqType = obj.getRequestTypeForKey(key);
-                if (tmpReqType != null && obj.getProcessFunction() == null){
-                    getThisBuilder().setProcessFunction(tmpReqType);
+                final UserObjectType uot = key.getUserObjectType();
+                final String fction = uot == null ? null : uot.getUoTypeFunctionString();
+                if (fction != null){
+                    obj.setProcessFunction(fction);
                 }
             }
             return getThisBuilder();
@@ -209,29 +205,6 @@ public class EBProcessDataCall extends EBAPICall {
     }
 
     /**
-     * Determines a ProcessData() request type for the given key.
-     * @param key
-     * @return
-     */
-    public EBRequestType getRequestTypeForKey(UserObjectKey key){
-        final String algorithm = key.getAlgorithm();
-        final int bitLength = key.length();
-        if ("AES".equalsIgnoreCase(algorithm)){
-            return EBRequestType.PLAINAES;
-        }
-
-        if ("RSA".equalsIgnoreCase(algorithm)){
-            if (bitLength == 1024){
-                return EBRequestType.RSA1024;
-            } else if (bitLength == 2048){
-                return EBRequestType.RSA2048;
-            }
-        }
-
-        return null;
-    }
-
-    /**
      * Performs request to the remote endpoint with built request.
      * @throws IOException
      * @throws EBCorruptedException
@@ -316,12 +289,5 @@ public class EBProcessDataCall extends EBAPICall {
 
     protected void setProcessFunction(String processFunction) {
         this.processFunction = processFunction;
-    }
-
-    protected void setProcessFunction(EBRequestType processFunction) {
-        if (processFunction == null){
-            return;
-        }
-        this.processFunction = processFunction.toString();
     }
 }
