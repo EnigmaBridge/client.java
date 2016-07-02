@@ -223,17 +223,36 @@ public class EBGetUOTemplateCall extends EBAPICall implements EBResponseParser {
         final JSONObject res = data.getJSONObject(FIELD_DATA);
 
         resp2ret.setObjectId(EBUtils.getAsLong(res, "objectid", 16));
-        resp2ret.setVersion(EBUtils.getAsInteger(res, "version", 10));
-        resp2ret.setProtocol(EBUtils.getAsInteger(res, "protocol", 10));
-
         resp2ret.setEncryptionOffset(EBUtils.getAsLong(res, "encryptionoffset", 10));
-        resp2ret.setFlagOffset(EBUtils.getAsLong(res, "flagoffset", 10));
-        resp2ret.setPolicyOffset(EBUtils.getAsLong(res, "policyoffset", 10));
-        resp2ret.setScriptOffset(EBUtils.getAsLong(res, "scriptoffset", 10));
-
         resp2ret.setTemplate(EBUtils.hex2byte(res.getString("template"), true));
-        resp2ret.setTemplateHs(EBUtils.hex2byte(res.getString("templatehs"), true));
-        resp2ret.setAuthorization(EBUtils.tryGetAsString(res, "authorization"));
+
+        if (res.has("version")) {
+            resp2ret.setVersion(EBUtils.getAsInteger(res, "version", 10));
+        }
+
+        if (res.has("protocol")) {
+            resp2ret.setProtocol(EBUtils.getAsInteger(res, "protocol", 10));
+        }
+
+        if (res.has("flagoffset")) {
+            resp2ret.setFlagOffset(EBUtils.getAsLong(res, "flagoffset", 10));
+        }
+
+        if (res.has("policyoffset")) {
+            resp2ret.setPolicyOffset(EBUtils.getAsLong(res, "policyoffset", 10));
+        }
+
+        if (res.has("scriptoffset")) {
+            resp2ret.setScriptOffset(EBUtils.getAsLong(res, "scriptoffset", 10));
+        }
+
+        if (res.has("templatehs")) {
+            resp2ret.setTemplateHs(EBUtils.hex2byte(res.getString("templatehs"), true));
+        }
+
+        if (res.has("authorization")) {
+            resp2ret.setAuthorization(EBUtils.tryGetAsString(res, "authorization"));
+        }
 
         List<EBUOTemplateKeyOffset> offsets = new LinkedList<EBUOTemplateKeyOffset>();
         final JSONArray keyOffsets = res.getJSONArray("keyoffsets");
@@ -262,7 +281,7 @@ public class EBGetUOTemplateCall extends EBAPICall implements EBResponseParser {
             final EBUOTemplateImportKey.Builder keyBld = new EBUOTemplateImportKey.Builder();
             keyBld.setId(key.getString("id"));
             keyBld.setType(key.getString("type"));
-            keyBld.setPublicKey(EBUtils.hex2byte(key.getString("publickey"), true));
+            keyBld.setPublicKey(EBUtils.hex2byte(key.getString("key"), true));
 
             keys.add(keyBld.build());
         }
