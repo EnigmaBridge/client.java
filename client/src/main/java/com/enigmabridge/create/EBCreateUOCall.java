@@ -129,7 +129,7 @@ public class EBCreateUOCall extends EBAPICall implements EBResponseParser {
         final JSONObject jdat = new JSONObject();
         jreq.put("data", jdat);
 
-        jdat.put("objectid",        Long.toHexString(request.getObjectId()));
+        jdat.put("objectid",        String.format("%08x", request.getObjectId()));
         jdat.put("object",          EBUtils.byte2hex(request.getObject()));
         jdat.put("authorization",   request.getAuthorization());
         jdat.put("importkey",       request.getImportKeyId());
