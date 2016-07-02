@@ -272,14 +272,14 @@ public class EBUOTemplateProcessor {
             tag = keyVal[pos];  pos += 1;
             len = EBCommUtils.getShort(keyVal, pos); pos += 2;
             switch(tag){
-                case 0x81:
+                case (byte)0x81:
                     tmpDat = new byte[len];
                     System.arraycopy(keyVal, pos, tmpDat, 0, len);
 
                     exp = new BigInteger(tmpDat);
                     break;
 
-                case 0x82:
+                case (byte)0x82:
                     tmpDat = new byte[len];
                     System.arraycopy(keyVal, pos, tmpDat, 0, len);
 
