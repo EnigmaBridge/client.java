@@ -71,8 +71,8 @@ public class EBUOTemplateProcessor {
 
         // Encrypt (AES) + MAC.
         final int encOffset = (int)template.getEncryptionOffset();
-        if ((encOffset % 7) != 0){
-            throw new EBInvalidException("Encryption offset position has to be byte aligned");
+        if ((encOffset & 7) != 0){
+            throw new EBInvalidException("Encryption offset position has to be byte aligned: " + encOffset);
         }
 
         int encryptedTplLen = encryptAndMac(tpl, encOffset/8, tplSrc.length - encOffset/8);
