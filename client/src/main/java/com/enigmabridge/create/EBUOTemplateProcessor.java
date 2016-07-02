@@ -60,7 +60,7 @@ public class EBUOTemplateProcessor {
         if (rand == null){
             rand = new SecureRandom();
         }
-        
+
         // Template to fill in.
         byte[] tplSrc = this.template.getTemplate();
         byte[] tpl = new byte[tplSrc.length + 4*32];
@@ -159,12 +159,14 @@ public class EBUOTemplateProcessor {
 
             final byte[] keyVal = keyToUse.getKey();
             if (keyVal.length*8 != offset.getLength()){
-                throw new EBCryptoException("Invalid key size, exp: " + offset.getLength() + ", given: " + keyVal.length*8);
+                throw new EBCryptoException("Invalid key size, exp: " + offset.getLength()
+                        + ", given: " + keyVal.length*8
+                        + ", type: " + offset.getType());
             }
 
             final long cOffset = offset.getOffset();
             if ((cOffset & 7) != 0){
-                throw new EBInvalidException("Key position has to be byte aligned");
+                throw new EBInvalidException("Key position has to be byte aligned, type: " + offset.getType());
             }
 
             for(int idx=0, len=(int)offset.getLength()/8; idx < len; ++idx){
