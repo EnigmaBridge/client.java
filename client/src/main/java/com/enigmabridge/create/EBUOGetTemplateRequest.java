@@ -24,8 +24,8 @@ public class EBUOGetTemplateRequest extends EBRawRequest {
     protected String resource = Constants.RESOURCE_GLOBAL;
     protected int credit = 256; // <1-32767>, a limit a seed card can provide to the EB service
     protected String generationCommKey = Constants.GENKEY_CLIENT;
-    protected String generationBillingKey = Constants.GENKEY_ENROLL_RANDOM;
-    protected String generationAppKey = Constants.GENKEY_ENROLL_RANDOM;
+    protected String generationBillingKey = Constants.GENKEY_LEGACY_ENROLL_RANDOM;
+    protected String generationAppKey = Constants.GENKEY_LEGACY_ENROLL_RANDOM;
 
     public int getFormat() {
         return format;
@@ -50,12 +50,24 @@ public class EBUOGetTemplateRequest extends EBRawRequest {
     }
 
     public EBUOGetTemplateRequest setType(long type) {
-        this.type = type;
+        setType(UserObjectType.valueOf(type));
         return this;
     }
 
     public EBUOGetTemplateRequest setType(UserObjectType type) {
         this.type = type.getValue();
+        if (type.isAppKeyClientGenerated()){
+            generationAppKey = Constants.GENKEY_CLIENT;
+        } else if (Constants.GENKEY_CLIENT.equalsIgnoreCase(generationAppKey)){
+            generationAppKey = Constants.GENKEY_LEGACY_ENROLL_RANDOM;
+        }
+
+        if (type.isComKeyClientGenerated()){
+            generationCommKey = Constants.GENKEY_CLIENT;
+        } else if (Constants.GENKEY_CLIENT.equalsIgnoreCase(generationCommKey)){
+            generationCommKey = Constants.GENKEY_LEGACY_ENROLL_RANDOM;
+        }
+
         return this;
     }
 
@@ -173,6 +185,10 @@ public class EBUOGetTemplateRequest extends EBRawRequest {
 
     public EBUOGetTemplateRequest setGenerationCommKey(String generationCommKey) {
         this.generationCommKey = generationCommKey;
+        this.type = UserObjectType.getValue((int)type,
+                Constants.GENKEY_CLIENT.equals(generationAppKey),
+                Constants.GENKEY_CLIENT.equals(generationCommKey));
+
         return this;
     }
 
@@ -191,6 +207,10 @@ public class EBUOGetTemplateRequest extends EBRawRequest {
 
     public EBUOGetTemplateRequest setGenerationAppKey(String generationAppKey) {
         this.generationAppKey = generationAppKey;
+        this.type = UserObjectType.getValue((int)type,
+                Constants.GENKEY_CLIENT.equals(generationAppKey),
+                Constants.GENKEY_CLIENT.equals(generationCommKey));
+
         return this;
     }
 }
