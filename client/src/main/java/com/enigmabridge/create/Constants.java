@@ -78,6 +78,6 @@ public class Constants {
     public static final String KEY_COMM_MAC = "commac";
     public static final String KEY_BILLING = "billing";
     public static final String KEY_COMM_ENC_NEXT = "comnextenc";
-    public static final String KEY_COMM_MAC_NEXT = "conextmac";
+    public static final String KEY_COMM_MAC_NEXT = "comnextmac";
     public static final String KEY_APP = "app";
 }
