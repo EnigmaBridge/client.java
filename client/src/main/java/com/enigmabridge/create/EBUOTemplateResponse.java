@@ -11,13 +11,13 @@ import java.util.List;
  * Created by dusanklinec on 28.06.16.
  */
 public class EBUOTemplateResponse extends EBResponse {
-    private long objectId;
-    private int version;            //<integer>,
-    private int protocol;           //<integer>,
-    private long encryptionOffset;  //<decimal_number>,
-    private long flagOffset;        //<decimal_number>,
-    private long policyOffset;      //<decimal_number>,
-    private long scriptOffset;      //<decimal_number,
+    private long objectId = -1;
+    private int version = -1;            //<integer>,
+    private int protocol = -1;           //<integer>,
+    private long encryptionOffset = -1;  //<decimal_number>,
+    private long flagOffset   = -1;        //<decimal_number>,
+    private long policyOffset = -1;      //<decimal_number>,
+    private long scriptOffset = -1;      //<decimal_number,
 
     private List<EBUOTemplateKeyOffset> keyOffsets;
     private byte[] template;
