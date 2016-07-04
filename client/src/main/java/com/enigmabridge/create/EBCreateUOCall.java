@@ -205,7 +205,7 @@ public class EBCreateUOCall extends EBAPICall implements EBResponseParser {
         final EBCreateUOResponse.ABuilder resp2ret = (EBCreateUOResponse.ABuilder) resp;
         final JSONObject res = data.getJSONObject(FIELD_DATA);
 
-        resp2ret.setHandle(res.getString("uoid"));
+        resp2ret.setHandle(res.getString("handle"));
 
         // TODO: process public key.
         // ...
