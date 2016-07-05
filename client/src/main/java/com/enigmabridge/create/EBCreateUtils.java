@@ -32,9 +32,9 @@ public class EBCreateUtils {
             throw new IllegalArgumentException("handle string is too short");
         }
 
-        final String apiKey = handleString.substring(0, len-1-8-2-8);
-        final String uoIdStr = handleString.substring(len-1-8-2-8, len-1-8-2);
-        final String uoTypeStr = handleString.substring(len-1-8, len-1);
+        final String apiKey = handleString.substring(0, len-2-8-2-8);
+        final String uoIdStr = handleString.substring(len-2-8-2-8, len-8-2);
+        final String uoTypeStr = handleString.substring(len-8, len);
 
         return new EBUOHandle(
                 apiKey,
