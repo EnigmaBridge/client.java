@@ -1,5 +1,6 @@
 package com.enigmabridge;
 
+import com.enigmabridge.create.Constants;
 import org.json.JSONObject;
 
 import java.io.Serializable;
@@ -41,23 +42,29 @@ public class UserObjectType implements Serializable{
     public static final UserObjectType OBJ_RANDOM = UserObjectType.valueOf(TYPE_RANDOMDATA);
     public static final UserObjectType INVALID = UserObjectType.valueOf(INVALID_TYPE);
 
-    protected int uoType;
-    protected boolean appKeyClientGenerated = false;
-    protected boolean comKeyClientGenerated = false;
+    // For forward compatibility we store UO type in the composite field
+    // as EB can add another bit field in the future.
+    protected long typeValue = 0;
 
     public static abstract class AbstractBuilder<T extends UserObjectType, B extends AbstractBuilder> {
         public B setUoTypeFunction(int type) {
-            getObj().uoType = type;
+            getObj().setUoTypeFunction(type);
             return getThisBuilder();
         }
 
-        public B setAppKeyClientGenerated(boolean gen) {
-            getObj().appKeyClientGenerated = gen;
+        public B setAppKeyGenerationType(int gen) {
+            if (gen < 0 || gen > Constants.GENKEY_ENROLL_DERIVED){
+                throw new IllegalArgumentException("Illegal argument for app key generation type");
+            }
+            getObj().setAppKeyGenerationType(gen);
             return getThisBuilder();
         }
 
-        public B setComKeyClientGenerated(boolean gen) {
-            getObj().comKeyClientGenerated = gen;
+        public B setComKeyGenerationType(int gen) {
+            if (gen != Constants.GENKEY_LEGACY_ENROLL_RANDOM && gen != Constants.GENKEY_CLIENT){
+                throw new IllegalArgumentException("Illegal argument for comm key generation type");
+            }
+            getObj().setComKeyGenerationType(gen);
             return getThisBuilder();
         }
 
@@ -101,10 +108,37 @@ public class UserObjectType implements Serializable{
         setValue(serialized);
     }
 
-    public UserObjectType(int function, boolean appKeyClientGenerated, boolean comKeyClientGenerated){
-        this.uoType = function & TYPE_MASK;
-        this.appKeyClientGenerated = appKeyClientGenerated;
-        this.comKeyClientGenerated = comKeyClientGenerated;
+    public UserObjectType(int function, int appKeyClientGenerated, int comKeyClientGenerated){
+        setUoTypeFunction(function);
+        setAppKeyGenerationType(appKeyClientGenerated);
+        setComKeyGenerationType(comKeyClientGenerated);
+    }
+
+    protected void setUoTypeFunction(int function){
+        if ((function & TYPE_MASK) != function){
+            throw new IllegalArgumentException("Illegal function argument");
+        }
+
+        this.typeValue &= ~TYPE_MASK;
+        this.typeValue |= function & TYPE_MASK;
+    }
+
+    protected void setAppKeyGenerationType(int gen){
+        if ((gen & 0x7) != gen){
+            throw new IllegalArgumentException("Illegal function argument");
+        }
+
+        this.typeValue &= ~(0x7 << 21);
+        this.typeValue |=   gen << 21;
+    }
+
+    protected void setComKeyGenerationType(int gen){
+        if ((gen & 0x1) != gen){
+            throw new IllegalArgumentException("Illegal function argument");
+        }
+
+        this.typeValue &= ~(0x1 << 20);
+        this.typeValue |=   gen << 20;
     }
 
     /**
@@ -122,7 +156,7 @@ public class UserObjectType implements Serializable{
      * @return uo type function
      */
     public int getUoTypeFunction(){
-        return uoType;
+        return (int) (typeValue & TYPE_MASK);
     }
 
     public static String getUoTypeFunctionString(int uoType){
@@ -171,7 +205,7 @@ public class UserObjectType implements Serializable{
     }
 
     public String getUoTypeFunctionString(){
-        return getUoTypeFunctionString(uoType);
+        return getUoTypeFunctionString(getUoTypeFunction());
     }
 
     /**
@@ -180,7 +214,7 @@ public class UserObjectType implements Serializable{
      * @return key algorithm, if key
      */
     public String getAlgorithm(){
-        switch (uoType){
+        switch (getUoTypeFunction()){
             case TYPE_PLAINAES:
             case TYPE_PLAINAESDECRYPT:
                 return "AES";
@@ -199,7 +233,7 @@ public class UserObjectType implements Serializable{
      * @return key type (secret/public/private)
      */
     public UserObjectKeyType getKeyType(){
-        switch (uoType){
+        switch (getUoTypeFunction()){
             case TYPE_PLAINAES:
             case TYPE_PLAINAESDECRYPT:
                 return UserObjectKeyType.SECRET;
@@ -218,7 +252,7 @@ public class UserObjectType implements Serializable{
      * @return key lenght in bits, 0 if not applicable.
      */
     public int keyLength(){
-        switch (uoType){
+        switch (getUoTypeFunction()){
             case TYPE_PLAINAES:
             case TYPE_PLAINAESDECRYPT:
                 return 256;
@@ -233,33 +267,35 @@ public class UserObjectType implements Serializable{
         }
     }
 
-    public static long getValue(int function, boolean appKeyClientGenerated, boolean comKeyClientGenerated){
+    public static long getValue(int function, int appKeyClientGenerated, int comKeyClientGenerated){
         long type = function & TYPE_MASK;
-        type |= appKeyClientGenerated ? 1L<<21 : 0;
-        type |= comKeyClientGenerated ? 1L<<20 : 0;
+        if (comKeyClientGenerated != Constants.GENKEY_LEGACY_ENROLL_RANDOM && comKeyClientGenerated != Constants.GENKEY_CLIENT){
+            throw new IllegalArgumentException("Illegal argument for comm key generation type");
+        }
+
+        if (appKeyClientGenerated < 0 || appKeyClientGenerated > Constants.GENKEY_ENROLL_DERIVED){
+            throw new IllegalArgumentException("Illegal argument for app key generation type");
+        }
+
+        type |= (appKeyClientGenerated & 0x7) << 21;
+        type |= (comKeyClientGenerated & 0x1) << 20;
         return type;
     }
 
-    public int getUoType() {
-        return uoType;
+    public int getAppKeyGenerationType() {
+        return (int) ((typeValue >> 20) & 0x1);
     }
 
-    public boolean isAppKeyClientGenerated() {
-        return appKeyClientGenerated;
-    }
-
-    public boolean isComKeyClientGenerated() {
-        return comKeyClientGenerated;
+    public int getComKeyGenerationType() {
+        return (int) ((typeValue >> 21) & 0x7);
     }
 
     public long getValue() {
-        return getValue(uoType, appKeyClientGenerated, comKeyClientGenerated);
+        return typeValue;
     }
 
     protected void setValue(long value){
-        uoType = (int) (value & TYPE_MASK);
-        appKeyClientGenerated = (value & (1L << 21)) > 0;
-        comKeyClientGenerated = (value & (1L << 20)) > 0;
+        this.typeValue = value;
     }
 
     /**
@@ -290,24 +326,4 @@ public class UserObjectType implements Serializable{
         return "{" + getValue() + "}";
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        UserObjectType that = (UserObjectType) o;
-
-        if (uoType != that.uoType) return false;
-        if (appKeyClientGenerated != that.appKeyClientGenerated) return false;
-        return comKeyClientGenerated == that.comKeyClientGenerated;
-
-    }
-
-    @Override
-    public int hashCode() {
-        int result = uoType;
-        result = 31 * result + (appKeyClientGenerated ? 1 : 0);
-        result = 31 * result + (comKeyClientGenerated ? 1 : 0);
-        return result;
-    }
 }

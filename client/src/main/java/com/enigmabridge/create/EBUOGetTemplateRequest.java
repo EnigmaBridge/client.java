@@ -10,7 +10,11 @@ import com.enigmabridge.comm.EBRawRequest;
 public class EBUOGetTemplateRequest extends EBRawRequest {
     protected int format = 1;        //<integer, starting with 1>,
     protected int protocol = 1;      //<integer, starting with 1>,
-    protected long type = UserObjectType.getValue(UserObjectType.TYPE_PLAINAES, true, false); //<32bit integer>,
+    protected long type = UserObjectType.getValue(
+            UserObjectType.TYPE_PLAINAES,
+            Constants.GENKEY_LEGACY_ENROLL_RANDOM,
+            Constants.GENKEY_CLIENT); //<32bit integer>,
+
     protected String environment = Constants.ENV_DEV; // shows whether the UO should be for production (live), test (pre-production testing), or dev (development)
     protected String maxtps = Constants.MAXTPS_UNLIMITED; // maximum guaranteed TPS
     protected String core = Constants.CORE_EMPTY; // how many cards have UO loaded permanently
@@ -23,9 +27,9 @@ public class EBUOGetTemplateRequest extends EBRawRequest {
     protected String clientdiv = Constants.NO; // if "yes", we expect the data starting with a diversification 16B for communication keys
     protected String resource = Constants.RESOURCE_GLOBAL;
     protected int credit = 256; // <1-32767>, a limit a seed card can provide to the EB service
-    protected String generationCommKey = Constants.GENKEY_CLIENT;
-    protected String generationBillingKey = Constants.GENKEY_LEGACY_ENROLL_RANDOM;
-    protected String generationAppKey = Constants.GENKEY_LEGACY_ENROLL_RANDOM;
+    protected int generationCommKey = Constants.GENKEY_CLIENT;
+    protected int generationBillingKey = Constants.GENKEY_LEGACY_ENROLL_RANDOM;
+    protected int generationAppKey = Constants.GENKEY_LEGACY_ENROLL_RANDOM;
 
     public int getFormat() {
         return format;
@@ -56,18 +60,8 @@ public class EBUOGetTemplateRequest extends EBRawRequest {
 
     public EBUOGetTemplateRequest setType(UserObjectType type) {
         this.type = type.getValue();
-        if (type.isAppKeyClientGenerated()){
-            generationAppKey = Constants.GENKEY_CLIENT;
-        } else if (Constants.GENKEY_CLIENT.equalsIgnoreCase(generationAppKey)){
-            generationAppKey = Constants.GENKEY_LEGACY_ENROLL_RANDOM;
-        }
-
-        if (type.isComKeyClientGenerated()){
-            generationCommKey = Constants.GENKEY_CLIENT;
-        } else if (Constants.GENKEY_CLIENT.equalsIgnoreCase(generationCommKey)){
-            generationCommKey = Constants.GENKEY_LEGACY_ENROLL_RANDOM;
-        }
-
+        generationAppKey = type.getAppKeyGenerationType();
+        generationCommKey = type.getComKeyGenerationType();
         return this;
     }
 
@@ -179,37 +173,33 @@ public class EBUOGetTemplateRequest extends EBRawRequest {
         return this;
     }
 
-    public String getGenerationCommKey() {
+    public int getGenerationCommKey() {
         return generationCommKey;
     }
 
-    public EBUOGetTemplateRequest setGenerationCommKey(String generationCommKey) {
+    public EBUOGetTemplateRequest setGenerationCommKey(int generationCommKey) {
         this.generationCommKey = generationCommKey;
-        this.type = UserObjectType.getValue((int)type,
-                Constants.GENKEY_CLIENT.equals(generationAppKey),
-                Constants.GENKEY_CLIENT.equals(generationCommKey));
+        this.type = UserObjectType.getValue((int)type, generationAppKey, generationCommKey);
 
         return this;
     }
 
-    public String getGenerationBillingKey() {
+    public int getGenerationBillingKey() {
         return generationBillingKey;
     }
 
-    public EBUOGetTemplateRequest setGenerationBillingKey(String generationBillingKey) {
+    public EBUOGetTemplateRequest setGenerationBillingKey(int generationBillingKey) {
         this.generationBillingKey = generationBillingKey;
         return this;
     }
 
-    public String getGenerationAppKey() {
+    public int getGenerationAppKey() {
         return generationAppKey;
     }
 
-    public EBUOGetTemplateRequest setGenerationAppKey(String generationAppKey) {
+    public EBUOGetTemplateRequest setGenerationAppKey(int generationAppKey) {
         this.generationAppKey = generationAppKey;
-        this.type = UserObjectType.getValue((int)type,
-                Constants.GENKEY_CLIENT.equals(generationAppKey),
-                Constants.GENKEY_CLIENT.equals(generationCommKey));
+        this.type = UserObjectType.getValue((int)type, generationAppKey, generationCommKey);
 
         return this;
     }
