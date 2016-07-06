@@ -52,6 +52,7 @@ public class EBCreateOUIT {
     @BeforeMethod(alwaysRun = true, groups = {"integration"})
     public void setUpMethod() throws Exception {
         endpoint = new EBEndpointInfo(EBTestingUtils.CONNECTION_STRING);
+        settings = new EBConnectionSettings();
 
         defaultSettings = new EBSettingsBase.Builder()
                 .setApiKey(apiKey)
