@@ -14,6 +14,8 @@ import java.util.List;
 public class EBCreateUOResponse extends EBResponse {
     private EBUOHandle handle;
     private byte[] certificate;
+    private byte[] publicKey;
+    private byte[] signature;
     private List<byte[]> certificateChain;
 
     public static abstract class ABuilder<T extends EBCreateUOResponse, B extends EBCreateUOResponse.ABuilder>
@@ -26,6 +28,16 @@ public class EBCreateUOResponse extends EBResponse {
 
         public B setHandle(EBUOHandle handle) {
             getObj().setHandle(handle);
+            return getThisBuilder();
+        }
+
+        public B setPublicKey(byte[] p) {
+            getObj().setPublicKey(p);
+            return getThisBuilder();
+        }
+
+        public B setSignature(byte[] s) {
+            getObj().setSignature(s);
             return getThisBuilder();
         }
 
@@ -80,10 +92,28 @@ public class EBCreateUOResponse extends EBResponse {
         return this;
     }
 
+    protected EBCreateUOResponse setPublicKey(byte[] publicKey) {
+        this.publicKey = publicKey;
+        return this;
+    }
+
+    protected EBCreateUOResponse setSignature(byte[] signature) {
+        this.signature = signature;
+        return this;
+    }
+
     // Getters
 
     public EBUOHandle getHandle() {
         return handle;
+    }
+
+    public byte[] getPublicKey() {
+        return publicKey;
+    }
+
+    public byte[] getSignature() {
+        return signature;
     }
 
     public byte[] getCertificate() {
@@ -108,6 +138,8 @@ public class EBCreateUOResponse extends EBResponse {
 
         if (handle != null ? !handle.equals(that.handle) : that.handle != null) return false;
         if (!Arrays.equals(certificate, that.certificate)) return false;
+        if (!Arrays.equals(publicKey, that.publicKey)) return false;
+        if (!Arrays.equals(signature, that.signature)) return false;
         return certificateChain != null ? certificateChain.equals(that.certificateChain) : that.certificateChain == null;
 
     }
@@ -116,6 +148,8 @@ public class EBCreateUOResponse extends EBResponse {
     public int hashCode() {
         int result = handle != null ? handle.hashCode() : 0;
         result = 31 * result + Arrays.hashCode(certificate);
+        result = 31 * result + Arrays.hashCode(publicKey);
+        result = 31 * result + Arrays.hashCode(signature);
         result = 31 * result + (certificateChain != null ? certificateChain.hashCode() : 0);
         return result;
     }
@@ -125,6 +159,8 @@ public class EBCreateUOResponse extends EBResponse {
         return "EBCreateUOResponse{" +
                 "handle=" + handle +
                 ", certificate=" + Arrays.toString(certificate) +
+                ", publicKey=" + Arrays.toString(publicKey) +
+                ", signature=" + Arrays.toString(signature) +
                 ", certificateChain=" + certificateChain +
                 "} " + super.toString();
     }

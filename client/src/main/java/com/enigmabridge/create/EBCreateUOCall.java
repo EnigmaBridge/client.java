@@ -207,8 +207,15 @@ public class EBCreateUOCall extends EBAPICall implements EBResponseParser {
 
         resp2ret.setHandle(res.getString("handle"));
 
-        // TODO: process public key.
-        // ...
+        // publickey?
+        if (res.has("publickey")){
+            resp2ret.setPublicKey(EBUtils.hex2byte(res.getString("certificate"), true));
+        }
+
+        // Signature?
+        if (res.has("signature")){
+            resp2ret.setSignature(EBUtils.hex2byte(res.getString("certificate"), true));
+        }
 
         // Certificate?
         if (res.has("certificate")){
