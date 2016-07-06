@@ -2,6 +2,7 @@ package com.enigmabridge.tests;
 
 import com.enigmabridge.*;
 import com.enigmabridge.comm.EBConnectionSettings;
+import com.enigmabridge.create.*;
 import com.enigmabridge.misc.EBTestingUtils;
 import com.enigmabridge.provider.EnigmaProvider;
 import com.enigmabridge.provider.rsa.EBRSAPrivateKey;
@@ -12,8 +13,7 @@ import org.testng.annotations.*;
 
 import javax.crypto.Cipher;
 import java.math.BigInteger;
-import java.security.PublicKey;
-import java.security.Security;
+import java.security.*;
 
 /**
  * Basic tests of Enigma Bridge crypto provider.
@@ -43,23 +43,12 @@ public class EBEnigmaProviderIT {
     // Enigma crypto provider.
     private static EnigmaProvider provider;
 
-    /**
-     * EB JCA/JCE provider
-     */
-    private EnigmaProvider ebProvider;
-
     public EBEnigmaProviderIT() {
 
     }
 
     @BeforeClass
     public static void setUpClass() throws Exception {
-        // Adding Enigma as a security provider.
-        provider = new EnigmaProvider();
-        Security.addProvider(provider);
-
-        // Do not forget to add BouncyCastle provider.
-        Security.addProvider(new BouncyCastleProvider());
 
     }
 
@@ -82,6 +71,13 @@ public class EBEnigmaProviderIT {
         ckRSA = new EBCommKeys()
                 .setEncKey("1234567890123456789012345678901234567890123456789012345678901234")
                 .setMacKey("2224262820223456789012345678901234567890123456789012345678901234");
+
+        // Adding Enigma as a security provider.
+        provider = new EnigmaProvider(engine);
+        Security.addProvider(provider);
+
+        // Do not forget to add BouncyCastle provider.
+        Security.addProvider(new BouncyCastleProvider());
     }
 
     @AfterMethod(alwaysRun = true, groups = {"integration"}, enabled = false)
@@ -89,7 +85,24 @@ public class EBEnigmaProviderIT {
     }
 
     @Test(groups = {"integration"}) //, timeOut = 100000
-    public void testCall() throws Exception {
+    public void testRSAKeyPair() throws Exception {
+        final KeyPairGenerator kpGen = KeyPairGenerator.getInstance("RSA", "EB");
+        kpGen.initialize(1024);
+        final KeyPair keyPair = kpGen.generateKeyPair();
+
+        final Cipher rsa = Cipher.getInstance("RSA");
+        rsa.init(Cipher.DECRYPT_MODE, keyPair.getPrivate());
+
+        // Encrypt test vector
+        // Test RSA_DEC(1) == 1 as (1^d) mod N = 1
+        final String input  = "01";
+        final byte[] bytes = rsa.doFinal(EBUtils.hex2byte(input));
+
+        LOG.info("DONE");
+    }
+
+    @Test(groups = {"integration"}) //, timeOut = 100000
+    public void testRSA() throws Exception {
         // Load key public parts.
         final BigInteger exp = BigInteger.valueOf(EBTestingUtils.RSA2k_PUB_EXP);
         final BigInteger mod = new BigInteger(EBUtils.hex2byte(EBTestingUtils.RSA2k_MODULUS));
@@ -99,7 +112,7 @@ public class EBEnigmaProviderIT {
         // Create UOKey
         final UserObjectKeyBase key = new UserObjectKeyBase.Builder()
                 .setUoid(EBTestingUtils.UOID_RSA2k_KNOWN)
-                .setUserObjectType(UserObjectType.TYPE_RSA2048)
+                .setUserObjectType(UserObjectType.TYPE_RSA2048DECRYPT_NOPAD)
                 .setCommKeys(ckRSA)
                 .build();
 
@@ -113,7 +126,7 @@ public class EBEnigmaProviderIT {
                 .setEngine(engine)
                 .build();
 
-        final Cipher rsa = Cipher.getInstance("RSA", provider);
+        final Cipher rsa = Cipher.getInstance("RSA");
         rsa.init(Cipher.DECRYPT_MODE, rsa2kPrivKey);
 
         // Encrypt test vector
