@@ -1,5 +1,17 @@
 package com.enigmabridge.create;
 
+import com.enigmabridge.EBCryptoException;
+import com.enigmabridge.EBInvalidException;
+import com.enigmabridge.comm.EBCommUtils;
+
+import java.math.BigInteger;
+import java.security.Key;
+import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.RSAPublicKeySpec;
+
 /**
  * EB Create utils.
  *
@@ -41,6 +53,51 @@ public class EBCreateUtils {
                 Long.parseLong(uoIdStr, 16),
                 Long.parseLong(uoTypeStr, 16)
         );
+    }
+
+    /**
+     * Reads serialized import public key, builds key spec (transparent key representation - modulus + exponent).
+     *
+     * @param keyVal RSA public key to deserialize.
+     * @return key spec
+     */
+    public static RSAPublicKeySpec readSerializedRSAPublicKey(byte[] keyVal){
+        // Read serialized import public key.
+        BigInteger exp = null;
+        BigInteger mod = null;
+
+        // TAG|len-2B|value. 81 = exponent, 82 = modulus
+        byte tmpDat[] = null;
+        int tag, len, pos, ln = keyVal.length;
+        for(pos = 0; pos < ln;){
+            tag = keyVal[pos];  pos += 1;
+            len = EBCommUtils.getShort(keyVal, pos); pos += 2;
+            switch(tag){
+                case (byte)0x81:
+                    tmpDat = new byte[len];
+                    System.arraycopy(keyVal, pos, tmpDat, 0, len);
+
+                    exp = new BigInteger(1, tmpDat);
+                    break;
+
+                case (byte)0x82:
+                    tmpDat = new byte[len];
+                    System.arraycopy(keyVal, pos, tmpDat, 0, len);
+
+                    mod = new BigInteger(1, tmpDat);
+                    break;
+                default:
+                    break;
+            }
+
+            pos += len;
+        }
+
+        if (exp == null || mod == null){
+            throw new EBInvalidException("RSA public key is malformed");
+        }
+
+        return new RSAPublicKeySpec(mod, exp);
     }
 
 

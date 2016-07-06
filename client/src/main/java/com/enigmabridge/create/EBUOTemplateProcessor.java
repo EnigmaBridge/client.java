@@ -284,49 +284,17 @@ public class EBUOTemplateProcessor {
      */
     protected Key readSerializedRSAPublicKey(EBUOTemplateImportKey key){
         // Read serialized import public key.
-        BigInteger exp = null;
-        BigInteger mod = null;
         if (!key.getType().startsWith("rsa")){
             throw new EBInvalidException("Only RSA keys are supported by now");
         }
 
         // TAG|len-2B|value. 81 = exponent, 82 = modulus
         byte keyVal[] = key.getPublicKey();
-        byte tmpDat[] = null;
-        int tag, len, pos, ln = keyVal.length;
-        for(pos = 0; pos < ln;){
-            tag = keyVal[pos];  pos += 1;
-            len = EBCommUtils.getShort(keyVal, pos); pos += 2;
-            switch(tag){
-                case (byte)0x81:
-                    tmpDat = new byte[len];
-                    System.arraycopy(keyVal, pos, tmpDat, 0, len);
-
-                    exp = new BigInteger(1, tmpDat);
-                    break;
-
-                case (byte)0x82:
-                    tmpDat = new byte[len];
-                    System.arraycopy(keyVal, pos, tmpDat, 0, len);
-
-                    mod = new BigInteger(1, tmpDat);
-                    break;
-                default:
-                    break;
-            }
-
-            pos += len;
-        }
-
-        if (exp == null || mod == null){
-            throw new EBInvalidException("RSA public key is malformed");
-        }
+        final RSAPublicKeySpec keySpec = EBCreateUtils.readSerializedRSAPublicKey(keyVal);
 
         try {
             final KeyFactory rsaFact = KeyFactory.getInstance("RSA", "BC");
-            final RSAPublicKeySpec pubKeySpec = new RSAPublicKeySpec(mod, exp);
-
-            return rsaFact.generatePublic(pubKeySpec);
+            return rsaFact.generatePublic(keySpec);
 
         } catch (NoSuchAlgorithmException e) {
             throw new EBCryptoException("No RSA key factory", e);
