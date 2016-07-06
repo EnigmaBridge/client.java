@@ -24,17 +24,17 @@ public class EBConnectionSettings implements Serializable, EBJSONSerializable {
     /**
      * Timeout for connecting to the endpoint in milliseconds.
      */
-    protected int connectTimeoutMilli = 30000;
+    protected int connectTimeoutMilli = 60000;
 
     /**
      * Timeout for reading data from the endpoint.
      */
-    protected int readTimeoutMilli = 30000;
+    protected int readTimeoutMilli = 60000;
 
     /**
      * Timeout for writing data to the endpoint.
      */
-    protected int writeTimeoutMilli = 30000;
+    protected int writeTimeoutMilli = 60000;
 
     /**
      * Method used for the API call.
