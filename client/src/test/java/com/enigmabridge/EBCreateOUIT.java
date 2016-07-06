@@ -11,6 +11,7 @@ import org.testng.annotations.*;
 
 import java.security.SecureRandom;
 import java.security.Security;
+import java.security.spec.RSAPublicKeySpec;
 
 /**
  * Created by dusanklinec on 06.07.16.
@@ -127,6 +128,8 @@ public class EBCreateOUIT {
                 .build();
 
         final EBCreateUOResponse response = callBld.create();
+        final byte[] publicKey = response.getPublicKey();
+        final RSAPublicKeySpec pubKeySpec = EBCreateUtils.readSerializedRSAPublicKey(publicKey);
 
         LOG.info("DONE");
     }
