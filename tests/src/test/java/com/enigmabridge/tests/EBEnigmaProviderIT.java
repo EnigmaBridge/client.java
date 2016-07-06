@@ -59,6 +59,7 @@ public class EBEnigmaProviderIT {
     @BeforeMethod(alwaysRun = true, groups = {"integration"})
     public void setUpMethod() throws Exception {
         endpoint = new EBEndpointInfo(EBTestingUtils.CONNECTION_STRING);
+        settings = new EBConnectionSettings();
 
         defaultSettings = new EBSettingsBase.Builder()
                 .setApiKey(apiKey)
@@ -87,7 +88,7 @@ public class EBEnigmaProviderIT {
     @Test(groups = {"integration"}) //, timeOut = 100000
     public void testRSAKeyPair() throws Exception {
         final KeyPairGenerator kpGen = KeyPairGenerator.getInstance("RSA", "EB");
-        kpGen.initialize(1024);
+        kpGen.initialize(2048);
         final KeyPair keyPair = kpGen.generateKeyPair();
 
         final Cipher rsa = Cipher.getInstance("RSA");
