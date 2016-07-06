@@ -131,9 +131,11 @@ public class EBKeyPairGenerator extends KeyPairGeneratorSpi {
                 final EBCreateUOResponse response = callBld.create();
 
                 // Load key public parts.
-                final BigInteger exp = null; // TODO
-                final BigInteger mod = null; // TODO
-                final PublicKey rsa2kPubkey = EBProviderUtils.createRSAPublicKey(mod, exp);
+                final byte[] publicKey = response.getPublicKey();
+                final RSAPublicKeySpec pubKeySpec = EBCreateUtils.readSerializedRSAPublicKey(publicKey);
+                final KeyFactory rsaFact = KeyFactory.getInstance("RSA");
+                final PublicKey rsa2kPubkey = rsaFact.generatePublic(pubKeySpec);
+
 
                 // Create UOKey
                 final UserObjectKeyBase key = new UserObjectKeyBase.Builder()
@@ -144,8 +146,8 @@ public class EBKeyPairGenerator extends KeyPairGeneratorSpi {
 
                 // Create Java RSA key - will be done with key specs.
                 final EBRSAPrivateKey rsa2kPrivKey = new EBRSAPrivateKey.Builder()
-                        .setPublicExponent(exp)
-                        .setModulus(mod)
+                        .setPublicExponent(pubKeySpec.getPublicExponent())
+                        .setModulus(pubKeySpec.getModulus())
                         .setUo(key)
                         .setEngine(engine)
                         .build();
