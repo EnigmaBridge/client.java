@@ -209,12 +209,12 @@ public class EBCreateUOCall extends EBAPICall implements EBResponseParser {
 
         // publickey?
         if (res.has("publickey")){
-            resp2ret.setPublicKey(EBUtils.hex2byte(res.getString("certificate"), true));
+            resp2ret.setPublicKey(EBUtils.hex2byte(res.getString("publickey"), true));
         }
 
         // Signature?
         if (res.has("signature")){
-            resp2ret.setSignature(EBUtils.hex2byte(res.getString("certificate"), true));
+            resp2ret.setSignature(EBUtils.hex2byte(res.getString("signature"), true));
         }
 
         // Certificate?
