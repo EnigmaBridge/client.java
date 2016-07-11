@@ -129,11 +129,10 @@ public class EBKeyPairGenerator extends KeyPairGeneratorSpi {
 
     public KeyPair generateKeyPair() {
         if(this.algorithm.equals("RSA")) {
-            final SecureRandom rand = new SecureRandom();
             final byte[] encKey = new byte[32];
             final byte[] macKey = new byte[32];
-            rand.nextBytes(encKey);
-            rand.nextBytes(macKey);
+            random.nextBytes(encKey);
+            random.nextBytes(macKey);
 
             final int uoTypeFunction = this.keySize == 1024 ? UserObjectType.TYPE_RSA1024DECRYPT_NOPAD : UserObjectType.TYPE_RSA2048DECRYPT_NOPAD;
             final EBEndpointInfo endpoint = engine.getDefaultSettings().getEndpointInfo();
