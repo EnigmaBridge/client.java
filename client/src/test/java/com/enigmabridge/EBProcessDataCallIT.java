@@ -149,7 +149,7 @@ public class EBProcessDataCallIT {
 
             final UserObjectInfoBase uo = new UserObjectInfoBase.Builder()
                     .setUoid(EBTestingUtils.UOID_AES)
-                    .setUserObjectType(1)
+                    .setUserObjectType(UserObjectType.OBJ_PLAINAES)
                     .setApiKey(apiKey)
                     .setEndpointInfo(endpoint)
                     .setCommKeys(ck)
@@ -182,7 +182,7 @@ public class EBProcessDataCallIT {
         try {
             final UserObjectInfoBase uo = new UserObjectInfoBase.Builder()
                     .setUoid(EBTestingUtils.UOID_AES)
-                    .setUserObjectType(1)
+                    .setUserObjectType(UserObjectType.OBJ_PLAINAES)
                     .setApiKey(apiKey)
                     .setEndpointInfo(endpoint)
                     .setCommKeys(ckAES)
