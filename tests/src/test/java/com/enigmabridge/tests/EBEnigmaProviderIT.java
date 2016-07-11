@@ -1,19 +1,27 @@
 package com.enigmabridge.tests;
 
-import com.enigmabridge.*;
+import com.enigmabridge.EBCommKeys;
+import com.enigmabridge.EBEndpointInfo;
+import com.enigmabridge.EBEngine;
+import com.enigmabridge.EBSettingsBase;
 import com.enigmabridge.comm.EBConnectionSettings;
-import com.enigmabridge.create.*;
+import com.enigmabridge.create.Constants;
+import com.enigmabridge.create.EBUOGetTemplateRequest;
 import com.enigmabridge.misc.EBTestingUtils;
 import com.enigmabridge.provider.EnigmaProvider;
-import com.enigmabridge.provider.rsa.EBRSAPrivateKey;
+import com.enigmabridge.provider.specs.EBRSAKeyGenParameterSpec;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.*;
 
 import javax.crypto.Cipher;
-import java.math.BigInteger;
-import java.security.*;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.SecureRandom;
+import java.security.Security;
+
+import static org.testng.Assert.assertEquals;
 
 /**
  * Basic tests of Enigma Bridge crypto provider.
@@ -87,55 +95,32 @@ public class EBEnigmaProviderIT {
 
     @Test(groups = {"integration"}) //, timeOut = 100000
     public void testRSAKeyPair() throws Exception {
+        final EBUOGetTemplateRequest tplReq = new EBUOGetTemplateRequest();
+        tplReq.setEnvironment(Constants.ENV_DEV);
+
         final KeyPairGenerator kpGen = KeyPairGenerator.getInstance("RSA", "EB");
-        kpGen.initialize(2048);
+        final EBRSAKeyGenParameterSpec keySpec = new EBRSAKeyGenParameterSpec(2048).setTplReq(tplReq);
+
+        kpGen.initialize(keySpec);
         final KeyPair keyPair = kpGen.generateKeyPair();
 
-        final Cipher rsa = Cipher.getInstance("RSA");
+        // Generate random input to encrypt.
+        final SecureRandom rand = new SecureRandom();
+        final byte[] testInput = new byte[32];
+        rand.nextBytes(testInput);
+
+        // Encrypt.
+        final Cipher rsaEnc = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+        rsaEnc.init(Cipher.ENCRYPT_MODE, keyPair.getPublic());
+        final byte[] ciphertext = rsaEnc.doFinal(testInput);
+
+        // Decrypt
+        final Cipher rsa = Cipher.getInstance("RSA/ECB/PKCS1Padding");
         rsa.init(Cipher.DECRYPT_MODE, keyPair.getPrivate());
+        final byte[] decrypted = rsa.doFinal(ciphertext);
 
-        // Encrypt test vector
-        // Test RSA_DEC(1) == 1 as (1^d) mod N = 1
-        final String input  = "01";
-        final byte[] bytes = rsa.doFinal(EBUtils.hex2byte(input));
-
+        // Test
+        assertEquals(decrypted, testInput, "RSAdecrypt(RSAencrypt(x)) != x");
         LOG.info("DONE");
-    }
-
-    @Test(groups = {"integration"}) //, timeOut = 100000
-    public void testRSA() throws Exception {
-        // Load key public parts.
-        final BigInteger exp = BigInteger.valueOf(EBTestingUtils.RSA2k_PUB_EXP);
-        final BigInteger mod = new BigInteger(EBUtils.hex2byte(EBTestingUtils.RSA2k_MODULUS));
-        final PublicKey rsa2kPubkey = EBTestingUtils.createRSAPublicKey2k();
-        final int bitLength = mod.bitLength();
-
-        // Create UOKey
-        final UserObjectKeyBase key = new UserObjectKeyBase.Builder()
-                .setUoid(EBTestingUtils.UOID_RSA2k_KNOWN)
-                .setUserObjectType(UserObjectType.TYPE_RSA2048DECRYPT_NOPAD)
-                .setCommKeys(ckRSA)
-                .build();
-
-        LOG.debug("UO: " + key.toJSON(null).toString());
-
-        // Create Java RSA key - will be done with key specs.
-        final EBRSAPrivateKey rsa2kPrivKey = new EBRSAPrivateKey.Builder()
-                .setPublicExponent(exp)
-                .setModulus(mod)
-                .setUo(key)
-                .setEngine(engine)
-                .build();
-
-        final Cipher rsa = Cipher.getInstance("RSA");
-        rsa.init(Cipher.DECRYPT_MODE, rsa2kPrivKey);
-
-        // Encrypt test vector
-        // Test RSA_DEC(1) == 1 as (1^d) mod N = 1
-        final String input  = "01";
-        final byte[] bytes = rsa.doFinal(EBUtils.hex2byte(input));
-
-        LOG.info("DONE");
-
     }
 }
