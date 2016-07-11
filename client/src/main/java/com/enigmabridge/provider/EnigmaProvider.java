@@ -1,6 +1,7 @@
 package com.enigmabridge.provider;
 
 import com.enigmabridge.EBEngine;
+import com.enigmabridge.provider.aes.AES;
 import com.enigmabridge.provider.rsa.RSA;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
@@ -77,6 +78,9 @@ public class EnigmaProvider extends Provider implements ConfigurableProvider {
         addAlgorithm("Alg.Alias.KeyPairGenerator." + X509ObjectIdentifiers.id_ea_rsa, "RSA", true);
         addAlgorithm("Alg.Alias.KeyPairGenerator." + PKCSObjectIdentifiers.id_RSAES_OAEP, "RSA", true);
         addAlgorithm("Alg.Alias.KeyPairGenerator." + PKCSObjectIdentifiers.id_RSASSA_PSS, "RSA", true);
+
+        // AES
+        new AES.Mappings().configure(this);
     }
 
     /**

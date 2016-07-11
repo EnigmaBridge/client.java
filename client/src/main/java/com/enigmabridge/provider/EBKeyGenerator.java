@@ -175,6 +175,7 @@ public class EBKeyGenerator extends KeyGeneratorSpi {
                     .setUoid(response.getHandle().getUoId())
                     .setUserObjectType(response.getHandle().getUoType().getValue())
                     .setCommKeys(new EBCommKeys(encKey, macKey))
+                    .setKeyLength(16)
                     .build();
 
             final EBAESKey.Builder bld = new EBAESKey.Builder()
