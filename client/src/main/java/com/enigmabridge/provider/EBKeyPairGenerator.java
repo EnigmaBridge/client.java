@@ -69,7 +69,10 @@ public class EBKeyPairGenerator extends KeyPairGeneratorSpi {
             this.rsaPublicExponent = rsaSpec.getPublicExponent();
 
             if (spec instanceof EBEngineReference){
-                this.engine = ((EBEngineReference) spec).getEBEngine();
+                final EBEngine lEngine = ((EBEngineReference) spec).getEBEngine();
+                if (lEngine != null){
+                    this.engine = lEngine;
+                }
             }
 
             if (spec instanceof EBCreateUOTemplateSpec){
