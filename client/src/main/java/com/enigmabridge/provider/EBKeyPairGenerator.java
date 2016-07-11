@@ -5,6 +5,7 @@ import com.enigmabridge.*;
 import com.enigmabridge.comm.EBCorruptedException;
 import com.enigmabridge.create.*;
 import com.enigmabridge.provider.rsa.EBRSAPrivateKey;
+import com.enigmabridge.provider.specs.EBCreateUOTemplateSpec;
 import sun.security.rsa.RSAKeyFactory;
 
 import java.io.IOException;
@@ -27,6 +28,7 @@ public class EBKeyPairGenerator extends KeyPairGeneratorSpi {
     private BigInteger rsaPublicExponent;
     private SecureRandom random;
     private EBEngine engine;
+    private EBUOGetTemplateRequest getTemplateRequest;
 
     public EBKeyPairGenerator(EnigmaProvider provider, String algorithm)  {
         this.rsaPublicExponent = RSAKeyGenParameterSpec.F4;
@@ -68,6 +70,10 @@ public class EBKeyPairGenerator extends KeyPairGeneratorSpi {
 
             if (spec instanceof EBEngineReference){
                 this.engine = ((EBEngineReference) spec).getEBEngine();
+            }
+
+            if (spec instanceof EBCreateUOTemplateSpec){
+                this.getTemplateRequest = ((EBCreateUOTemplateSpec) spec).getTemplateRequest();
             }
 
         } else {
@@ -114,10 +120,15 @@ public class EBKeyPairGenerator extends KeyPairGeneratorSpi {
 
             final int uoTypeFunction = this.keySize == 1024 ? UserObjectType.TYPE_RSA1024DECRYPT_NOPAD : UserObjectType.TYPE_RSA2048DECRYPT_NOPAD;
             final EBEndpointInfo endpoint = engine.getDefaultSettings().getEndpointInfo();
-            EBUOGetTemplateRequest req = new EBUOGetTemplateRequest();
+            EBUOGetTemplateRequest req = this.getTemplateRequest != null ? this.getTemplateRequest : new EBUOGetTemplateRequest();
             req.setType(uoTypeFunction);
             req.setGenerationCommKey(Constants.GENKEY_CLIENT);
             req.setGenerationAppKey(Constants.GENKEY_ENROLL_RANDOM);
+
+            // Force remaining parameters to default values.
+            req.setGenerationBillingKey(Constants.GENKEY_LEGACY_ENROLL_RANDOM);
+            req.setFormat(1);
+            req.setProtocol(1);
 
             EBCreateUOSimpleCall callBld = new EBCreateUOSimpleCall.Builder()
                     .setEngine(engine)
