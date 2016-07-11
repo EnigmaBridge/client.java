@@ -1,6 +1,7 @@
 package com.enigmabridge.comm;
 
 import javax.crypto.BadPaddingException;
+import java.security.SecureRandom;
 
 /**
  * PKCS 1.5 padding for RSA operation.
@@ -19,6 +20,63 @@ import javax.crypto.BadPaddingException;
  * Created by dusanklinec on 04.05.16.
  */
 public class PKCS1Padding {
+
+    public static void pad(byte[] a, int offsetSrc, int lenSrc, byte[] dest, int offsetDest, int blockLength, int bt, SecureRandom rand){
+        if (bt != 0 && bt != 1 && bt != 2){
+            throw new IllegalArgumentException("invalid BT size");
+        }
+
+        final int psLen = blockLength - 3 - lenSrc;
+        if (lenSrc + 3 > blockLength){
+            throw new IllegalArgumentException("data to pad is too big for the padding block length");
+        }
+
+        // Copy data to end of the buffer
+        System.arraycopy(a, offsetSrc, dest, offsetDest + psLen + 3, lenSrc);
+        dest[offsetDest]   = 0;
+        dest[offsetDest+1] = (byte)bt;
+        dest[offsetDest+2+psLen] = 0;
+
+        // Padding
+        for (int i=0; i < psLen; i++) {
+            if (bt == 0){
+                dest[offsetDest + 2 + i] = (byte)0;
+            } else if (bt == 1){
+                dest[offsetDest + 2 + i] = (byte)0xff;
+            } else {
+                do {
+                    dest[offsetDest + 2 + i] = (byte)rand.nextInt();
+                }while(dest[offsetDest + 2 + i] == 0);
+            }
+        }
+    }
+
+    public static void pad(byte[] a, int offsetSrc, int lenSrc, byte[] dest, int offsetDest, int blockLength, int bt){
+        pad(a, offsetSrc, lenSrc, dest, offsetDest, blockLength, bt, new SecureRandom());
+    }
+
+    public static void pad(byte[] a, int offsetSrc, int lenSrc, byte[] dest, int offsetDest, int blockLength){
+        pad(a, offsetSrc, lenSrc, dest, offsetDest, blockLength, 0, new SecureRandom());
+    }
+
+    public static byte[] pad(byte[] a, int offsetSrc, int lenSrc, int blockLength, int bt, SecureRandom rand){
+        byte[] dest = new byte[blockLength];
+        pad(a, offsetSrc, lenSrc, dest, 0, blockLength, bt, rand);
+        return dest;
+    }
+
+    public static byte[] pad(byte[] a, int blockLength, int bt, SecureRandom rand){
+        byte[] dest = new byte[blockLength];
+        pad(a, 0, a.length, dest, 0, blockLength, bt, rand);
+        return dest;
+    }
+
+    public static byte[] pad(byte[] a, int blockLength, int bt){
+        byte[] dest = new byte[blockLength];
+        pad(a, 0, a.length, dest, 0, blockLength, bt, new SecureRandom());
+        return dest;
+    }
+
     public static byte[] unpad(byte[] buff, int blockLen) throws BadPaddingException {
         return unpad(buff, 0, buff.length, blockLen);
     }
