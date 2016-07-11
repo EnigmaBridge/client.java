@@ -1,6 +1,5 @@
 package com.enigmabridge.tests;
 
-import com.enigmabridge.EBCommKeys;
 import com.enigmabridge.EBEndpointInfo;
 import com.enigmabridge.EBEngine;
 import com.enigmabridge.EBSettingsBase;
@@ -45,9 +44,6 @@ public class EBEnigmaProviderIT {
     // EBSettings - defaults.
     private EBSettingsBase defaultSettings;
 
-    // RSA UOs comm keys
-    private EBCommKeys ckRSA;
-
     // Enigma crypto provider.
     private static EnigmaProvider provider;
 
@@ -76,10 +72,6 @@ public class EBEnigmaProviderIT {
                 .build();
 
         engine.setDefaultSettings(defaultSettings);
-
-        ckRSA = new EBCommKeys()
-                .setEncKey("1234567890123456789012345678901234567890123456789012345678901234")
-                .setMacKey("2224262820223456789012345678901234567890123456789012345678901234");
 
         // Adding Enigma as a security provider.
         provider = new EnigmaProvider(engine);
