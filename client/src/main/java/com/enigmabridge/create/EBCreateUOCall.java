@@ -189,7 +189,7 @@ public class EBCreateUOCall extends EBAPICall implements EBResponseParser {
     @Override
     public EBResponse.ABuilder parseResponse(JSONObject data, EBResponse.ABuilder resp, EBResponseParserOptions options) throws EBCorruptedException {
         if (data == null || !data.has(FIELD_DATA)){
-            throw new EBCorruptedException("Message corrupted");
+            throw new EBCorruptedException("Create UO response corrupted: " + data);
         }
 
         if (resp == null){
