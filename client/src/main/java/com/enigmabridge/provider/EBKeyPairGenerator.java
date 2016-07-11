@@ -45,8 +45,16 @@ public class EBKeyPairGenerator extends KeyPairGeneratorSpi {
             throw new InvalidParameterException(ex.getMessage());
         }
 
-        if (random == null){
-            random = engine.getRnd();
+        if (random != null){
+            this.random = random;
+        }
+
+        if (this.random == null){
+            this.random = engine.getRnd();
+        }
+
+        if (this.random == null){
+            this.random = new SecureRandom();
         }
 
         this.keySize = keySize;
@@ -84,11 +92,17 @@ public class EBKeyPairGenerator extends KeyPairGeneratorSpi {
             throw new ProviderException("Unknown algorithm: " + this.algorithm);
         }
 
-        if (random == null){
-            random = engine.getRnd();
+        if (random != null){
+            this.random = random;
         }
 
-        this.random = random;
+        if (this.random == null){
+            this.random = engine.getRnd();
+        }
+
+        if (this.random == null){
+            this.random = new SecureRandom();
+        }
     }
 
     private void checkKeySize(int keySize, AlgorithmParameterSpec params) throws InvalidAlgorithmParameterException {
