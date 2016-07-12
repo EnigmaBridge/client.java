@@ -10,6 +10,7 @@ import org.bouncycastle.jcajce.provider.asymmetric.rsa.*;
 import org.bouncycastle.jcajce.provider.config.ConfigurableProvider;
 import org.bouncycastle.jcajce.provider.config.ProviderConfiguration;
 import org.bouncycastle.jcajce.provider.util.AsymmetricKeyInfoConverter;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import javax.crypto.SecretKey;
 import java.lang.reflect.Constructor;
@@ -69,6 +70,9 @@ public class EnigmaProvider extends Provider implements ConfigurableProvider {
 
     private void setup()
     {
+        // Register BC provider if not already registered.
+        Security.addProvider(new BouncyCastleProvider());
+
         // Register our RSA engine.
         new RSA.Mappings().configure(this);
 
