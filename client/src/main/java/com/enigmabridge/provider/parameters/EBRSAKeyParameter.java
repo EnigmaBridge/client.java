@@ -11,7 +11,7 @@ import java.math.BigInteger;
  * EB RSA parameters.
  * Created by dusanklinec on 26.04.16.
  */
-public class EBRSAKeyParameter extends EBAsymmetricKeyParameter implements UserObjectKey {
+public class EBRSAKeyParameter extends EBAsymmetricKeyParameter {
     /**
      * Modulus & public exponents are required for blinding.
      */

@@ -8,13 +8,18 @@ import com.enigmabridge.create.Constants;
 import com.enigmabridge.create.EBUOGetTemplateRequest;
 import com.enigmabridge.misc.EBTestingUtils;
 import com.enigmabridge.provider.EnigmaProvider;
+import com.enigmabridge.provider.specs.EBAESKeyGenParameterSpec;
 import com.enigmabridge.provider.specs.EBRSAKeyGenParameterSpec;
+import com.enigmabridge.provider.specs.EBSymmetricKeyGenTypes;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.*;
 
 import javax.crypto.Cipher;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.IvParameterSpec;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.SecureRandom;
@@ -86,7 +91,7 @@ public class EBEnigmaProviderIT {
     }
 
     @Test(groups = {"integration"}) //, timeOut = 100000
-    public void testRSAKeyPair() throws Exception {
+    public void testRSA() throws Exception {
         final EBUOGetTemplateRequest tplReq = new EBUOGetTemplateRequest();
         tplReq.setEnvironment(Constants.ENV_DEV);
 
@@ -113,6 +118,61 @@ public class EBEnigmaProviderIT {
 
         // Test
         assertEquals(decrypted, testInput, "RSAdecrypt(RSAencrypt(x)) != x");
+        LOG.info("DONE");
+    }
+
+    @Test(groups = {"integration"}) //, timeOut = 100000
+    public void testAES() throws Exception {
+        final SecureRandom rand = new SecureRandom();
+
+        // Create AES keys, for encryption & decryption.
+        final EBUOGetTemplateRequest tplReq = new EBUOGetTemplateRequest();
+        tplReq.setEnvironment(Constants.ENV_DEV);
+
+        final KeyGenerator kGen = KeyGenerator.getInstance("AES", "EB");
+        final EBAESKeyGenParameterSpec keySpec = new EBAESKeyGenParameterSpec(128)
+                .setTplReq(tplReq)
+                .setKeyType(EBSymmetricKeyGenTypes.BOTH);
+
+        kGen.init(keySpec);
+        final SecretKey secretKey = kGen.generateKey();
+
+        // Very simple 1 block test.
+        final byte[] simpleInput = new byte[16];
+        rand.nextBytes(simpleInput);
+
+        // Encrypt.
+        final Cipher aesEncSimple = Cipher.getInstance("AES/ECB/NoPadding", "EB");
+        aesEncSimple.init(Cipher.ENCRYPT_MODE, secretKey);
+        final byte[] ciphertextSimple = aesEncSimple.doFinal(simpleInput);
+
+        // Decrypt
+        final Cipher aesDecSimple = Cipher.getInstance("AES/ECB/NoPadding", "EB");
+        aesDecSimple.init(Cipher.DECRYPT_MODE, secretKey);
+        final byte[] decryptedSimple = aesDecSimple.doFinal(ciphertextSimple);
+
+        // Test
+        assertEquals(decryptedSimple, simpleInput, "AESdecrypt(AESencrypt(x)) != x");
+
+        // More complex test - CBC mode, more blocks.
+        // Generate random input to encrypt.
+        final byte[] testInput = new byte[24];
+        final byte[] iv = new byte[16];
+        rand.nextBytes(testInput);
+        rand.nextBytes(iv);
+
+        // Encrypt.
+        final Cipher aesEnc = Cipher.getInstance("AES/CBC/PKCS5PADDING", "EB");
+        aesEnc.init(Cipher.ENCRYPT_MODE, secretKey, new IvParameterSpec(iv));
+        final byte[] ciphertext = aesEnc.doFinal(testInput);
+
+        // Decrypt
+        final Cipher aesDec = Cipher.getInstance("AES/CBC/PKCS5PADDING", "EB");
+        aesDec.init(Cipher.DECRYPT_MODE, secretKey, new IvParameterSpec(iv));
+        final byte[] decrypted = aesDec.doFinal(ciphertext);
+
+        // Test
+        assertEquals(decrypted, testInput, "AESdecrypt(AESencrypt(x)) != x");
         LOG.info("DONE");
     }
 }
