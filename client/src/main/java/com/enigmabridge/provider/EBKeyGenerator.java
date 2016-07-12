@@ -207,7 +207,7 @@ public class EBKeyGenerator extends KeyGeneratorSpi {
 
             // Create encrypt.
             if (keyType == EBSymmetricKeyGenTypes.BOTH || keyType == EBSymmetricKeyGenTypes.ENCRYPT){
-                encKey = engineGenerateAESKey(false, appKeySeed);
+                encKey = engineGenerateAESKey(true, appKeySeed);
             }
 
             // If pair was generated - chain them.
