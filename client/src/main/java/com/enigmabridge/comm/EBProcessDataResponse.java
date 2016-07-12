@@ -87,9 +87,9 @@ public class EBProcessDataResponse extends EBResponse {
                 this.statusDetail,
                 this.userObjectId,
                 this.function,
-                EBUtils.byte2hex(this.nonce),
-                EBUtils.byte2hex(this.protectedData),
-                EBUtils.byte2hex(this.plainData)
+                this.nonce          == null ? "null" : EBUtils.byte2hex(this.nonce),
+                this.protectedData  == null ? "null" : EBUtils.byte2hex(this.protectedData),
+                this.plainData      == null ? "null" : EBUtils.byte2hex(this.plainData)
         );
     }
 
