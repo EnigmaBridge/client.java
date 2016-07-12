@@ -165,6 +165,7 @@ public class EBKeyGenerator extends KeyGeneratorSpi {
                 .setRequest(req)
                 .addKey(new EBUOTemplateKey(Constants.KEY_COMM_ENC, encKey))
                 .addKey(new EBUOTemplateKey(Constants.KEY_COMM_MAC, macKey))
+                .addKey(new EBUOTemplateKey(Constants.KEY_APP,      appKeySeed))
                 .build();
 
         try {
