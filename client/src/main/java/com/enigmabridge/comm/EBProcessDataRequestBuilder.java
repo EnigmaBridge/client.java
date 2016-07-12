@@ -31,7 +31,19 @@ public class EBProcessDataRequestBuilder {
      * @return request
      */
     public EBProcessDataRequest build(byte[] requestData) throws IOException, EBEngineException {
-        return build(null, requestData);
+        return build(null, requestData, 0, requestData == null ? 0 : requestData.length);
+    }
+
+    /**
+     * Builds EB request.
+     *
+     * @param requestData - bitArray with userdata to perform operation on (will be encrypted, MAC protected)
+     * @param offset - offset to start with request data
+     * @param length - number of bytes to read from request data
+     * @return request
+     */
+    public EBProcessDataRequest build(byte[] requestData, int offset, int length) throws IOException, EBEngineException {
+        return build(null, requestData, offset, length);
     }
 
     /**
@@ -42,6 +54,21 @@ public class EBProcessDataRequestBuilder {
      * @return request
      */
     public EBProcessDataRequest build(byte[] plainData, byte[] requestData) throws IOException, EBEngineException {
+        return build(plainData, requestData, 0, requestData == null ? 0 : requestData.length);
+    }
+
+    /**
+     * Builds EB request.
+     *
+     * @param plainData - bitArray of the plaintext data.
+     * @param requestData - bitArray with userdata to perform operation on (will be encrypted, MAC protected)
+     * @param requestDataOffset - offset to start with request data
+     * @param requestDataLength - number of bytes to read from request data
+     * @return request
+     */
+    public EBProcessDataRequest build(byte[] plainData, byte[] requestData, int requestDataOffset, int requestDataLength)
+            throws IOException, EBEngineException
+    {
         if (nonce == null){
             nonce = EBCommUtils.genProcessDataNonce();
         }
@@ -53,7 +80,7 @@ public class EBProcessDataRequestBuilder {
                 + EBCommUtils.UO_SECTION_SIZE_LENGTH
                 + plainDataLength
                 + EBCommUtils.PROCESSDATA_FRESHNESS_NONCE_LENGTH
-                + requestData.length
+                + requestDataLength
                 + EBCommUtils.AES_BLOCK_LEN
                 + EBCommUtils.APDU_MAC_AES_LENGTH;
         byte[] inDataWithUOID = new byte[bufferSize];
@@ -77,8 +104,8 @@ public class EBProcessDataRequestBuilder {
         offset += nonce.length;
 
         // Request data
-        System.arraycopy(requestData, 0, inDataWithUOID, offset, requestData.length);
-        offset += requestData.length;
+        System.arraycopy(requestData, requestDataOffset, inDataWithUOID, offset, requestDataLength);
+        offset += requestDataLength;
 
         //this.log('ProcessData function input PDIN (0x1f | <UOID-4B> | <nonce-8B> | data | pkcs#7padding) : ' + h.fromBits(baBuff) + "; len: " + ba.bitLength(baBuff));
 

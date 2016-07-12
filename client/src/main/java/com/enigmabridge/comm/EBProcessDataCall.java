@@ -163,6 +163,16 @@ public class EBProcessDataCall extends EBAPICall {
      * @param requestData raw data to ProcessData().
      */
     public void build(byte[] requestData) throws IOException {
+        build(requestData, 0, requestData == null ? 0 : requestData.length);
+    }
+
+    /**
+     * Builds request data.
+     * @param requestData raw data to ProcessData().
+     * @param offset - offset to start with request data
+     * @param length - number of bytes to read from request data
+     */
+    public void build(byte[] requestData, int offset, int length) throws IOException {
         this.buildApiBlock(null, null);
 
         // Build raw request.
@@ -177,7 +187,7 @@ public class EBProcessDataCall extends EBAPICall {
                 .setRequestType(getProcessFunction())
                 .setUoInfo(getUo());
 
-        pdRequest = pdRequestBuilder.build(requestData);
+        pdRequest = pdRequestBuilder.build(requestData, offset, length);
 
         // Build request - headers.
         if (isMethodPost()){
@@ -215,14 +225,31 @@ public class EBProcessDataCall extends EBAPICall {
 
     /**
      * Performs request to the remote endpoint with built request.
+     *
+     * @param requestData - data to build request with
+     * @return process data response
      * @throws IOException
      * @throws EBCorruptedException
      */
     public EBProcessDataResponse doRequest(byte[] requestData) throws IOException, EBCorruptedException {
+        return doRequest(requestData, 0, requestData == null ? 0 : requestData.length);
+    }
+
+    /**
+     * Performs request to the remote endpoint with built request.
+     *
+     * @param requestData - data to build request with
+     * @param offset - offset to start with request data
+     * @param length - number of bytes to read from request data
+     * @return process data response
+     * @throws IOException
+     * @throws EBCorruptedException
+     */
+    public EBProcessDataResponse doRequest(byte[] requestData, int offset, int length) throws IOException, EBCorruptedException {
         if (apiBlock == null && requestData == null){
             throw new IllegalArgumentException("Call was not built with request data, cannot build now - no data");
         } else if (requestData != null){
-            build(requestData);
+            build(requestData, offset, length);
         }
 
         this.connector = engine.getConMgr().getConnector(this.endpoint);
