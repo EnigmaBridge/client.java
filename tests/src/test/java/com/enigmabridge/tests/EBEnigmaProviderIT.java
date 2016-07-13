@@ -8,9 +8,7 @@ import com.enigmabridge.create.Constants;
 import com.enigmabridge.create.EBUOGetTemplateRequest;
 import com.enigmabridge.misc.EBTestingUtils;
 import com.enigmabridge.provider.EnigmaProvider;
-import com.enigmabridge.provider.specs.EBAESKeyGenParameterSpec;
-import com.enigmabridge.provider.specs.EBRSAKeyGenParameterSpec;
-import com.enigmabridge.provider.specs.EBSymmetricKeyGenTypes;
+import com.enigmabridge.provider.specs.*;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +17,9 @@ import org.testng.annotations.*;
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.SecureRandom;
@@ -130,7 +130,7 @@ public class EBEnigmaProviderIT {
         tplReq.setEnvironment(Constants.ENV_DEV);
 
         final KeyGenerator kGen = KeyGenerator.getInstance("AES", "EB");
-        final EBAESKeyGenParameterSpec keySpec = new EBAESKeyGenParameterSpec(128)
+        final EBSymmetricKeyGenParameterSpec keySpec = new EBSymmetricKeyGenParameterSpec(128)
                 .setTplReq(tplReq)
                 .setKeyType(EBSymmetricKeyGenTypes.BOTH);
 
@@ -169,6 +169,68 @@ public class EBEnigmaProviderIT {
         // Decrypt
         final Cipher aesDec = Cipher.getInstance("AES/CBC/PKCS5PADDING", "EB");
         aesDec.init(Cipher.DECRYPT_MODE, secretKey, new IvParameterSpec(iv));
+        final byte[] decrypted = aesDec.doFinal(ciphertext);
+
+        // Test
+        assertEquals(decrypted, testInput, "AESdecrypt(AESencrypt(x)) != x");
+        LOG.info("DONE");
+    }
+
+    @Test(groups = {"integration"}) //, timeOut = 100000
+    public void testAESFactory() throws Exception {
+        final SecureRandom rand = new SecureRandom();
+
+        // Create AES keys, for encryption & decryption.
+        final EBUOGetTemplateRequest tplReq = new EBUOGetTemplateRequest();
+        tplReq.setEnvironment(Constants.ENV_DEV);
+
+        final SecretKeyFactory kFact = SecretKeyFactory.getInstance("AES", "EB");
+
+        final byte[] aesKey = new byte[16];
+        rand.nextBytes(aesKey);
+
+        final EBSecretKeySpec spec = new EBSecretKeySpec(aesKey, "AES", engine);
+        spec.setKeyType(EBSymmetricKeyGenTypes.BOTH);
+        spec.setTplReq(tplReq);
+
+        // Method accepts SecretKeySpec (simple one) or EBSecretKeySpec
+        final SecretKey key = kFact.generateSecret(spec);
+
+        // Bouncy castle secret
+        final SecretKeySpec bcKey = new SecretKeySpec(aesKey, "AES");
+
+        // Very simple 1 block test.
+        final byte[] simpleInput = new byte[16];
+        rand.nextBytes(simpleInput);
+
+        // Encrypt.
+        final Cipher aesEncSimple = Cipher.getInstance("AES/ECB/NoPadding", "EB");
+        aesEncSimple.init(Cipher.ENCRYPT_MODE, key);
+        final byte[] ciphertextSimple = aesEncSimple.doFinal(simpleInput);
+
+        // Decrypt
+        final Cipher aesDecSimple = Cipher.getInstance("AES/ECB/NoPadding", "BC");
+        aesDecSimple.init(Cipher.DECRYPT_MODE, bcKey);
+        final byte[] decryptedSimple = aesDecSimple.doFinal(ciphertextSimple);
+
+        // Test
+        assertEquals(decryptedSimple, simpleInput, "AESdecrypt(AESencrypt(x)) != x");
+
+        // More complex test - CBC mode, more blocks, inverted operation.
+        // Generate random input to encrypt.
+        final byte[] testInput = new byte[24];
+        final byte[] iv = new byte[16];
+        rand.nextBytes(testInput);
+        rand.nextBytes(iv);
+
+        // Encrypt.
+        final Cipher aesEnc = Cipher.getInstance("AES/CBC/PKCS5PADDING", "BC");
+        aesEnc.init(Cipher.ENCRYPT_MODE, bcKey, new IvParameterSpec(iv));
+        final byte[] ciphertext = aesEnc.doFinal(testInput);
+
+        // Decrypt
+        final Cipher aesDec = Cipher.getInstance("AES/CBC/PKCS5PADDING", "EB");
+        aesDec.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(iv));
         final byte[] decrypted = aesDec.doFinal(ciphertext);
 
         // Test
