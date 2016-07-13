@@ -1,15 +1,13 @@
 package com.enigmabridge.create;
 
-import com.enigmabridge.EBCryptoException;
 import com.enigmabridge.EBInvalidException;
 import com.enigmabridge.comm.EBCommUtils;
+import com.enigmabridge.create.misc.EBRSAPrivateCrtKey;
+import com.enigmabridge.create.misc.EBRSAPrivateCrtKeyWrapper;
 
 import java.math.BigInteger;
-import java.security.Key;
-import java.security.KeyFactory;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.spec.InvalidKeySpecException;
+import java.security.interfaces.RSAPrivateCrtKey;
+import java.security.interfaces.RSAPrivateKey;
 import java.security.spec.RSAPublicKeySpec;
 
 /**
@@ -100,5 +98,81 @@ public class EBCreateUtils {
         return new RSAPublicKeySpec(mod, exp);
     }
 
+    public static short ExportPrivateKeyUOStyle(byte[] buffer, short baseOffset, RSAPrivateCrtKey privKey) {
+        return ExportPrivateKeyUOStyle(buffer, baseOffset, privKey, (byte) 0);
+    }
+
+    public static short ExportPrivateKeyUOStyle(byte[] buffer, short baseOffset, RSAPrivateKey privKey, BigInteger e, byte spareBytes) {
+        return ExportPrivateKeyUOStyle(buffer, baseOffset,
+                new EBRSAPrivateCrtKeyWrapper(new EBRSAPrivateCrtKey(privKey, e)),
+                spareBytes);
+    }
+
+    public static short ExportPrivateKeyUOStyle(byte[] buffer, short baseOffset, RSAPrivateCrtKey privKey, byte spareBytes) {
+        return ExportPrivateKeyUOStyle(buffer, baseOffset, new EBRSAPrivateCrtKeyWrapper(privKey), spareBytes);
+    }
+
+    public static short ExportPrivateKeyUOStyle(byte[] buffer, short baseOffset, EBRSAPrivateCrtKeyWrapper privKey, byte spareBytes) {
+        short tempOffset = baseOffset;
+
+        // Length of overall key section
+        short keyLengthOffset = tempOffset;
+        tempOffset += EBCommUtils.UO_KEY_SIZE_LENGTH;   // make space for total length value, set later
+
+        // Separate parts of key
+        short keyBaseOffset = tempOffset;
+        tempOffset += EBCommUtils.UO_KEY_SIZE_LENGTH;   // make space for part length value, set later
+        short partLen = privKey.getDP1(buffer, tempOffset);
+        // If there is leading zero (some software lib keys make it),
+        // then export again shifted by -1 (will put leading zero into
+        // TLV length segment where it will be overwritten just after)
+        if (buffer[tempOffset] == (byte) 0) {
+            partLen = privKey.getDP1(buffer, (short) (tempOffset - 1));
+            partLen--; // don't count leading zero
+        }
+        EBCommUtils.setShort(buffer, (short) (tempOffset - EBCommUtils.UO_KEY_SIZE_LENGTH), partLen);
+        tempOffset += partLen;
+        tempOffset += EBCommUtils.UO_KEY_SIZE_LENGTH;   // make space for part length value, set later
+        partLen = privKey.getDQ1(buffer, tempOffset);
+        if (buffer[tempOffset] == (byte) 0) { // Check for leading zero (see reason above)
+            partLen = privKey.getDQ1(buffer, (short) (tempOffset - 1));
+            partLen--; // don't count leading zero
+        }
+        EBCommUtils.setShort(buffer, (short) (tempOffset - EBCommUtils.UO_KEY_SIZE_LENGTH), partLen);
+        tempOffset += partLen;
+        tempOffset += EBCommUtils.UO_KEY_SIZE_LENGTH;   // make space for part length value, set later
+        partLen = privKey.getP(buffer, tempOffset);
+        if (buffer[tempOffset] == (byte) 0) { // Check for leading zero (see reason above)
+            partLen = privKey.getP(buffer, (short) (tempOffset - 1));
+            partLen--; // don't count leading zero
+        }
+        EBCommUtils.setShort(buffer, (short) (tempOffset - EBCommUtils.UO_KEY_SIZE_LENGTH), partLen);
+        tempOffset += partLen;
+        tempOffset += EBCommUtils.UO_KEY_SIZE_LENGTH;   // make space for part length value, set later
+        partLen = privKey.getQ(buffer, tempOffset);
+        if (buffer[tempOffset] == (byte) 0) { // Check for leading zero (see reason above)
+            partLen = privKey.getQ(buffer, (short) (tempOffset - 1));
+            partLen--; // don't count leading zero
+        }
+        EBCommUtils.setShort(buffer, (short) (tempOffset - EBCommUtils.UO_KEY_SIZE_LENGTH), partLen);
+        tempOffset += partLen;
+        tempOffset += EBCommUtils.UO_KEY_SIZE_LENGTH;   // make space for part length value, set later
+        partLen = privKey.getPQ(buffer, tempOffset);
+        if (buffer[tempOffset] == (byte) 0) { // Check for leading zero (see reason above)
+            partLen = privKey.getPQ(buffer, (short) (tempOffset - 1));
+            partLen--; // don't count leading zero
+        }
+        EBCommUtils.setShort(buffer, (short) (tempOffset - EBCommUtils.UO_KEY_SIZE_LENGTH), partLen);
+        tempOffset += partLen;
+
+        // Add spare bytes if required (used as compensation for tmaple objects generated later)
+        tempOffset += spareBytes;
+
+        // set length for key section
+        EBCommUtils.setShort(buffer, keyLengthOffset, (short) (tempOffset - keyBaseOffset));
+
+        // Return overall length that was inserted
+        return (short) (tempOffset - baseOffset);
+    }
 
 }
