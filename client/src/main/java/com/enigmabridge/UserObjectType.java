@@ -282,11 +282,11 @@ public class UserObjectType implements Serializable{
         return type;
     }
 
-    public int getAppKeyGenerationType() {
+    public int getComKeyGenerationType() {
         return (int) ((typeValue >> 20) & 0x1);
     }
 
-    public int getComKeyGenerationType() {
+    public int getAppKeyGenerationType() {
         return (int) ((typeValue >> 21) & 0x7);
     }
 
