@@ -268,6 +268,66 @@ public class UserObjectType implements Serializable{
         }
     }
 
+    /**
+     * Returns true if the UO represents encryption key.
+     * @return true if encryption key
+     */
+    public boolean isCipherObject(boolean forEncryption){
+        switch (getUoTypeFunction()){
+            case TYPE_PLAINAES:
+            case TYPE_RSA1024ENCRYPT_NOPAD:
+            case TYPE_RSA2048ENCRYPT_NOPAD:
+                return forEncryption;
+            case TYPE_PLAINAESDECRYPT:
+            case TYPE_RSA1024DECRYPT_NOPAD:
+            case TYPE_RSA2048DECRYPT_NOPAD:
+                return !forEncryption;
+            default:
+                throw new EBInvalidException("UO does not represent encryption");
+        }
+    }
+
+    /**
+     * Returns true if the UO represents encryption key.
+     * @return true if encryption key
+     */
+    public boolean isEncryptionObject(){
+        return isCipherObject(true);
+    }
+
+    /**
+     * Returns true if the UO represents decryption key.
+     * @return true if decryption key
+     */
+    public boolean isDecryptionObject(){
+        return isCipherObject(false);
+    }
+
+    /**
+     * If UO type represents encryption this function returns UO type function
+     * representing inversion encryption operation than current one.
+     *
+     * @return inversion cipher operation to the current one. TYPE_INVALID on error
+     */
+    public int getInversionUoTypeFunction(){
+        switch (getUoTypeFunction()){
+            case TYPE_PLAINAES:
+                return TYPE_PLAINAESDECRYPT;
+            case TYPE_PLAINAESDECRYPT:
+                return TYPE_PLAINAES;
+            case TYPE_RSA1024DECRYPT_NOPAD:
+                return TYPE_RSA1024ENCRYPT_NOPAD;
+            case TYPE_RSA1024ENCRYPT_NOPAD:
+                return TYPE_RSA1024DECRYPT_NOPAD;
+            case TYPE_RSA2048DECRYPT_NOPAD:
+                return TYPE_RSA2048ENCRYPT_NOPAD;
+            case TYPE_RSA2048ENCRYPT_NOPAD:
+                return TYPE_RSA2048DECRYPT_NOPAD;
+            default:
+                return TYPE_INVALID;
+        }
+    }
+
     public static long getValue(int function, int appKeyClientGenerated, int comKeyClientGenerated){
         long type = function & TYPE_MASK;
         if (comKeyClientGenerated != Constants.GENKEY_LEGACY_ENROLL_RANDOM && comKeyClientGenerated != Constants.GENKEY_CLIENT){
