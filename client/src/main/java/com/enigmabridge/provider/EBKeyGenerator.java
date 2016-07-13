@@ -1,12 +1,9 @@
 package com.enigmabridge.provider;
 
 import com.enigmabridge.*;
-import com.enigmabridge.comm.EBCorruptedException;
 import com.enigmabridge.create.*;
-import com.enigmabridge.provider.aes.EBAESKey;
-import com.enigmabridge.provider.rsa.EBRSAPrivateKey;
-import com.enigmabridge.provider.specs.EBAESKeyGenParameterSpec;
 import com.enigmabridge.provider.specs.EBCreateUOTemplateSpec;
+import com.enigmabridge.provider.specs.EBSymmetricKeyGenParameterSpec;
 import com.enigmabridge.provider.specs.EBSymmetricKeyGenTypes;
 
 import javax.crypto.KeyGeneratorSpi;
@@ -14,9 +11,6 @@ import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.security.*;
 import java.security.spec.AlgorithmParameterSpec;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.RSAKeyGenParameterSpec;
-import java.security.spec.RSAPublicKeySpec;
 
 /**
  * Symmetric key generator. Key is stored in the EB, non-extractable.
@@ -24,14 +18,16 @@ import java.security.spec.RSAPublicKeySpec;
  * Created by dusanklinec on 06.07.16.
  */
 public class EBKeyGenerator extends KeyGeneratorSpi {
-    private final EnigmaProvider provider;
-    private SecureRandom random;
-    private EBEngine engine;
+    protected final EnigmaProvider provider;
+    protected SecureRandom random;
+    protected EBEngine engine;
 
-    private final String algorithm;
-    private int keySize = 128;
-    private EBUOGetTemplateRequest getTemplateRequest;
-    private EBSymmetricKeyGenTypes keyType = EBSymmetricKeyGenTypes.BOTH;
+    protected final String algorithm;
+    protected int keySize = 128;
+    protected EBUOGetTemplateRequest getTemplateRequest;
+    protected EBSymmetricKeyGenTypes keyType = EBSymmetricKeyGenTypes.BOTH;
+
+    protected EBSymmetricKeyCreator keyCreator;
 
     public EBKeyGenerator(EnigmaProvider provider, String algorithm)  {
         if (!"AES".equalsIgnoreCase(algorithm)){
@@ -60,22 +56,6 @@ public class EBKeyGenerator extends KeyGeneratorSpi {
             this.random = rand;
         }
 
-        if (this.random == null){
-            this.random = engine.getRnd();
-        }
-
-        if (this.random == null){
-            this.random = new SecureRandom();
-        }
-
-        if (spec instanceof EBAESKeyGenParameterSpec){
-            this.keySize = ((EBAESKeyGenParameterSpec) spec).getKeySize();
-            this.keyType = ((EBAESKeyGenParameterSpec) spec).getKeyType();
-
-        } else {
-            throw new InvalidAlgorithmParameterException("AlgorithmParameterSpec not supported");
-        }
-
         if (spec instanceof EBEngineReference){
             final EBEngine lEngine = ((EBEngineReference) spec).getEBEngine();
             if (lEngine != null){
@@ -83,8 +63,35 @@ public class EBKeyGenerator extends KeyGeneratorSpi {
             }
         }
 
+        if (this.engine == null && this.provider != null){
+            this.engine = this.provider.getEngine();
+        }
+
         if (spec instanceof EBCreateUOTemplateSpec){
             this.getTemplateRequest = ((EBCreateUOTemplateSpec) spec).getTemplateRequest();
+        }
+
+        if (this.random == null && engine != null){
+            this.random = engine.getRnd();
+        }
+
+        if (this.random == null){
+            this.random = new SecureRandom();
+        }
+
+        if (spec instanceof EBSymmetricKeyGenParameterSpec){
+            this.keySize = ((EBSymmetricKeyGenParameterSpec) spec).getKeySize();
+            this.keyType = ((EBSymmetricKeyGenParameterSpec) spec).getKeyType();
+            this.checkKeySize(this.keySize, spec);
+
+            keyCreator = new EBSymmetricKeyCreator.Builder()
+                    .setEngine(this.engine)
+                    .setRandom(this.random)
+                    .setGetTemplateRequest(getTemplateRequest)
+                    .build();
+
+        } else {
+            throw new InvalidAlgorithmParameterException("AlgorithmParameterSpec not supported");
         }
     }
 
@@ -117,112 +124,18 @@ public class EBKeyGenerator extends KeyGeneratorSpi {
         }
     }
 
-    /**
-     * Generates AES key in the EB with randomly generated comm keys.
-     * appKeySeed is used to derive main AES app key. This protects application as only EB knows actual key.
-     *
-     * @param forEncryption
-     * @param appKeySeed
-     * @return
-     */
-    protected EBAESKey.Builder engineGenerateAESKey(boolean forEncryption, byte[] appKeySeed){
-        final byte[] encKey = new byte[32];
-        final byte[] macKey = new byte[32];
-        random.nextBytes(encKey);
-        random.nextBytes(macKey);
-
-        return engineGenerateAESKey(forEncryption, encKey, macKey, appKeySeed);
-    }
-
-    /**
-     * Generates AES key in the EB.
-     * appKeySeed is used to derive main AES app key. This protects application as only EB knows actual key.
-     *
-     * @param forEncryption
-     * @param encKey
-     * @param macKey
-     * @param appKeySeed
-     * @return
-     */
-    protected EBAESKey.Builder engineGenerateAESKey(boolean forEncryption, byte[] encKey, byte[] macKey, byte[] appKeySeed){
-        // Create decrypt.
-        final EBEndpointInfo endpoint = engine.getDefaultSettings().getEndpointInfo();
-        final int uoTypeFunction = forEncryption ? UserObjectType.TYPE_PLAINAES : UserObjectType.TYPE_PLAINAESDECRYPT;
-
-        EBUOGetTemplateRequest req = this.getTemplateRequest != null ? this.getTemplateRequest : new EBUOGetTemplateRequest();
-        req.setType(uoTypeFunction);
-        req.setGenerationCommKey(Constants.GENKEY_CLIENT);
-        req.setGenerationAppKey(Constants.GENKEY_ENROLL_DERIVED);
-
-        // Force remaining parameters to default values.
-        req.setGenerationBillingKey(Constants.GENKEY_LEGACY_ENROLL_RANDOM);
-        req.setFormat(1);
-        req.setProtocol(1);
-
-        EBCreateUOSimpleCall callBld = new EBCreateUOSimpleCall.Builder()
-                .setEngine(engine)
-                .setEndpoint(new EBEndpointInfo(endpoint.getScheme(), endpoint.getHostname(), 11182))
-                .setRequest(req)
-                .addKey(new EBUOTemplateKey(Constants.KEY_COMM_ENC, encKey))
-                .addKey(new EBUOTemplateKey(Constants.KEY_COMM_MAC, macKey))
-                .addKey(new EBUOTemplateKey(Constants.KEY_APP,      appKeySeed))
-                .build();
-
-        try {
-            final EBCreateUOResponse response = callBld.create();
-
-            // Create UOKey
-            final UserObjectKeyBase key = new UserObjectKeyBase.Builder()
-                    .setUoid(response.getHandle().getUoId())
-                    .setUserObjectType(response.getHandle().getUoType().getValue())
-                    .setCommKeys(new EBCommKeys(encKey, macKey))
-                    .setKeyLength(16)
-                    .build();
-
-            final EBAESKey.Builder bld = new EBAESKey.Builder()
-                    .setUo(key)
-                    .setEngine(engine);
-
-            return bld;
-
-        } catch (IOException e) {
-            throw new ProviderException("Create AES key failed", e);
-        } catch (EBCorruptedException e) {
-            throw new ProviderException("AES keys are supported only", e);
-        }
-    }
-
     protected SecretKey engineGenerateKey() {
         if ("AES".equalsIgnoreCase(algorithm)){
             // AES key will be derived using this seed.
             final byte[] appKeySeed = new byte[16];
             random.nextBytes(appKeySeed);
 
-            EBAESKey.Builder decKey = null;
-            EBAESKey.Builder encKey = null;
+            keyCreator
+                    .setUoTypeFunction(UserObjectType.TYPE_PLAINAES)
+                    .setAppKey(appKeySeed)
+                    .setAppKeyGeneration(Constants.GENKEY_ENROLL_DERIVED);
 
-            // Create decrypt.
-            if (keyType == EBSymmetricKeyGenTypes.BOTH || keyType == EBSymmetricKeyGenTypes.DECRYPT){
-                decKey = engineGenerateAESKey(false, appKeySeed);
-            }
-
-            // Create encrypt.
-            if (keyType == EBSymmetricKeyGenTypes.BOTH || keyType == EBSymmetricKeyGenTypes.ENCRYPT){
-                encKey = engineGenerateAESKey(true, appKeySeed);
-            }
-
-            // If pair was generated - chain them.
-            if (keyType == EBSymmetricKeyGenTypes.BOTH){
-                decKey.setInversionKey(encKey);
-                final EBAESKey decKeyFinal = decKey.build();
-
-                encKey.setInversionKey(decKeyFinal);
-                return decKeyFinal;
-            } else if (keyType == EBSymmetricKeyGenTypes.DECRYPT){
-                return decKey.build();
-            } else {
-                return encKey.build();
-            }
+            return keyCreator.engineGenerateKey();
 
         } else {
             throw new ProviderException("AES algorithm supported only.");

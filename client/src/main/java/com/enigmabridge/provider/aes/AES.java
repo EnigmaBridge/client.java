@@ -1,10 +1,8 @@
 package com.enigmabridge.provider.aes;
 
-import com.enigmabridge.provider.EBKeyGenerator;
-import com.enigmabridge.provider.EnigmaProvider;
-import com.enigmabridge.provider.SymmetricAlgorithmProvider;
-import com.enigmabridge.provider.BaseBlockCipher;
+import com.enigmabridge.provider.*;
 
+import com.enigmabridge.provider.BaseBlockCipher;
 import org.bouncycastle.asn1.bc.BCObjectIdentifiers;
 import org.bouncycastle.asn1.cms.CCMParameters;
 import org.bouncycastle.asn1.cms.GCMParameters;
@@ -199,6 +197,16 @@ public class AES {
         public KeyGen256(EnigmaProvider provider)
         {
             super(provider, 256);
+        }
+    }
+
+    // SecretKeyFactory
+    public static class KeyFact
+            extends EBSecretKeyFactory
+    {
+        public KeyFact(EnigmaProvider provider)
+        {
+            super(provider, "AES");
         }
     }
 
@@ -599,6 +607,34 @@ public class AES {
             provider.addAlgorithm("KeyGenerator", NISTObjectIdentifiers.id_aes128_CCM, PREFIX + "$KeyGen128");
             provider.addAlgorithm("KeyGenerator", NISTObjectIdentifiers.id_aes192_CCM, PREFIX + "$KeyGen192");
             provider.addAlgorithm("KeyGenerator", NISTObjectIdentifiers.id_aes256_CCM, PREFIX + "$KeyGen256");
+
+            // SecretKeyFactory
+            provider.addAlgorithm("SecretKeyFactory.AES", PREFIX + "$KeyFact");
+            provider.addAlgorithm("SecretKeyFactory." + wrongAES128, PREFIX + "$KeyFact");
+            provider.addAlgorithm("SecretKeyFactory." + wrongAES192, PREFIX + "$KeyFact");
+            provider.addAlgorithm("SecretKeyFactory." + wrongAES256, PREFIX + "$KeyFact");
+            provider.addAlgorithm("SecretKeyFactory", NISTObjectIdentifiers.id_aes128_ECB, PREFIX + "$KeyFact");
+            provider.addAlgorithm("SecretKeyFactory", NISTObjectIdentifiers.id_aes128_CBC, PREFIX + "$KeyFact");
+            provider.addAlgorithm("SecretKeyFactory", NISTObjectIdentifiers.id_aes128_OFB, PREFIX + "$KeyFact");
+            provider.addAlgorithm("SecretKeyFactory", NISTObjectIdentifiers.id_aes128_CFB, PREFIX + "$KeyFact");
+            provider.addAlgorithm("SecretKeyFactory", NISTObjectIdentifiers.id_aes192_ECB, PREFIX + "$KeyFact");
+            provider.addAlgorithm("SecretKeyFactory", NISTObjectIdentifiers.id_aes192_CBC, PREFIX + "$KeyFact");
+            provider.addAlgorithm("SecretKeyFactory", NISTObjectIdentifiers.id_aes192_OFB, PREFIX + "$KeyFact");
+            provider.addAlgorithm("SecretKeyFactory", NISTObjectIdentifiers.id_aes192_CFB, PREFIX + "$KeyFact");
+            provider.addAlgorithm("SecretKeyFactory", NISTObjectIdentifiers.id_aes256_ECB, PREFIX + "$KeyFact");
+            provider.addAlgorithm("SecretKeyFactory", NISTObjectIdentifiers.id_aes256_CBC, PREFIX + "$KeyFact");
+            provider.addAlgorithm("SecretKeyFactory", NISTObjectIdentifiers.id_aes256_OFB, PREFIX + "$KeyFact");
+            provider.addAlgorithm("SecretKeyFactory", NISTObjectIdentifiers.id_aes256_CFB, PREFIX + "$KeyFact");
+            provider.addAlgorithm("SecretKeyFactory.AESWRAP", PREFIX + "$KeyFact");
+            provider.addAlgorithm("SecretKeyFactory", NISTObjectIdentifiers.id_aes128_wrap, PREFIX + "$KeyFact");
+            provider.addAlgorithm("SecretKeyFactory", NISTObjectIdentifiers.id_aes192_wrap, PREFIX + "$KeyFact");
+            provider.addAlgorithm("SecretKeyFactory", NISTObjectIdentifiers.id_aes256_wrap, PREFIX + "$KeyFact");
+            provider.addAlgorithm("SecretKeyFactory", NISTObjectIdentifiers.id_aes128_GCM, PREFIX + "$KeyFact");
+            provider.addAlgorithm("SecretKeyFactory", NISTObjectIdentifiers.id_aes192_GCM, PREFIX + "$KeyFact");
+            provider.addAlgorithm("SecretKeyFactory", NISTObjectIdentifiers.id_aes256_GCM, PREFIX + "$KeyFact");
+            provider.addAlgorithm("SecretKeyFactory", NISTObjectIdentifiers.id_aes128_CCM, PREFIX + "$KeyFact");
+            provider.addAlgorithm("SecretKeyFactory", NISTObjectIdentifiers.id_aes192_CCM, PREFIX + "$KeyFact");
+            provider.addAlgorithm("SecretKeyFactory", NISTObjectIdentifiers.id_aes256_CCM, PREFIX + "$KeyFact");
 
             provider.addAlgorithm("Mac.AESCMAC", PREFIX + "$AESCMAC");
 

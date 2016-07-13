@@ -5,27 +5,40 @@ import com.enigmabridge.EBEngineReference;
 import com.enigmabridge.create.EBUOGetTemplateRequest;
 
 import java.security.spec.AlgorithmParameterSpec;
-import java.security.spec.RSAKeyGenParameterSpec;
 
 /**
- * AES key generation spec for EB.
- * In future maybe more settings - encrypt, decrypt, both.
+ * Key generation spec for EB.
  *
- * Created by dusanklinec on 28.06.16.
+ * Created by dusanklinec on 13.07.16.
  */
-public class EBAESKeyGenParameterSpec implements AlgorithmParameterSpec, EBEngineReference, EBCreateUOTemplateSpec {
+public class EBSymmetricKeyGenParameterSpec implements AlgorithmParameterSpec, EBEngineReference, EBCreateUOTemplateSpec {
+    /**
+     * Basic EB engine / configuration.
+     */
     private final EBEngine engine;
+
+    /**
+     * Desired key size for key to be generated.
+     */
     private final int keySize;
+
+    /**
+     * Override point for creating new objects.
+     * If both objects are to be created (enc, dec), the same template request is used for both.
+     */
     private EBUOGetTemplateRequest tplReq;
 
+    /**
+     * Generate key only for one symmetric operation (i.e., encryption, decryption) or both.
+     */
     private EBSymmetricKeyGenTypes keyType = EBSymmetricKeyGenTypes.BOTH;
 
-    public EBAESKeyGenParameterSpec(int keySize) {
+    public EBSymmetricKeyGenParameterSpec(int keySize) {
         this.keySize = keySize;
         this.engine = null;
     }
 
-    public EBAESKeyGenParameterSpec(int keySize, EBEngine engine) {
+    public EBSymmetricKeyGenParameterSpec(int keySize, EBEngine engine) {
         this.keySize = keySize;
         this.engine = engine;
     }
@@ -39,7 +52,7 @@ public class EBAESKeyGenParameterSpec implements AlgorithmParameterSpec, EBEngin
         return keySize;
     }
 
-    public EBAESKeyGenParameterSpec setTplReq(EBUOGetTemplateRequest tplReq) {
+    public EBSymmetricKeyGenParameterSpec setTplReq(EBUOGetTemplateRequest tplReq) {
         this.tplReq = tplReq;
         return this;
     }
@@ -53,7 +66,7 @@ public class EBAESKeyGenParameterSpec implements AlgorithmParameterSpec, EBEngin
         return keyType;
     }
 
-    public EBAESKeyGenParameterSpec setKeyType(EBSymmetricKeyGenTypes keyType) {
+    public EBSymmetricKeyGenParameterSpec setKeyType(EBSymmetricKeyGenTypes keyType) {
         this.keyType = keyType;
         return this;
     }

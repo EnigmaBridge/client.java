@@ -4,6 +4,7 @@ import com.enigmabridge.EBCryptoException;
 import com.enigmabridge.comm.EBCorruptedException;
 import com.enigmabridge.comm.EBProcessDataCall;
 import com.enigmabridge.comm.EBProcessDataResponse;
+import com.enigmabridge.provider.EBSymmetricKey;
 import com.enigmabridge.provider.EBUOKey;
 import com.enigmabridge.provider.EnigmaProvider;
 import com.enigmabridge.provider.parameters.EBKeyParameter;
@@ -26,7 +27,7 @@ public class AESEngine implements BlockCipher
 {
     private EnigmaProvider provider;
     private boolean     forEncryption;
-    private EBAESKey    aesKey;
+    private EBSymmetricKey aesKey;
     private static final int BLOCK_SIZE = 16;
 
     /**
@@ -58,17 +59,17 @@ public class AESEngine implements BlockCipher
             final EBKeyParameter ebParam = (EBKeyParameter) params;
             final EBUOKey uoKey = ebParam.getUoKey();
 
-            if (!(uoKey instanceof EBAESKey)){
+            if (!(uoKey instanceof EBSymmetricKey) || !"AES".equalsIgnoreCase(uoKey.getAlgorithm())){
                 throw new IllegalArgumentException("AES expects AES key");
             }
 
-            final EBAESKey tmpAesKey = (EBAESKey)uoKey;
+            final EBSymmetricKey tmpAesKey = (EBSymmetricKey)uoKey;
             if (isMatchingKey(forEncryption, tmpAesKey)){
                 this.aesKey = tmpAesKey;
 
             } else {
                 // Is inversion key available?
-                final EBAESKey inversionKey = tmpAesKey.getInversionKey();
+                final EBSymmetricKey inversionKey = tmpAesKey.getInversionKey();
                 if (inversionKey == null){
                     throw new IllegalArgumentException("AES key for "
                             + (forEncryption ? "encryption" : "decryption")
@@ -89,7 +90,7 @@ public class AESEngine implements BlockCipher
         throw new IllegalArgumentException("invalid parameter passed to AES init - " + params.getClass().getName());
     }
 
-    protected boolean isMatchingKey(boolean forEncryption, EBAESKey key){
+    protected boolean isMatchingKey(boolean forEncryption, EBSymmetricKey key){
         return (forEncryption && key.isEncryptionKey()) || (!forEncryption && key.isDecryptionKey());
     }
 
