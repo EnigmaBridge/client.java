@@ -65,6 +65,18 @@ public class EBUOGetTemplateRequest extends EBRawRequest {
         return this;
     }
 
+    public EBUOGetTemplateRequest setTypeFunction(int typeFunction) {
+        UserObjectType newType = new UserObjectType.Builder()
+                .setUoType(this.getType())
+                .setUoTypeFunction(typeFunction)
+                .build();
+
+        this.type = newType.getValue();
+        generationAppKey = newType.getAppKeyGenerationType();
+        generationCommKey = newType.getComKeyGenerationType();
+        return this;
+    }
+
     public String getEnvironment() {
         return environment;
     }
