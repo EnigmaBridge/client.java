@@ -14,16 +14,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.*;
 
-import javax.crypto.Cipher;
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
+import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.SecureRandom;
-import java.security.Security;
+import java.security.*;
 
 import static org.testng.Assert.assertEquals;
 
@@ -137,18 +131,25 @@ public class EBEnigmaProviderIT {
         kGen.init(keySpec);
         final SecretKey secretKey = kGen.generateKey();
 
+        // Test
+        testAESKey(secretKey);
+    }
+
+    protected void testAESKey(Key key) throws NoSuchPaddingException, NoSuchAlgorithmException, NoSuchProviderException, BadPaddingException, IllegalBlockSizeException, InvalidKeyException, InvalidAlgorithmParameterException {
+        final SecureRandom rand = new SecureRandom();
+
         // Very simple 1 block test.
         final byte[] simpleInput = new byte[16];
         rand.nextBytes(simpleInput);
 
         // Encrypt.
         final Cipher aesEncSimple = Cipher.getInstance("AES/ECB/NoPadding", "EB");
-        aesEncSimple.init(Cipher.ENCRYPT_MODE, secretKey);
+        aesEncSimple.init(Cipher.ENCRYPT_MODE, key);
         final byte[] ciphertextSimple = aesEncSimple.doFinal(simpleInput);
 
         // Decrypt
         final Cipher aesDecSimple = Cipher.getInstance("AES/ECB/NoPadding", "EB");
-        aesDecSimple.init(Cipher.DECRYPT_MODE, secretKey);
+        aesDecSimple.init(Cipher.DECRYPT_MODE, key);
         final byte[] decryptedSimple = aesDecSimple.doFinal(ciphertextSimple);
 
         // Test
@@ -163,17 +164,16 @@ public class EBEnigmaProviderIT {
 
         // Encrypt.
         final Cipher aesEnc = Cipher.getInstance("AES/CBC/PKCS5PADDING", "EB");
-        aesEnc.init(Cipher.ENCRYPT_MODE, secretKey, new IvParameterSpec(iv));
+        aesEnc.init(Cipher.ENCRYPT_MODE, key, new IvParameterSpec(iv));
         final byte[] ciphertext = aesEnc.doFinal(testInput);
 
         // Decrypt
         final Cipher aesDec = Cipher.getInstance("AES/CBC/PKCS5PADDING", "EB");
-        aesDec.init(Cipher.DECRYPT_MODE, secretKey, new IvParameterSpec(iv));
+        aesDec.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(iv));
         final byte[] decrypted = aesDec.doFinal(ciphertext);
 
         // Test
         assertEquals(decrypted, testInput, "AESdecrypt(AESencrypt(x)) != x");
-        LOG.info("DONE");
     }
 
     @Test(groups = {"integration"}) //, timeOut = 100000
@@ -199,13 +199,36 @@ public class EBEnigmaProviderIT {
         // Bouncy castle secret
         final SecretKeySpec bcKey = new SecretKeySpec(aesKey, "AES");
 
+        // Test factory.
+        testAESFactoryKeys(key, bcKey);
+    }
+
+    /**
+     * Test encryption & decryption of AES encryption keys generated with factory method.
+     * One is generated for EB, another one directly with AES key. Operations should be compatible between each other
+     * (encryption performed with EB should match decryption performed locally and vice versa).
+     *
+     * @param ebKey EB key
+     * @param bcKey local key
+     *
+     * @throws NoSuchPaddingException
+     * @throws NoSuchAlgorithmException
+     * @throws NoSuchProviderException
+     * @throws BadPaddingException
+     * @throws IllegalBlockSizeException
+     * @throws InvalidKeyException
+     * @throws InvalidAlgorithmParameterException
+     */
+    protected void testAESFactoryKeys(Key ebKey, Key bcKey) throws NoSuchPaddingException, NoSuchAlgorithmException, NoSuchProviderException, BadPaddingException, IllegalBlockSizeException, InvalidKeyException, InvalidAlgorithmParameterException {
+        final SecureRandom rand = new SecureRandom();
+
         // Very simple 1 block test.
         final byte[] simpleInput = new byte[16];
         rand.nextBytes(simpleInput);
 
         // Encrypt.
         final Cipher aesEncSimple = Cipher.getInstance("AES/ECB/NoPadding", "EB");
-        aesEncSimple.init(Cipher.ENCRYPT_MODE, key);
+        aesEncSimple.init(Cipher.ENCRYPT_MODE, ebKey);
         final byte[] ciphertextSimple = aesEncSimple.doFinal(simpleInput);
 
         // Decrypt
@@ -230,11 +253,10 @@ public class EBEnigmaProviderIT {
 
         // Decrypt
         final Cipher aesDec = Cipher.getInstance("AES/CBC/PKCS5PADDING", "EB");
-        aesDec.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(iv));
+        aesDec.init(Cipher.DECRYPT_MODE, ebKey, new IvParameterSpec(iv));
         final byte[] decrypted = aesDec.doFinal(ciphertext);
 
         // Test
         assertEquals(decrypted, testInput, "AESdecrypt(AESencrypt(x)) != x");
-        LOG.info("DONE");
     }
 }
