@@ -15,6 +15,7 @@ public class UserObjectType implements Serializable{
     protected static final int TYPE_MASK = 0xffff;
 
     // Request type from the lower bytes.
+    public static final int TYPE_INVALID = -1;
     public static final int TYPE_HMAC = 0x0001;
     public static final int TYPE_SCRAMBLE = 0x0002;
     public static final int TYPE_ENSCRAMBLE = 0x0003;
