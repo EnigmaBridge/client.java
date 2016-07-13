@@ -7,6 +7,7 @@ import org.json.JSONObject;
 import sun.security.util.Length;
 
 import java.io.Serializable;
+import java.security.SecureRandom;
 import java.util.Arrays;
 import javax.crypto.SecretKey;
 
@@ -14,7 +15,7 @@ import javax.crypto.SecretKey;
  * EB communication keys.
  * Created by dusanklinec on 26.04.16.
  */
-public class EBCommKeys implements SecretKey, CipherParameters, Length, Serializable{
+public class EBCommKeys implements SecretKey, CipherParameters, Length, Serializable {
     public static final long serialVersionUID = 1L;
     public static final int ENC_KEY_LEN = 32;
     public static final int MAC_KEY_LEN = 32;
@@ -36,8 +37,8 @@ public class EBCommKeys implements SecretKey, CipherParameters, Length, Serializ
 
     /**
      * Constructor initializes each key separately.
-     * @param encKey
-     * @param macKey
+     * @param encKey encryption key
+     * @param macKey mac key
      */
     public EBCommKeys(byte[] encKey, byte[] macKey) {
         this.encKey = encKey;
@@ -45,8 +46,17 @@ public class EBCommKeys implements SecretKey, CipherParameters, Length, Serializ
     }
 
     /**
+     * Copy constructor.
+     * @param commKeys to copy
+     */
+    public EBCommKeys(EBCommKeys commKeys) {
+        this.encKey = commKeys.getEncKey().clone();
+        this.macKey = commKeys.getMacKey().clone();
+    }
+
+    /**
      * Initializes comm keys from the encoded form.
-     * @param encoded
+     * @param encoded encoded comm key
      */
     public EBCommKeys(byte[] encoded) {
         initFromEncoded(encoded, 0, encoded.length);
@@ -58,6 +68,19 @@ public class EBCommKeys implements SecretKey, CipherParameters, Length, Serializ
 
     public EBCommKeys(JSONObject json){
         initFromJson(json);
+    }
+
+    /**
+     * Generates random comm keys.
+     * @param random secure random used for key generation
+     * @return generated comm keys
+     */
+    public static EBCommKeys generate(SecureRandom random){
+        byte encKey[] = new byte[32];
+        byte macKey[] = new byte[32];
+        random.nextBytes(encKey);
+        random.nextBytes(macKey);
+        return new EBCommKeys(encKey, macKey);
     }
 
     private void initFromEncoded(byte[] encoded, int keyOff, int keyLen){
