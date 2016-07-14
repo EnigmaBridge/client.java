@@ -161,8 +161,13 @@ public class EBUOTemplateProcessor {
             }
 
             final byte[] keyVal = keyToUse.getKey();
-            if (keyVal.length*8 != offset.getLength()){
+            if (keyVal.length*8 > offset.getLength()){
                 throw new EBCryptoException("Invalid key size, exp: " + offset.getLength()
+                        + ", given: " + keyVal.length*8
+                        + ", type: " + offset.getType());
+            }
+            else if (keyVal.length*8 != offset.getLength()){
+                LOG.debug("Invalid key size, exp: " + offset.getLength()
                         + ", given: " + keyVal.length*8
                         + ", type: " + offset.getType());
             }
