@@ -140,7 +140,24 @@ public class KeyFactorySpi
                 return engineGeneratePrivate(new EBRSAPrivateCrtKeyWrapper((RSAPrivateKey)key));
             }
             else if ("PKCS#8".equalsIgnoreCase(key.getFormat())){
-                return generatePrivate(PrivateKeyInfo.getInstance(key.getEncoded()), null);
+                try {
+                    return generatePrivate(PrivateKeyInfo.getInstance(key.getEncoded()), null);
+                } catch(Exception e){
+                    // Try last thing - convert to specs.
+                }
+            }
+
+            // Specs?
+            try {
+                final KeyFactory kFactBc = KeyFactory.getInstance("RSA", "BC");
+
+                // At first extract CRT key specs from the locally generated private key
+                final RSAPrivateCrtKeySpec keySpec = kFactBc.getKeySpec(key, RSAPrivateCrtKeySpec.class);
+                return engineGeneratePrivate(new EBRSAPrivateCrtKeyWrapper(keySpec));
+
+            } catch(Exception e){
+                // Cannot be converted
+                throw new InvalidKeyException("key type unknown", e);
             }
 
         } catch (MalformedURLException e) {
@@ -150,8 +167,6 @@ public class KeyFactorySpi
         } catch (InvalidKeySpecException e) {
             throw new InvalidKeyException("Cannot translate the key", e);
         }
-
-        throw new InvalidKeyException("key type unknown");
     }
 
     /**
