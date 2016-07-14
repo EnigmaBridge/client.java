@@ -9,5 +9,7 @@ package com.enigmabridge;
  * Created by dusanklinec on 27.04.16.
  */
 public class EBOperationConfiguration {
-
+    public EBOperationConfiguration copy(){
+        return this;
+    }
 }

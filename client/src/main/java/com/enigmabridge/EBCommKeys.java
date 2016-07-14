@@ -216,4 +216,8 @@ public class EBCommKeys implements SecretKey, CipherParameters, Length, Serializ
     public int length() {
         return encKey.length + macKey.length;
     }
+
+    public EBCommKeys copy() {
+        return new EBCommKeys(this);
+    }
 }

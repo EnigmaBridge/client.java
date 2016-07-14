@@ -133,6 +133,17 @@ public class EBConnectionSettings implements Serializable, EBJSONSerializable {
         return result;
     }
 
+    public EBConnectionSettings copy(){
+        final EBConnectionSettings n = new EBConnectionSettings();
+        n.method = this.method;
+        n.writeTimeoutMilli = this.writeTimeoutMilli;
+        n.readTimeoutMilli = this.readTimeoutMilli;
+        n.connectTimeoutMilli = this.connectTimeoutMilli;
+        n.trust = this.trust == null ? null : this.trust.copy();
+
+        return n;
+    }
+
     public int getConnectTimeoutMilli() {
         return connectTimeoutMilli;
     }

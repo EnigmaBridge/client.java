@@ -116,6 +116,10 @@ public class UserObjectType implements Serializable{
         setComKeyGenerationType(comKeyClientGenerated);
     }
 
+    public UserObjectType copy() {
+        return new UserObjectType(this.getValue());
+    }
+
     protected void setUoTypeFunction(int function){
         if ((function & TYPE_MASK) != function){
             throw new IllegalArgumentException("Illegal function argument");
