@@ -33,12 +33,7 @@ public class EBRSAPrivateCrtKey implements RSAPrivateCrtKey {
         this.e = e;
         this.d = key.getPrivateExponent();
         this.n = key.getModulus();
-        computePq();
-
-        final BigInteger d = key.getPrivateExponent();
-        dp = d.mod(p.subtract(ONE));
-        dq = d.mod(q.subtract(ONE));
-        qInv = q.modInverse(p);
+        init();
     }
 
     public EBRSAPrivateCrtKey(RSAPrivateKeySpec key, BigInteger e) {
@@ -46,6 +41,18 @@ public class EBRSAPrivateCrtKey implements RSAPrivateCrtKey {
         this.e = e;
         this.d = key.getPrivateExponent();
         this.n = key.getModulus();
+        init();
+    }
+
+    public EBRSAPrivateCrtKey(BigInteger e, BigInteger d, BigInteger n) {
+        this.key = null;
+        this.e = e;
+        this.d = d;
+        this.n = n;
+        init();
+    }
+
+    private void init(){
         computePq();
 
         final BigInteger d = key.getPrivateExponent();
