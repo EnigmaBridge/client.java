@@ -98,21 +98,37 @@ public class EBCreateUtils {
         return new RSAPublicKeySpec(mod, exp);
     }
 
-    public static short ExportPrivateKeyUOStyle(byte[] buffer, short baseOffset, RSAPrivateCrtKey privKey) {
-        return ExportPrivateKeyUOStyle(buffer, baseOffset, privKey, (byte) 0);
+    public static short exportPrivateKeyUOStyle(byte[] buffer, short baseOffset, RSAPrivateCrtKey privKey) {
+        return exportPrivateKeyUOStyle(buffer, baseOffset, privKey, (byte) 0);
     }
 
-    public static short ExportPrivateKeyUOStyle(byte[] buffer, short baseOffset, RSAPrivateKey privKey, BigInteger e, byte spareBytes) {
-        return ExportPrivateKeyUOStyle(buffer, baseOffset,
+    public static short exportPrivateKeyUOStyle(byte[] buffer, short baseOffset, RSAPrivateKey privKey, BigInteger e, byte spareBytes) {
+        return exportPrivateKeyUOStyle(buffer, baseOffset,
                 new EBRSAPrivateCrtKeyWrapper(new EBRSAPrivateCrtKey(privKey, e)),
                 spareBytes);
     }
 
-    public static short ExportPrivateKeyUOStyle(byte[] buffer, short baseOffset, RSAPrivateCrtKey privKey, byte spareBytes) {
-        return ExportPrivateKeyUOStyle(buffer, baseOffset, new EBRSAPrivateCrtKeyWrapper(privKey), spareBytes);
+    public static short exportPrivateKeyUOStyle(byte[] buffer, short baseOffset, RSAPrivateCrtKey privKey, byte spareBytes) {
+        return exportPrivateKeyUOStyle(buffer, baseOffset, new EBRSAPrivateCrtKeyWrapper(privKey), spareBytes);
     }
 
-    public static short ExportPrivateKeyUOStyle(byte[] buffer, short baseOffset, EBRSAPrivateCrtKeyWrapper privKey, byte spareBytes) {
+    public static byte[] exportPrivateKeyUOStyle(EBRSAPrivateCrtKeyWrapper privKey) {
+        return exportPrivateKeyUOStyle(privKey, (byte) 0);
+    }
+
+    public static byte[] exportPrivateKeyUOStyle(EBRSAPrivateCrtKeyWrapper privKey, byte spareBytes) {
+        final int baseLen = privKey.getModulus().bitLength()/8;
+        final int buffLen = baseLen * 6;
+        byte[] buffer = new byte[buffLen];
+        short usedBytes = exportPrivateKeyUOStyle(buffer, (short) 0, privKey, spareBytes);
+
+        byte[] realBuffer = new byte[usedBytes];
+        System.arraycopy(buffer, 0, realBuffer, 0, usedBytes);
+
+        return realBuffer;
+    }
+
+    public static short exportPrivateKeyUOStyle(byte[] buffer, short baseOffset, EBRSAPrivateCrtKeyWrapper privKey, byte spareBytes) {
         short tempOffset = baseOffset;
 
         // Length of overall key section
