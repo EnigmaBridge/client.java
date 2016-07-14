@@ -56,8 +56,8 @@ public class EBRSAPrivateCrtKeyWrapper implements RSAPrivateCrtKey {
 
     protected short getNum(BigInteger num, byte[] buffer, short offset){
         final byte[] bytes = num.toByteArray();
-        System.arraycopy(bytes, 0, buffer, offset, buffer.length);
-        return (short) buffer.length;
+        System.arraycopy(bytes, 0, buffer, offset, bytes.length);
+        return (short) bytes.length;
     }
 
     @Override
