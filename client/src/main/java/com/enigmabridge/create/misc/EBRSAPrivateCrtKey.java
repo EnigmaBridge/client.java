@@ -3,6 +3,7 @@ package com.enigmabridge.create.misc;
 import java.math.BigInteger;
 import java.security.interfaces.RSAPrivateCrtKey;
 import java.security.interfaces.RSAPrivateKey;
+import java.security.spec.RSAPrivateKeySpec;
 import java.util.Random;
 
 /**
@@ -12,7 +13,10 @@ import java.util.Random;
  */
 public class EBRSAPrivateCrtKey implements RSAPrivateCrtKey {
     protected final RSAPrivateKey key;
+
     protected final BigInteger e;
+    protected final BigInteger d;
+    protected final BigInteger n;
 
     protected BigInteger p;
     protected BigInteger q;
@@ -27,6 +31,21 @@ public class EBRSAPrivateCrtKey implements RSAPrivateCrtKey {
     public EBRSAPrivateCrtKey(RSAPrivateKey key, BigInteger e) {
         this.key = key;
         this.e = e;
+        this.d = key.getPrivateExponent();
+        this.n = key.getModulus();
+        computePq();
+
+        final BigInteger d = key.getPrivateExponent();
+        dp = d.mod(p.subtract(ONE));
+        dq = d.mod(q.subtract(ONE));
+        qInv = q.modInverse(p);
+    }
+
+    public EBRSAPrivateCrtKey(RSAPrivateKeySpec key, BigInteger e) {
+        this.key = null;
+        this.e = e;
+        this.d = key.getPrivateExponent();
+        this.n = key.getModulus();
         computePq();
 
         final BigInteger d = key.getPrivateExponent();
@@ -161,26 +180,26 @@ public class EBRSAPrivateCrtKey implements RSAPrivateCrtKey {
 
     @Override
     public BigInteger getPrivateExponent() {
-        return key.getPrivateExponent();
+        return d;
     }
 
     @Override
     public String getAlgorithm() {
-        return key.getAlgorithm();
+        return key != null ? key.getAlgorithm() : "RSA";
     }
 
     @Override
     public String getFormat() {
-        return key.getFormat();
+        return key != null ? key.getFormat() : null;
     }
 
     @Override
     public byte[] getEncoded() {
-        return key.getEncoded();
+        return key != null ? key.getEncoded() : null;
     }
 
     @Override
     public BigInteger getModulus() {
-        return key.getModulus();
+        return n;
     }
 }
