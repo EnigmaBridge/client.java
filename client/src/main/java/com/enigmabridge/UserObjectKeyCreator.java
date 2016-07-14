@@ -145,6 +145,21 @@ public class UserObjectKeyCreator {
     }
 
     /**
+     * Sets RSA private CRT key wrapper for import.
+     * Serializes it to the appKey for import, sets setAppKeyGeneration(client), calls
+     * appropriate setUoTypeFunction.
+     *
+     * @param wrapper RSA private key wrapper.
+     * @return this
+     */
+    public UserObjectKeyCreator setAppKey(EBRSAPrivateCrtKeyWrapper wrapper){
+        this.appKey = EBCreateUtils.exportPrivateKeyUOStyle(wrapper);
+        setAppKeyGeneration(Constants.GENKEY_CLIENT);
+        setRSADecryptFunctionFromModulus(wrapper.getModulus());
+        return this;
+    }
+
+    /**
      * Sets RSA private CRT key spec for import.
      * Serializes it to the appKey for import, sets setAppKeyGeneration(client), calls
      * appropriate setUoTypeFunction.
@@ -166,10 +181,7 @@ public class UserObjectKeyCreator {
      * @return this
      */
     public UserObjectKeyCreator setAppKey(RSAPrivateCrtKeySpec spec, BigInteger e){
-        this.appKey = EBCreateUtils.exportPrivateKeyUOStyle(new EBRSAPrivateCrtKeyWrapper(spec));
-        setAppKeyGeneration(Constants.GENKEY_CLIENT);
-        setRSADecryptFunctionFromModulus(spec.getModulus());
-        return this;
+        return setAppKey(new EBRSAPrivateCrtKeyWrapper(spec));
     }
 
     /**
@@ -194,10 +206,7 @@ public class UserObjectKeyCreator {
      * @return this
      */
     public UserObjectKeyCreator setAppKey(RSAPrivateCrtKey key, BigInteger e){
-        this.appKey = EBCreateUtils.exportPrivateKeyUOStyle(new EBRSAPrivateCrtKeyWrapper(key));
-        setAppKeyGeneration(Constants.GENKEY_CLIENT);
-        setRSADecryptFunctionFromModulus(key.getModulus());
-        return this;
+        return setAppKey(new EBRSAPrivateCrtKeyWrapper(key));
     }
 
     /**
@@ -213,12 +222,7 @@ public class UserObjectKeyCreator {
      * @return this
      */
     public UserObjectKeyCreator setAppKey(RSAPrivateKeySpec spec, BigInteger e){
-        this.appKey = EBCreateUtils.exportPrivateKeyUOStyle(
-                new EBRSAPrivateCrtKeyWrapper(new EBRSAPrivateCrtKey(spec, e))
-        );
-        setAppKeyGeneration(Constants.GENKEY_CLIENT);
-        setRSADecryptFunctionFromModulus(spec.getModulus());
-        return this;
+        return setAppKey(new EBRSAPrivateCrtKeyWrapper(new EBRSAPrivateCrtKey(spec, e)));
     }
 
     /**
@@ -234,12 +238,7 @@ public class UserObjectKeyCreator {
      * @return this
      */
     public UserObjectKeyCreator setAppKey(RSAPrivateKey key, BigInteger e){
-        this.appKey = EBCreateUtils.exportPrivateKeyUOStyle(
-                new EBRSAPrivateCrtKeyWrapper(new EBRSAPrivateCrtKey(key, e))
-        );
-        setAppKeyGeneration(Constants.GENKEY_CLIENT);
-        setRSADecryptFunctionFromModulus(key.getModulus());
-        return this;
+        return setAppKey(new EBRSAPrivateCrtKeyWrapper(new EBRSAPrivateCrtKey(key, e)));
     }
 
     protected void setRSADecryptFunctionFromModulus(BigInteger modulus){
@@ -247,8 +246,7 @@ public class UserObjectKeyCreator {
             throw new NullPointerException("Empty modulus");
         }
 
-        // 1048 is on purpose, not exact 1024, what if implementation generated modulus of bitlength 1025?
-        setUoTypeFunction(modulus.bitLength() > 1048 ? UserObjectType.TYPE_RSA2048DECRYPT_NOPAD : UserObjectType.TYPE_RSA1024DECRYPT_NOPAD);
+        setUoTypeFunction(UserObjectType.getRSADecryptFunctionFromModulus(modulus));
     }
 
     /**
