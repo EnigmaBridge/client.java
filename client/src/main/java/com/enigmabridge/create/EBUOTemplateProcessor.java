@@ -177,7 +177,7 @@ public class EBUOTemplateProcessor {
                 throw new EBInvalidException("Key position has to be byte aligned, type: " + offset.getType());
             }
 
-            for(int idx=0, len=(int)offset.getLength()/8; idx < len; ++idx){
+            for(int idx=0, len=keyVal.length; idx < len; ++idx){
                 template[(int)cOffset/8 + idx] = keyVal[idx];
             }
 
