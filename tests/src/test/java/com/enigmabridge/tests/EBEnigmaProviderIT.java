@@ -9,6 +9,7 @@ import com.enigmabridge.create.EBUOGetTemplateRequest;
 import com.enigmabridge.misc.EBTestingUtils;
 import com.enigmabridge.provider.EnigmaProvider;
 import com.enigmabridge.provider.specs.*;
+import org.bouncycastle.asn1.pkcs.RSAPrivateKey;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +19,8 @@ import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.*;
+import java.security.spec.RSAPrivateCrtKeySpec;
+import java.security.spec.RSAPrivateKeySpec;
 
 import static org.testng.Assert.assertEquals;
 
@@ -95,24 +98,69 @@ public class EBEnigmaProviderIT {
         kpGen.initialize(keySpec);
         final KeyPair keyPair = kpGen.generateKeyPair();
 
+        // Test
+        testRSAKeys(keyPair.getPublic(), keyPair.getPrivate());
+    }
+
+    @Test(groups = {"integration"}) //, timeOut = 100000
+    public void testRSAFactory() throws Exception {
+        final EBUOGetTemplateRequest tplReq = new EBUOGetTemplateRequest();
+        tplReq.setEnvironment(Constants.ENV_DEV);
+
+        // At first, generate local RSA keys.
+        final KeyPairGenerator kpGen = KeyPairGenerator.getInstance("RSA", "BC");
+        kpGen.initialize(2048);
+        final KeyPair keyPair = kpGen.generateKeyPair();
+
+        // Use EB factory to import existing RSA key to EB.
+        final KeyFactory kFact = KeyFactory.getInstance("RSA", "EB");
+        final KeyFactory kFactBc = KeyFactory.getInstance("RSA", "BC");
+
+        // At first extract CRT key specs from the locally generated private key
+        final RSAPrivateCrtKeySpec keySpec = kFactBc.getKeySpec(keyPair.getPrivate(), RSAPrivateCrtKeySpec.class);
+
+        // Convert specs to the EB stored key.
+        final PrivateKey ebPrivate = kFact.generatePrivate(keySpec);
+
+        // test
+        testRSAKeys(keyPair.getPublic(), ebPrivate);
+    }
+
+    @Test(groups = {"integration"}) //, timeOut = 100000
+    public void testRSAFactoryTranslation() throws Exception {
+        final EBUOGetTemplateRequest tplReq = new EBUOGetTemplateRequest();
+        tplReq.setEnvironment(Constants.ENV_DEV);
+
+        // At first, generate local RSA keys.
+        final KeyPairGenerator kpGen = KeyPairGenerator.getInstance("RSA", "BC");
+        kpGen.initialize(2048);
+        final KeyPair keyPair = kpGen.generateKeyPair();
+
+        // Use EB factory to import existing RSA key to EB.
+        final KeyFactory kFact = KeyFactory.getInstance("RSA", "EB");
+        final PrivateKey ebPrivate = (PrivateKey) kFact.translateKey(keyPair.getPrivate());
+
+        // Test.
+        testRSAKeys(keyPair.getPublic(), ebPrivate);
+    }
+
+    protected void testRSAKeys(PublicKey pub, PrivateKey priv) throws InvalidKeyException, NoSuchPaddingException, NoSuchAlgorithmException, BadPaddingException, IllegalBlockSizeException {
         // Generate random input to encrypt.
         final SecureRandom rand = new SecureRandom();
         final byte[] testInput = new byte[32];
         rand.nextBytes(testInput);
 
-        // Encrypt.
         final Cipher rsaEnc = Cipher.getInstance("RSA/ECB/PKCS1Padding");
-        rsaEnc.init(Cipher.ENCRYPT_MODE, keyPair.getPublic());
+        rsaEnc.init(Cipher.ENCRYPT_MODE, pub);
         final byte[] ciphertext = rsaEnc.doFinal(testInput);
 
         // Decrypt
         final Cipher rsa = Cipher.getInstance("RSA/ECB/PKCS1Padding");
-        rsa.init(Cipher.DECRYPT_MODE, keyPair.getPrivate());
+        rsa.init(Cipher.DECRYPT_MODE, priv);
         final byte[] decrypted = rsa.doFinal(ciphertext);
 
         // Test
         assertEquals(decrypted, testInput, "RSAdecrypt(RSAencrypt(x)) != x");
-        LOG.info("DONE");
     }
 
     @Test(groups = {"integration"}) //, timeOut = 100000
