@@ -21,14 +21,16 @@ import java.security.spec.RSAPrivateKeySpec;
  * Created by dusanklinec on 13.07.16.
  */
 public class UserObjectKeyCreator {
-    private SecureRandom random;
-    private EBEngine engine;
+    protected SecureRandom random;
+    protected EBEngine engine;
 
-    private UserObjectType uoType;
-    private EBUOGetTemplateRequest getTemplateRequest;
+    protected UserObjectType uoType;
+    protected EBUOGetTemplateRequest getTemplateRequest;
 
-    private EBCommKeys commKeys;
-    private byte[] appKey;
+    protected EBCommKeys commKeys;
+    protected byte[] appKey;
+
+    protected EBCreateUOResponse lastResponse;
 
     public static abstract class AbstractBuilder<T extends UserObjectKeyCreator, B extends AbstractBuilder>
     {
@@ -253,7 +255,7 @@ public class UserObjectKeyCreator {
      * Creates a new Use Object Key from the input values.
      * @return builder for new user object key
      */
-    public UserObjectKeyBase.Builder create() {
+    public UserObjectKeyBase.Builder create() throws IOException {
         final EBEndpointInfo endpoint = engine.getDefaultSettings().getEndpointInfo();
         final EBUOGetTemplateRequest req = this.getTemplateRequest;
 
@@ -288,10 +290,11 @@ public class UserObjectKeyCreator {
                     .setCommKeys(new EBCommKeys(commKeys))
                     .setKeyLength(response.getHandle().getUoType().keyLength()/8);
 
+            lastResponse = response;
             return keyBld;
 
         } catch (IOException e) {
-            throw new EBEngineException("Could not create UO", e);
+            throw new IOException("Could not create UO", e);
         } catch (EBCorruptedException e) {
             throw new EBEngineException("Could not create UO", e);
         }
@@ -338,5 +341,9 @@ public class UserObjectKeyCreator {
 
     public UserObjectType getUoType() {
         return UserObjectType.valueOf(getTemplateRequest.getType());
+    }
+
+    public EBCreateUOResponse getLastResponse() {
+        return lastResponse;
     }
 }
