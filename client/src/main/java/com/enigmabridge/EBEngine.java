@@ -24,6 +24,11 @@ public class EBEngine {
      */
     protected EBSettings defaultSettings;
 
+    /**
+     * Endpoint for enrollment.
+     */
+    protected EBEndpointInfo enrollmentEndpoint;
+
     public EBConnectorManager getConMgr() {
         if (conMgr == null){
             conMgr = new EBConnectorManager();
@@ -44,5 +49,20 @@ public class EBEngine {
 
     public void setDefaultSettings(EBSettings defaultSettings) {
         this.defaultSettings = defaultSettings;
+    }
+
+    public void setEnrollmentEndpoint(EBEndpointInfo enrollmentEndpoint) {
+        this.enrollmentEndpoint = enrollmentEndpoint;
+    }
+
+    public EBEndpointInfo getEnrollmentEndpoint() {
+        if (enrollmentEndpoint == null){
+            final EBEndpointInfo endpoint = getDefaultSettings().getEndpointInfo();
+            if (endpoint != null){
+                return endpoint.copy().setPort(EBEndpointInfo.DEFAULT_ENROLLMENT_PORT);
+            }
+        }
+
+        return enrollmentEndpoint;
     }
 }
