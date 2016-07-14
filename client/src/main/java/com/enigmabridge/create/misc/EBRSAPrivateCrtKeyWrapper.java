@@ -1,5 +1,7 @@
 package com.enigmabridge.create.misc;
 
+import org.bouncycastle.asn1.pkcs.RSAPrivateKey;
+
 import java.math.BigInteger;
 import java.security.interfaces.RSAPrivateCrtKey;
 import java.security.spec.RSAPrivateCrtKeySpec;
@@ -12,15 +14,24 @@ import java.security.spec.RSAPrivateCrtKeySpec;
 public class EBRSAPrivateCrtKeyWrapper implements RSAPrivateCrtKey {
     protected final RSAPrivateCrtKey key;
     protected final RSAPrivateCrtKeySpec keySpec;
+    protected final RSAPrivateKey ebKey;
 
     public EBRSAPrivateCrtKeyWrapper(RSAPrivateCrtKey key) {
         this.key = key;
         this.keySpec = null;
+        this.ebKey = null;
     }
 
     public EBRSAPrivateCrtKeyWrapper(RSAPrivateCrtKeySpec key) {
         this.key = null;
         this.keySpec = key;
+        this.ebKey = null;
+    }
+
+    public EBRSAPrivateCrtKeyWrapper(RSAPrivateKey ebKey) {
+        this.key = null;
+        this.keySpec = null;
+        this.ebKey = ebKey;
     }
 
     public short getP(byte[] buffer, short offset) {
@@ -51,37 +62,90 @@ public class EBRSAPrivateCrtKeyWrapper implements RSAPrivateCrtKey {
 
     @Override
     public BigInteger getPublicExponent() {
-        return key != null ? key.getPublicExponent() : keySpec.getPublicExponent();
+        if (key != null){
+            return key.getPublicExponent();
+        } else if (ebKey != null){
+            return ebKey.getPublicExponent();
+        } else {
+            return keySpec.getPublicExponent();
+        }
     }
 
     @Override
     public BigInteger getPrimeP() {
-        return key != null ? key.getPrimeP() : keySpec.getPrimeP();
+        if (key != null){
+            return key.getPrimeP();
+        } else if (ebKey != null){
+            return ebKey.getPrime1();
+        } else {
+            return keySpec.getPrimeP();
+        }
     }
 
     @Override
     public BigInteger getPrimeQ() {
-        return key != null ? key.getPrimeQ() : keySpec.getPrimeQ();
+        if (key != null){
+            return key.getPrimeQ();
+        } else if (ebKey != null){
+            return ebKey.getPrime2();
+        } else {
+            return keySpec.getPrimeQ();
+        }
     }
 
     @Override
     public BigInteger getPrimeExponentP() {
-        return key != null ? key.getPrimeExponentP() : keySpec.getPrimeExponentP();
+        if (key != null){
+            return key.getPrimeExponentP();
+        } else if (ebKey != null){
+            return ebKey.getExponent1();
+        } else {
+            return keySpec.getPrimeExponentP();
+        }
     }
 
     @Override
     public BigInteger getPrimeExponentQ() {
-        return key != null ? key.getPrimeExponentQ() : keySpec.getPrimeExponentQ();
+        if (key != null){
+            return key.getPrimeExponentQ();
+        } else if (ebKey != null){
+            return ebKey.getExponent2();
+        } else {
+            return keySpec.getPrimeExponentQ();
+        }
     }
 
     @Override
     public BigInteger getCrtCoefficient() {
-        return key != null ? key.getCrtCoefficient() : keySpec.getCrtCoefficient();
+        if (key != null){
+            return key.getCrtCoefficient();
+        } else if (ebKey != null){
+            return ebKey.getCoefficient();
+        } else {
+            return keySpec.getCrtCoefficient();
+        }
     }
 
     @Override
     public BigInteger getPrivateExponent() {
-        return key != null ? key.getPrivateExponent() : keySpec.getPrivateExponent();
+        if (key != null){
+            return key.getPrivateExponent();
+        } else if (ebKey != null){
+            return ebKey.getPrivateExponent();
+        } else {
+            return keySpec.getPrivateExponent();
+        }
+    }
+
+    @Override
+    public BigInteger getModulus() {
+        if (key != null){
+            return key.getModulus();
+        } else if (ebKey != null){
+            return ebKey.getModulus();
+        } else {
+            return keySpec.getModulus();
+        }
     }
 
     @Override
@@ -97,10 +161,5 @@ public class EBRSAPrivateCrtKeyWrapper implements RSAPrivateCrtKey {
     @Override
     public byte[] getEncoded() {
         return key != null ? key.getEncoded() : null;
-    }
-
-    @Override
-    public BigInteger getModulus() {
-        return key != null ? key.getModulus() : keySpec.getModulus();
     }
 }
