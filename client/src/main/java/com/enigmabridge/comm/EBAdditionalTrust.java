@@ -46,7 +46,7 @@ public class EBAdditionalTrust implements EBJSONSerializable, Serializable {
     public EBAdditionalTrust() {
         letsEncryptFlag = true;
         systemFlag = true;
-        init(letsEncryptFlag, systemFlag, null);
+        init(letsEncryptFlag, systemFlag, (InputStream)null);
     }
 
     /**
@@ -75,6 +75,20 @@ public class EBAdditionalTrust implements EBJSONSerializable, Serializable {
     }
 
     /**
+     * As LetsEcrypt is not yet in the Java trusted roots, this class offer to build own view on trusted roots for EB
+     * service.
+     *
+     * @param letsEncrypt if true, letsencrypt trusted roots are added to the trust object.
+     * @param system if true, all system roots are added to the trust object.
+     * @param additionalRoots  Collections of additional trusted roots in X509.
+     */
+    public EBAdditionalTrust(boolean letsEncrypt, boolean system, Collection<? extends Certificate> additionalRoots) {
+        letsEncryptFlag = letsEncrypt;
+        systemFlag = system;
+        init(letsEncrypt, system, additionalRoots == null ? null : new LinkedList<Certificate>(additionalRoots));
+    }
+
+    /**
      * Constructs object from its JSON serialized version.
      * @param json
      */
@@ -90,7 +104,7 @@ public class EBAdditionalTrust implements EBJSONSerializable, Serializable {
 
         letsEncryptFlag = EBUtils.getAsBoolean(json, FIELD_LETSENCRYPT);
         systemFlag = EBUtils.getAsBoolean(json, FIELD_SYSTEM);
-        init(letsEncryptFlag, systemFlag, null);
+        init(letsEncryptFlag, systemFlag, (InputStream) null);
     }
 
     @Override
@@ -109,11 +123,23 @@ public class EBAdditionalTrust implements EBJSONSerializable, Serializable {
         return json;
     }
 
+    public EBAdditionalTrust copy(){
+        return new EBAdditionalTrust(letsEncryptFlag, systemFlag, customRoots);
+    }
+
     protected void init(boolean letsEncrypt, boolean system, InputStream additionalRoots) {
+        try {
+            init(letsEncrypt, system, additionalRoots == null ? null : readCertificates(additionalRoots));
+        } catch (GeneralSecurityException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    protected void init(boolean letsEncrypt, boolean system, Collection<? extends Certificate> additionalRoots) {
         try {
             LinkedList<TrustManager> managers = new LinkedList<TrustManager>();
             if (letsEncrypt) {
-                managers.add(trustManagerForCertificates(letsEncryptCertificatesInputStream(), null));
+                managers.add(trustManagerForCertificates(readCertificates(letsEncryptCertificatesInputStream())));
             }
 
             if (system){
@@ -125,9 +151,9 @@ public class EBAdditionalTrust implements EBJSONSerializable, Serializable {
                 }
             }
 
-            if (additionalRoots != null){
-                customRoots = new LinkedList<Certificate>();
-                managers.add(trustManagerForCertificates(additionalRoots, customRoots));
+            if (additionalRoots != null && !additionalRoots.isEmpty()){
+                customRoots = new LinkedList<Certificate>(additionalRoots);
+                managers.add(trustManagerForCertificates(additionalRoots));
             }
 
             trustManagers = managers.toArray(new TrustManager[managers.size()]);
@@ -313,6 +339,18 @@ public class EBAdditionalTrust implements EBJSONSerializable, Serializable {
     }
 
     /**
+     * Parses input stream for certificates.
+     *
+     * @param in input stream to parse for certificates.
+     * @return collection of certificates parsed from in, possibly empty.
+     * @throws GeneralSecurityException
+     */
+    public static Collection<? extends Certificate> readCertificates(InputStream in) throws GeneralSecurityException{
+        CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
+        return certificateFactory.generateCertificates(in);
+    }
+
+    /**
      * Returns a trust manager that trusts {@code certificates} and none other. HTTPS services whose
      * certificates have not been signed by these certificates will fail with a {@code
      * SSLHandshakeException}.
@@ -332,19 +370,11 @@ public class EBAdditionalTrust implements EBJSONSerializable, Serializable {
      * not use custom trusted certificates in production without the blessing of your server's TLS
      * administrator.
      */
-    public static X509TrustManager trustManagerForCertificates(
-            InputStream in,
-            Collection<Certificate> certificatesCollection)
+    public static X509TrustManager trustManagerForCertificates(Collection<? extends Certificate> certificates)
             throws GeneralSecurityException
     {
-        CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
-        Collection<? extends Certificate> certificates = certificateFactory.generateCertificates(in);
         if (certificates.isEmpty()) {
             throw new IllegalArgumentException("expected non-empty set of trusted certificates");
-        }
-
-        if (certificatesCollection != null){
-            certificatesCollection.addAll(certificates);
         }
 
         // Put the certificates a key store.
@@ -390,8 +420,9 @@ public class EBAdditionalTrust implements EBJSONSerializable, Serializable {
     private static KeyStore newEmptyKeyStore(char[] password) throws GeneralSecurityException {
         try {
             KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-            InputStream in = null; // By convention, 'null' creates an empty key store.
-            keyStore.load(in, password);
+
+            // By convention, 'null' creates an empty key store.
+            keyStore.load(null, password);
             return keyStore;
         } catch (IOException e) {
             throw new AssertionError(e);
