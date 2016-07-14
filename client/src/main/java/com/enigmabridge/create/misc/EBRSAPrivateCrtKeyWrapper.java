@@ -51,7 +51,7 @@ public class EBRSAPrivateCrtKeyWrapper implements RSAPrivateCrtKey {
     }
 
     public short getPQ(byte[] buffer, short offset) {
-        return getNum(getModulus(), buffer, offset);
+        return getNum(getCrtCoefficient(), buffer, offset);
     }
 
     protected short getNum(BigInteger num, byte[] buffer, short offset){
