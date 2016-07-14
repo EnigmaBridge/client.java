@@ -288,7 +288,7 @@ public class UserObjectKeyCreator {
                     .setUoid(response.getHandle().getUoId())
                     .setUserObjectType(response.getHandle().getUoType().getValue())
                     .setCommKeys(new EBCommKeys(commKeys))
-                    .setKeyLength(response.getHandle().getUoType().keyLength()/8);
+                    .setKeyLength(response.getHandle().getUoType().keyLength());
 
             lastResponse = response;
             return keyBld;
