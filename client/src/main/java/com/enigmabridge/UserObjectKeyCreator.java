@@ -1,12 +1,19 @@
 package com.enigmabridge;
 
+import com.enigmabridge.comm.EBCommUtils;
 import com.enigmabridge.comm.EBCorruptedException;
 import com.enigmabridge.create.*;
-import com.enigmabridge.provider.EBSymmetricKey;
+import com.enigmabridge.create.misc.EBRSAPrivateCrtKey;
+import com.enigmabridge.create.misc.EBRSAPrivateCrtKeyWrapper;
 
+import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
-import java.security.ProviderException;
+import java.math.BigInteger;
 import java.security.SecureRandom;
+import java.security.interfaces.RSAPrivateCrtKey;
+import java.security.interfaces.RSAPrivateKey;
+import java.security.spec.RSAPrivateCrtKeySpec;
+import java.security.spec.RSAPrivateKeySpec;
 
 /**
  * Creates UserObject keys in the EB.
@@ -106,11 +113,6 @@ public class UserObjectKeyCreator {
         return this;
     }
 
-    public UserObjectKeyCreator setAppKey(byte[] appKey){
-        this.appKey = appKey;
-        return this;
-    }
-
     public UserObjectKeyCreator setAppKeyGeneration(int appKeyGeneration){
         this.getTemplateRequest.setGenerationAppKey(appKeyGeneration);
         return this;
@@ -121,6 +123,138 @@ public class UserObjectKeyCreator {
         return this;
     }
 
+    public UserObjectKeyCreator setAppKey(byte[] appKey){
+        this.appKey = appKey;
+        return this;
+    }
+
+    // Sugar for easy setting of objects
+    // Later maybe move to anoher builder class, after more objects emerge.
+
+    /**
+     * Adds the symmetric key from the specifications (e.g., AES).
+     * For secret key it is needed to set setAppKeyGeneration, setUoTypeFunction.
+     * We don't know which mode user wants to use (e.g., derive, client = import).
+     *
+     * @param keySpec secret key spec to import
+     * @return this
+     */
+    public UserObjectKeyCreator setAppKey(SecretKeySpec keySpec){
+        this.appKey = keySpec.getEncoded();
+        return this;
+    }
+
+    /**
+     * Sets RSA private CRT key spec for import.
+     * Serializes it to the appKey for import, sets setAppKeyGeneration(client), calls
+     * appropriate setUoTypeFunction.
+     *
+     * @param spec RSA private key spec.
+     * @return this
+     */
+    public UserObjectKeyCreator setAppKey(RSAPrivateCrtKeySpec spec){
+        return setAppKey(spec, null);
+    }
+
+    /**
+     * Sets RSA private CRT key spec for import.
+     * Serializes it to the appKey for import, sets setAppKeyGeneration(client), calls
+     * appropriate setUoTypeFunction.
+     *
+     * @param spec RSA private key spec.
+     * @param e public exponent, unused. for easier calling if user is unsure whether CRT or not.
+     * @return this
+     */
+    public UserObjectKeyCreator setAppKey(RSAPrivateCrtKeySpec spec, BigInteger e){
+        this.appKey = EBCreateUtils.exportPrivateKeyUOStyle(new EBRSAPrivateCrtKeyWrapper(spec));
+        setAppKeyGeneration(Constants.GENKEY_CLIENT);
+        setRSADecryptFunctionFromModulus(spec.getModulus());
+        return this;
+    }
+
+    /**
+     * Sets RSA private CRT key for import.
+     * Serializes it to the appKey for import, sets setAppKeyGeneration(client), calls
+     * appropriate setUoTypeFunction.
+     *
+     * @param key RSA private key spec.
+     * @return this
+     */
+    public UserObjectKeyCreator setAppKey(RSAPrivateCrtKey key){
+        return setAppKey(key, null);
+    }
+
+    /**
+     * Sets RSA private CRT key for import.
+     * Serializes it to the appKey for import, sets setAppKeyGeneration(client), calls
+     * appropriate setUoTypeFunction.
+     *
+     * @param key RSA private key spec.
+     * @param e public exponent, unused. for easier calling if user is unsure whether CRT or not.
+     * @return this
+     */
+    public UserObjectKeyCreator setAppKey(RSAPrivateCrtKey key, BigInteger e){
+        this.appKey = EBCreateUtils.exportPrivateKeyUOStyle(new EBRSAPrivateCrtKeyWrapper(key));
+        setAppKeyGeneration(Constants.GENKEY_CLIENT);
+        setRSADecryptFunctionFromModulus(key.getModulus());
+        return this;
+    }
+
+    /**
+     * Sets RSA private key spec for import.
+     * Only CRT keys are allowed to import thus this one needs to be converted to CRT key.
+     * Such conversion may take some time and may not succeed. If conversion fails, RuntimeException is thrown.
+     *
+     * Key is then serialized to the appKey for import, setAppKeyGeneration(client), calls
+     * appropriate setUoTypeFunction.
+     *
+     * @param spec RSA private key spec.
+     * @param e public exponent, required.
+     * @return this
+     */
+    public UserObjectKeyCreator setAppKey(RSAPrivateKeySpec spec, BigInteger e){
+        this.appKey = EBCreateUtils.exportPrivateKeyUOStyle(
+                new EBRSAPrivateCrtKeyWrapper(new EBRSAPrivateCrtKey(spec, e))
+        );
+        setAppKeyGeneration(Constants.GENKEY_CLIENT);
+        setRSADecryptFunctionFromModulus(spec.getModulus());
+        return this;
+    }
+
+    /**
+     * Sets RSA private key for import.
+     * Only CRT keys are allowed to import thus this one needs to be converted to CRT key.
+     * Such conversion may take some time and may not succeed. If conversion fails, RuntimeException is thrown.
+     *
+     * Key is then serialized to the appKey for import, setAppKeyGeneration(client), calls
+     * appropriate setUoTypeFunction.
+     *
+     * @param key RSA private key.
+     * @param e public exponent, required.
+     * @return this
+     */
+    public UserObjectKeyCreator setAppKey(RSAPrivateKey key, BigInteger e){
+        this.appKey = EBCreateUtils.exportPrivateKeyUOStyle(
+                new EBRSAPrivateCrtKeyWrapper(new EBRSAPrivateCrtKey(key, e))
+        );
+        setAppKeyGeneration(Constants.GENKEY_CLIENT);
+        setRSADecryptFunctionFromModulus(key.getModulus());
+        return this;
+    }
+
+    protected void setRSADecryptFunctionFromModulus(BigInteger modulus){
+        if (modulus == null){
+            throw new NullPointerException("Empty modulus");
+        }
+
+        // 1048 is on purpose, not exact 1024, what if implementation generated modulus of bitlength 1025?
+        setUoTypeFunction(modulus.bitLength() > 1048 ? UserObjectType.TYPE_RSA2048DECRYPT_NOPAD : UserObjectType.TYPE_RSA1024DECRYPT_NOPAD);
+    }
+
+    /**
+     * Creates a new Use Object Key from the input values.
+     * @return builder for new user object key
+     */
     public UserObjectKeyBase.Builder create() {
         final EBEndpointInfo endpoint = engine.getDefaultSettings().getEndpointInfo();
         final EBUOGetTemplateRequest req = this.getTemplateRequest;
