@@ -72,10 +72,10 @@ public class RSA
 //            provider.addAlgorithm("KeyPairGenerator.RSA", PREFIX + "KeyPairGeneratorSpi");
 
             AsymmetricKeyInfoConverter keyFact = new KeyFactorySpi();
-            registerOid(provider, PKCSObjectIdentifiers.rsaEncryption, "RSA", keyFact);
-            registerOid(provider, X509ObjectIdentifiers.id_ea_rsa, "RSA", keyFact);
-            registerOid(provider, PKCSObjectIdentifiers.id_RSAES_OAEP, "RSA", keyFact);
-            registerOid(provider, PKCSObjectIdentifiers.id_RSASSA_PSS, "RSA", keyFact);
+            registerOid(provider, PKCSObjectIdentifiers.rsaEncryption, "RSA", keyFact, false);
+            registerOid(provider, X509ObjectIdentifiers.id_ea_rsa, "RSA", keyFact, false);
+            registerOid(provider, PKCSObjectIdentifiers.id_RSAES_OAEP, "RSA", keyFact, false);
+            registerOid(provider, PKCSObjectIdentifiers.id_RSASSA_PSS, "RSA", keyFact, false);
 
             registerOidAlgorithmParameters(provider, PKCSObjectIdentifiers.rsaEncryption, "RSA");
             registerOidAlgorithmParameters(provider, X509ObjectIdentifiers.id_ea_rsa, "RSA");
@@ -250,6 +250,16 @@ public class RSA
             provider.addAlgorithm("Alg.Alias.Signature." + digest + "withRSA/X9.31", digest + "WITHRSA/X9.31");
             provider.addAlgorithm("Alg.Alias.Signature." + digest + "WithRSA/X9.31", digest + "WITHRSA/X9.31");
             provider.addAlgorithm("Signature." + digest + "WITHRSA/X9.31", className);
+        }
+
+        protected void registerOid(ConfigurableProvider provider, ASN1ObjectIdentifier oid, String name, AsymmetricKeyInfoConverter keyFactory, boolean generator)
+        {
+            provider.addAlgorithm("Alg.Alias.KeyFactory." + oid, name);
+            if (generator){
+                provider.addAlgorithm("Alg.Alias.KeyPairGenerator." + oid, name);
+            }
+
+            provider.addKeyInfoConverter(oid, keyFactory);
         }
     }
 }
