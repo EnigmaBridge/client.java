@@ -201,13 +201,10 @@ public class KeyFactorySpi
             final UserObjectKeyBase.Builder keyBld = keyCreator.create();
             final EBCreateUOResponse response = keyCreator.getLastResponse();
 
-            // Load key public parts.
-            final RSAPublicKeySpec pubKeySpec = EBCreateUtils.readSerializedRSAPublicKey(response.getPublicKey());
-
             // Create Java RSA key - will be done with key specs.
             final EBRSAPrivateKey rsa2kPrivKey = new EBRSAPrivateKey.Builder()
-                    .setPublicExponent(pubKeySpec.getPublicExponent())
-                    .setModulus(pubKeySpec.getModulus())
+                    .setPublicExponent(wrapper.getPublicExponent())
+                    .setModulus(wrapper.getModulus())
                     .setUo(keyBld.build())
                     .setEngine(engine)
                     .build();
