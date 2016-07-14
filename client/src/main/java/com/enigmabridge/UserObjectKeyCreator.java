@@ -256,7 +256,7 @@ public class UserObjectKeyCreator {
      * @return builder for new user object key
      */
     public UserObjectKeyBase.Builder create() throws IOException {
-        final EBEndpointInfo endpoint = engine.getDefaultSettings().getEndpointInfo();
+        final EBEndpointInfo endpoint = engine.getEnrollmentEndpoint();
         final EBUOGetTemplateRequest req = this.getTemplateRequest;
 
         if (commKeys == null){
@@ -270,7 +270,7 @@ public class UserObjectKeyCreator {
 
         EBCreateUOSimpleCall.Builder callBld = new EBCreateUOSimpleCall.Builder()
                 .setEngine(engine)
-                .setEndpoint(new EBEndpointInfo(endpoint.getScheme(), endpoint.getHostname(), 11182))
+                .setEndpoint(endpoint)
                 .setRequest(req)
                 .addKey(new EBUOTemplateKey(Constants.KEY_COMM_ENC, commKeys.getEncKey()))
                 .addKey(new EBUOTemplateKey(Constants.KEY_COMM_MAC, commKeys.getMacKey()));
