@@ -98,6 +98,39 @@ public class UserObjectInfoBase implements UserObjectInfo, EBJSONSerializable {
             return getThisBuilder();
         }
 
+        public B setUserObjectInfo(UserObjectInfo i) throws MalformedURLException {
+            getObj().setUoid(i.getUoid());
+            getObj().setUserObjectType(i.getUserObjectType());
+            getObj().setCommKeys(i.getCommKeys());
+            getObj().setConnectionSettings(i.getConnectionSettings());
+            getObj().setApiKey(i.getApiKey());
+            getObj().setEndpointInfo(i.getEndpointInfo());
+            return getThisBuilder();
+        }
+
+        public B setUserObjectInfoCopy(UserObjectInfo i) throws MalformedURLException {
+            getObj().setUoid(i.getUoid());
+            getObj().setApiKey(i.getApiKey());
+
+            getObj().setUserObjectType(
+                    i.getUserObjectType() == null ? null :
+                            i.getUserObjectType().copy());
+
+            getObj().setCommKeys(
+                    i.getCommKeys() == null ? null :
+                            i.getCommKeys().copy());
+
+            getObj().setConnectionSettings(
+                    i.getConnectionSettings() == null ? null :
+                            i.getConnectionSettings().copy());
+
+            getObj().setEndpointInfo(
+                    i.getEndpointInfo() == null ? null :
+                            i.getEndpointInfo().copy());
+
+            return getThisBuilder();
+        }
+
         public abstract T build();
         public abstract B getThisBuilder();
         public abstract T getObj();

@@ -36,6 +36,24 @@ public class UserObjectKeyBase extends UserObjectInfoBase implements UserObjectK
             return getThisBuilder();
         }
 
+        public B setUserObjectKey(UserObjectKey k) throws MalformedURLException {
+            getObj().setAlgorithm(k.getAlgorithm());
+            getObj().setKeyLength(k.length());
+            getObj().setKeyType(k.getKeyType());
+            this.setUserObjectInfo(k);
+
+            return getThisBuilder();
+        }
+
+        public B setUserObjectKeyCopy(UserObjectKey k) throws MalformedURLException {
+            getObj().setAlgorithm(k.getAlgorithm());
+            getObj().setKeyLength(k.length());
+            getObj().setKeyType(k.getKeyType());
+            this.setUserObjectInfoCopy(k);
+
+            return getThisBuilder();
+        }
+
         public abstract T build();
         public abstract B getThisBuilder();
         public abstract T getObj();
