@@ -15,8 +15,9 @@ import java.util.regex.Pattern;
 public class EBEndpointInfo implements Serializable, Cloneable {
     public static final long serialVersionUID = 1L;
 
-    private static final int DEFAULT_PORT = 11180;
-    private static final String DEFAULT_SCHEME = "https";
+    public static final int DEFAULT_PORT = 11180;
+    public static final int DEFAULT_ENROLLMENT_PORT = 11182;
+    public static final String DEFAULT_SCHEME = "https";
     private static final Pattern PROTOCOL_PATTERN = Pattern.compile("^([a-zA-Z0-9])+://");
 
     private String scheme = DEFAULT_SCHEME;
