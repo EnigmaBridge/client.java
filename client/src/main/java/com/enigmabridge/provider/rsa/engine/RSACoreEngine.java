@@ -4,6 +4,7 @@ import com.enigmabridge.EBCryptoException;
 import com.enigmabridge.EBUtils;
 import com.enigmabridge.UserObjectInfoBase;
 import com.enigmabridge.comm.*;
+import com.enigmabridge.create.EBUOHandle;
 import com.enigmabridge.provider.parameters.EBCipherParameters;
 import com.enigmabridge.provider.parameters.EBRSAKeyParameter;
 import com.enigmabridge.provider.rsa.EBRSAKey;
@@ -181,9 +182,9 @@ class RSACoreEngine
             return convertInput(respData, 0, respData.length);
 
         } catch (IOException e) {
-            throw new EBCryptoException(e);
+            throw new EBCryptoException("ProcessData failed for: " + new EBUOHandle(key.getUserObjectInfo()), e);
         } catch (EBCorruptedException e) {
-            throw new EBCryptoException(e);
+            throw new EBCryptoException("ProcessData failed for: " + new EBUOHandle(key.getUserObjectInfo()), e);
         }
     }
 }

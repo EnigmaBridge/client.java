@@ -4,6 +4,7 @@ import com.enigmabridge.EBCryptoException;
 import com.enigmabridge.comm.EBCorruptedException;
 import com.enigmabridge.comm.EBProcessDataCall;
 import com.enigmabridge.comm.EBProcessDataResponse;
+import com.enigmabridge.create.EBUOHandle;
 import com.enigmabridge.provider.EBSymmetricKey;
 import com.enigmabridge.provider.EBUOKey;
 import com.enigmabridge.provider.EnigmaProvider;
@@ -139,9 +140,9 @@ public class AESEngine implements BlockCipher
             System.arraycopy(respData, 0, out, outOff, BLOCK_SIZE);
 
         } catch (IOException e) {
-            throw new EBCryptoException(e);
+            throw new EBCryptoException("ProcessData failed for: " + new EBUOHandle(aesKey.getUserObjectInfo()), e);
         } catch (EBCorruptedException e) {
-            throw new EBCryptoException(e);
+            throw new EBCryptoException("ProcessData failed for: " + new EBUOHandle(aesKey.getUserObjectInfo()), e);
         }
 
         return BLOCK_SIZE;
