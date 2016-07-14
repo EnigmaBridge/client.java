@@ -181,6 +181,10 @@ public class KeyFactorySpi
             throws InvalidKeySpecException
     {
         final int uoFunction = UserObjectType.getRSADecryptFunctionFromModulus(wrapper.getModulus());
+        if (engine == null){
+            engine = provider.getEngine();
+        }
+
         keyCreatorBld.setEngine(this.engine)
                 .setRandom(this.random)
                 .setUoType(new UserObjectType(uoFunction,
