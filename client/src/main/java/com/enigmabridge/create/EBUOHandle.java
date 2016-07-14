@@ -1,5 +1,6 @@
 package com.enigmabridge.create;
 
+import com.enigmabridge.UserObjectInfo;
 import com.enigmabridge.UserObjectType;
 
 /**
@@ -20,6 +21,12 @@ public class EBUOHandle {
         this.apiKey = apiKey;
         this.uoId = uoId;
         this.uoType = new UserObjectType(uoType);
+    }
+
+    public EBUOHandle(UserObjectInfo uoInfo) {
+        this.apiKey = uoInfo.getApiKey();
+        this.uoId = uoInfo.getUoid();
+        this.uoType = uoInfo.getUserObjectType();
     }
 
     // Setters
