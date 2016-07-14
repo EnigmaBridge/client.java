@@ -4,6 +4,7 @@ import com.enigmabridge.create.Constants;
 import org.json.JSONObject;
 
 import java.io.Serializable;
+import java.math.BigInteger;
 
 /**
  * Encapsulates allowed operations with user object and another misc info.
@@ -384,7 +385,17 @@ public class UserObjectType implements Serializable{
 
     @Override
     public String toString() {
-        return "{" + getValue() + "}";
+        return "{" + Long.toHexString(getValue()) + "}";
     }
 
+    /**
+     * Returns either TYPE_RSA2048DECRYPT_NOPAD or TYPE_RSA1024DECRYPT_NOPAD depending on the bitLength of the modulus.
+     *
+     * @param modulus modulus of the RSA private key
+     * @return TYPE_RSA2048DECRYPT_NOPAD or TYPE_RSA1024DECRYPT_NOPAD
+     */
+    public static int getRSADecryptFunctionFromModulus(BigInteger modulus){
+        // 1048 is on purpose, not exact 1024, what if implementation generated modulus of bitLength 1025?
+        return modulus.bitLength() > 1048 ? UserObjectType.TYPE_RSA2048DECRYPT_NOPAD : UserObjectType.TYPE_RSA1024DECRYPT_NOPAD;
+    }
 }
