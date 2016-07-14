@@ -66,16 +66,16 @@ public class RSA
             provider.addAlgorithm("Alg.Alias.Cipher.RSA//OAEPPADDING", "RSA/OAEP");
             provider.addAlgorithm("Alg.Alias.Cipher.RSA//ISO9796-1PADDING", "RSA/ISO9796-1");
 
-            // TODO: implement.
-//            provider.addAlgorithm("KeyFactory.RSA", PREFIX + "KeyFactorySpi");
+            provider.addAlgorithm("KeyFactory.RSA", PREFIX + "KeyFactorySpi");
+
+            // KeyPair generator is implemented in common class.
 //            provider.addAlgorithm("KeyPairGenerator.RSA", PREFIX + "KeyPairGeneratorSpi");
-//
-//            AsymmetricKeyInfoConverter keyFact = new KeyFactorySpi();
-//
-//            registerOid(provider, PKCSObjectIdentifiers.rsaEncryption, "RSA", keyFact);
-//            registerOid(provider, X509ObjectIdentifiers.id_ea_rsa, "RSA", keyFact);
-//            registerOid(provider, PKCSObjectIdentifiers.id_RSAES_OAEP, "RSA", keyFact);
-//            registerOid(provider, PKCSObjectIdentifiers.id_RSASSA_PSS, "RSA", keyFact);
+
+            AsymmetricKeyInfoConverter keyFact = new KeyFactorySpi();
+            registerOid(provider, PKCSObjectIdentifiers.rsaEncryption, "RSA", keyFact);
+            registerOid(provider, X509ObjectIdentifiers.id_ea_rsa, "RSA", keyFact);
+            registerOid(provider, PKCSObjectIdentifiers.id_RSAES_OAEP, "RSA", keyFact);
+            registerOid(provider, PKCSObjectIdentifiers.id_RSASSA_PSS, "RSA", keyFact);
 
             registerOidAlgorithmParameters(provider, PKCSObjectIdentifiers.rsaEncryption, "RSA");
             registerOidAlgorithmParameters(provider, X509ObjectIdentifiers.id_ea_rsa, "RSA");

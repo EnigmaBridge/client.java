@@ -28,7 +28,9 @@ public class EBKeyPairGenerator extends KeyPairGeneratorSpi {
     private BigInteger rsaPublicExponent;
     private SecureRandom random;
     private EBEngine engine;
-    private EBUOGetTemplateRequest getTemplateRequest;
+
+    protected final UserObjectKeyCreator.Builder keyCreatorBld = new UserObjectKeyCreator.Builder();
+    protected UserObjectKeyCreator keyCreator;
 
     public EBKeyPairGenerator(EnigmaProvider provider, String algorithm)  {
         this.rsaPublicExponent = RSAKeyGenParameterSpec.F4;
@@ -84,7 +86,10 @@ public class EBKeyPairGenerator extends KeyPairGeneratorSpi {
             }
 
             if (spec instanceof EBCreateUOTemplateSpec){
-                this.getTemplateRequest = ((EBCreateUOTemplateSpec) spec).getTemplateRequest();
+                final EBCreateUOTemplateSpec ebSpec = (EBCreateUOTemplateSpec) spec;
+                if (ebSpec.getTemplateRequest() != null){
+                    keyCreatorBld.setGetTemplateRequest(ebSpec.getTemplateRequest());
+                }
             }
 
         } else {
@@ -103,6 +108,10 @@ public class EBKeyPairGenerator extends KeyPairGeneratorSpi {
         if (this.random == null){
             this.random = new SecureRandom();
         }
+
+        keyCreatorBld
+                .setEngine(engine)
+                .setRandom(random);
     }
 
     private void checkKeySize(int keySize, AlgorithmParameterSpec params) throws InvalidAlgorithmParameterException {
@@ -129,53 +138,34 @@ public class EBKeyPairGenerator extends KeyPairGeneratorSpi {
 
     public KeyPair generateKeyPair() {
         if(this.algorithm.equals("RSA")) {
-            final byte[] encKey = new byte[32];
-            final byte[] macKey = new byte[32];
-            random.nextBytes(encKey);
-            random.nextBytes(macKey);
 
             final int uoTypeFunction = this.keySize == 1024 ? UserObjectType.TYPE_RSA1024DECRYPT_NOPAD : UserObjectType.TYPE_RSA2048DECRYPT_NOPAD;
-            final EBEndpointInfo endpoint = engine.getDefaultSettings().getEndpointInfo();
-            EBUOGetTemplateRequest req = this.getTemplateRequest != null ? this.getTemplateRequest : new EBUOGetTemplateRequest();
-            req.setType(uoTypeFunction);
-            req.setGenerationCommKey(Constants.GENKEY_CLIENT);
-            req.setGenerationAppKey(Constants.GENKEY_ENROLL_RANDOM);
+            keyCreatorBld.setEngine(this.engine)
+                    .setRandom(this.random)
+                    .setUoType(new UserObjectType(uoTypeFunction,
+                            Constants.GENKEY_ENROLL_RANDOM,
+                            Constants.GENKEY_CLIENT
+                    ));
 
-            // Force remaining parameters to default values.
-            req.setGenerationBillingKey(Constants.GENKEY_LEGACY_ENROLL_RANDOM);
-            req.setFormat(1);
-            req.setProtocol(1);
-
-            EBCreateUOSimpleCall callBld = new EBCreateUOSimpleCall.Builder()
-                    .setEngine(engine)
-                    .setEndpoint(new EBEndpointInfo(endpoint.getScheme(), endpoint.getHostname(), 11182))
-                    .setRequest(req)
-                    .addKey(new EBUOTemplateKey(Constants.KEY_COMM_ENC, encKey))
-                    .addKey(new EBUOTemplateKey(Constants.KEY_COMM_MAC, macKey))
-                    .build();
+            keyCreator = keyCreatorBld.build();
+            keyCreator
+                    .setUoTypeFunction(uoTypeFunction)
+                    .setAppKeyGeneration(Constants.GENKEY_ENROLL_RANDOM);
 
             try {
-                final EBCreateUOResponse response = callBld.create();
+                final UserObjectKeyBase.Builder keyBld = keyCreator.create();
+                final EBCreateUOResponse response = keyCreator.getLastResponse();
 
                 // Load key public parts.
-                final byte[] publicKey = response.getPublicKey();
-                final RSAPublicKeySpec pubKeySpec = EBCreateUtils.readSerializedRSAPublicKey(publicKey);
+                final RSAPublicKeySpec pubKeySpec = EBCreateUtils.readSerializedRSAPublicKey(response.getPublicKey());
                 final KeyFactory rsaFact = KeyFactory.getInstance("RSA");
                 final PublicKey rsa2kPubkey = rsaFact.generatePublic(pubKeySpec);
-
-
-                // Create UOKey
-                final UserObjectKeyBase key = new UserObjectKeyBase.Builder()
-                        .setUoid(response.getHandle().getUoId())
-                        .setUserObjectType(response.getHandle().getUoType().getValue())
-                        .setCommKeys(new EBCommKeys(encKey, macKey))
-                        .build();
 
                 // Create Java RSA key - will be done with key specs.
                 final EBRSAPrivateKey rsa2kPrivKey = new EBRSAPrivateKey.Builder()
                         .setPublicExponent(pubKeySpec.getPublicExponent())
                         .setModulus(pubKeySpec.getModulus())
-                        .setUo(key)
+                        .setUo(keyBld.build())
                         .setEngine(engine)
                         .build();
 
@@ -183,7 +173,7 @@ public class EBKeyPairGenerator extends KeyPairGeneratorSpi {
 
             } catch (IOException e) {
                 throw new ProviderException("Create RSA key failed", e);
-            } catch (EBCorruptedException e) {
+            } catch (EBEngineException e) {
                 throw new ProviderException("RSA keys are supported only", e);
             } catch (InvalidKeySpecException e) {
                 throw new ProviderException("Cannot create RSA pub key", e);

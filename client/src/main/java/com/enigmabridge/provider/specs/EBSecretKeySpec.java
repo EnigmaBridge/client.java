@@ -5,13 +5,14 @@ import com.enigmabridge.EBEngineReference;
 import com.enigmabridge.create.EBUOGetTemplateRequest;
 
 import javax.crypto.spec.SecretKeySpec;
+import java.security.spec.KeySpec;
 
 /**
  * SecretKeySpec, extended version, capable of storing EB options for import.
  *
  * Created by dusanklinec on 13.07.16.
  */
-public class EBSecretKeySpec extends SecretKeySpec implements EBEngineReference, EBCreateUOTemplateSpec {
+public class EBSecretKeySpec extends SecretKeySpec implements EBKeyCreateSpec {
     /**
      * Basic EB engine / configuration.
      */
@@ -77,4 +78,8 @@ public class EBSecretKeySpec extends SecretKeySpec implements EBEngineReference,
         return this;
     }
 
+    @Override
+    public KeySpec getUnderlyingSpec() {
+        return this;
+    }
 }
