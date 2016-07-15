@@ -199,7 +199,6 @@ public class KeyFactorySpi
                 .setAppKeyGeneration(Constants.GENKEY_CLIENT);
         try {
             final UserObjectKeyBase.Builder keyBld = keyCreator.create();
-            final EBCreateUOResponse response = keyCreator.getLastResponse();
 
             // Create Java RSA key - will be done with key specs.
             final EBRSAPrivateKey rsa2kPrivKey = new EBRSAPrivateKey.Builder()
