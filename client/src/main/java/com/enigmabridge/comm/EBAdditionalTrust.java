@@ -66,6 +66,19 @@ public class EBAdditionalTrust implements EBJSONSerializable, Serializable {
      *
      * @param letsEncrypt if true, letsencrypt trusted roots are added to the trust object.
      * @param system if true, all system roots are added to the trust object.
+     */
+    public EBAdditionalTrust(boolean letsEncrypt, boolean system) {
+        letsEncryptFlag = letsEncrypt;
+        systemFlag = system;
+        init(letsEncrypt, system, (InputStream) null);
+    }
+
+    /**
+     * As LetsEcrypt is not yet in the Java trusted roots, this class offer to build own view on trusted roots for EB
+     * service.
+     *
+     * @param letsEncrypt if true, letsencrypt trusted roots are added to the trust object.
+     * @param system if true, all system roots are added to the trust object.
      * @param additionalRoots  input stream of additional trusted roots in PEM format, concatenated. May be null.
      */
     public EBAdditionalTrust(boolean letsEncrypt, boolean system, InputStream additionalRoots) {
