@@ -69,7 +69,7 @@ public class EBProcessDataCallIT {
     public void setUpMethod() throws Exception {
         endpoint = new EBEndpointInfo(EBTestingUtils.CONNECTION_STRING);
 
-        trust = new EBAdditionalTrust(true, true, null);
+        trust = new EBAdditionalTrust(true, true);
 
         settings = new EBConnectionSettings()
                 .setMethod(EBCommUtils.METHOD_POST)
