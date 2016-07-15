@@ -128,7 +128,8 @@ public class EBUOTemplateProcessor {
             EBUOTemplateKey keyToUse = keyMap.get(type);
 
             if (keyToUse == null){
-                LOG.debug("Key not found: " + type);
+                //TODO: if key was set client generated, take care it was really set
+                //LOG.debug("Key not found: " + type);
 
                 // Comm keys
                 if (Constants.KEY_COMM_ENC.equalsIgnoreCase(type) || Constants.KEY_COMM_MAC.equalsIgnoreCase(type)){
