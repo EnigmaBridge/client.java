@@ -13,6 +13,8 @@ import java.security.SecureRandom;
 import java.security.Security;
 import java.security.spec.RSAPublicKeySpec;
 
+import static org.testng.Assert.assertEquals;
+
 /**
  * Created by dusanklinec on 06.07.16.
  */
@@ -101,8 +103,7 @@ public class EBCreateOUIT {
                 .build();
 
         final EBCreateUOResponse response = callBld.create();
-
-        LOG.info("DONE");
+        assertEquals(response.isCodeOk(), true, "UO create failed");
     }
 
     @Test(groups = {"integration"}) //, timeOut = 100000
@@ -128,9 +129,10 @@ public class EBCreateOUIT {
                 .build();
 
         final EBCreateUOResponse response = callBld.create();
+        assertEquals(response.isCodeOk(), true, "UO create failed");
+
         final byte[] publicKey = response.getPublicKey();
         final RSAPublicKeySpec pubKeySpec = EBCreateUtils.readSerializedRSAPublicKey(publicKey);
-
-        LOG.info("DONE");
+        assertEquals(pubKeySpec.getModulus().bitLength() > 1000, true, "BitLength crippled");
     }
 }
