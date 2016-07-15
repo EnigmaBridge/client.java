@@ -28,7 +28,7 @@ public class UserObjectKeyCreator {
     protected EBUOGetTemplateRequest getTemplateRequest;
 
     protected EBCommKeys commKeys;
-    protected byte[] appKey;
+    protected EBUOTemplateKey appKey;
 
     protected EBCreateUOResponse lastResponse;
 
@@ -126,7 +126,7 @@ public class UserObjectKeyCreator {
     }
 
     public UserObjectKeyCreator setAppKey(byte[] appKey){
-        this.appKey = appKey;
+        this.appKey = new EBUOTemplateKey(Constants.KEY_APP, appKey);
         return this;
     }
 
@@ -142,7 +142,7 @@ public class UserObjectKeyCreator {
      * @return this
      */
     public UserObjectKeyCreator setAppKey(SecretKeySpec keySpec){
-        this.appKey = keySpec.getEncoded();
+        this.appKey = new EBUOTemplateKey(keySpec);
         return this;
     }
 
@@ -155,7 +155,7 @@ public class UserObjectKeyCreator {
      * @return this
      */
     public UserObjectKeyCreator setAppKey(EBRSAPrivateCrtKeyWrapper wrapper){
-        this.appKey = EBCreateUtils.exportPrivateKeyUOStyle(wrapper);
+        this.appKey = new EBUOTemplateKeyRSA(wrapper);
         setAppKeyGeneration(Constants.GENKEY_CLIENT);
         setRSADecryptFunctionFromModulus(wrapper.getModulus());
         return this;
@@ -276,7 +276,7 @@ public class UserObjectKeyCreator {
                 .addKey(new EBUOTemplateKey(Constants.KEY_COMM_MAC, commKeys.getMacKey()));
 
         if (appKey != null){
-            callBld.addKey(new EBUOTemplateKey(Constants.KEY_APP, appKey));
+            callBld.addKey(appKey);
         }
 
         final EBCreateUOSimpleCall createCall = callBld.build();

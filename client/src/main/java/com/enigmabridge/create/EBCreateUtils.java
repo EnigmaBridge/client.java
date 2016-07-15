@@ -2,6 +2,7 @@ package com.enigmabridge.create;
 
 import com.enigmabridge.EBInvalidException;
 import com.enigmabridge.comm.EBCommUtils;
+import com.enigmabridge.comm.EBCorruptedException;
 import com.enigmabridge.create.misc.EBRSAPrivateCrtKey;
 import com.enigmabridge.create.misc.EBRSAPrivateCrtKeyWrapper;
 
@@ -98,18 +99,18 @@ public class EBCreateUtils {
         return new RSAPublicKeySpec(mod, exp);
     }
 
-    public static short exportPrivateKeyUOStyle(byte[] buffer, short baseOffset, RSAPrivateCrtKey privKey) {
-        return exportPrivateKeyUOStyle(buffer, baseOffset, privKey, (byte) 0);
+    public static short exportPrivateKeyUOStyle(byte[] buffer, short baseOffset, short length, RSAPrivateCrtKey privKey) {
+        return exportPrivateKeyUOStyle(buffer, baseOffset, length, privKey, (byte) 0);
     }
 
-    public static short exportPrivateKeyUOStyle(byte[] buffer, short baseOffset, RSAPrivateKey privKey, BigInteger e, byte spareBytes) {
-        return exportPrivateKeyUOStyle(buffer, baseOffset,
+    public static short exportPrivateKeyUOStyle(byte[] buffer, short baseOffset, short length, RSAPrivateKey privKey, BigInteger e, byte spareBytes) {
+        return exportPrivateKeyUOStyle(buffer, baseOffset, length,
                 new EBRSAPrivateCrtKeyWrapper(new EBRSAPrivateCrtKey(privKey, e)),
                 spareBytes);
     }
 
-    public static short exportPrivateKeyUOStyle(byte[] buffer, short baseOffset, RSAPrivateCrtKey privKey, byte spareBytes) {
-        return exportPrivateKeyUOStyle(buffer, baseOffset, new EBRSAPrivateCrtKeyWrapper(privKey), spareBytes);
+    public static short exportPrivateKeyUOStyle(byte[] buffer, short baseOffset, short length, RSAPrivateCrtKey privKey, byte spareBytes) {
+        return exportPrivateKeyUOStyle(buffer, baseOffset, length, new EBRSAPrivateCrtKeyWrapper(privKey), spareBytes);
     }
 
     public static byte[] exportPrivateKeyUOStyle(EBRSAPrivateCrtKeyWrapper privKey) {
@@ -120,7 +121,7 @@ public class EBCreateUtils {
         final int baseLen = privKey.getModulus().bitLength()/8;
         final int buffLen = baseLen * 6;
         byte[] buffer = new byte[buffLen];
-        short usedBytes = exportPrivateKeyUOStyle(buffer, (short) 0, privKey, spareBytes);
+        short usedBytes = exportPrivateKeyUOStyle(buffer, (short) 0, (short) -1, privKey, spareBytes);
 
         byte[] realBuffer = new byte[usedBytes];
         System.arraycopy(buffer, 0, realBuffer, 0, usedBytes);
@@ -128,7 +129,13 @@ public class EBCreateUtils {
         return realBuffer;
     }
 
-    public static short exportPrivateKeyUOStyle(byte[] buffer, short baseOffset, EBRSAPrivateCrtKeyWrapper privKey, byte spareBytes) {
+    public static short exportPrivateKeyUOStyle(
+            byte[] buffer,
+            short baseOffset,
+            short length,
+            EBRSAPrivateCrtKeyWrapper privKey,
+            byte spareBytes)
+    {
         short tempOffset = baseOffset;
 
         // Length of overall key section
@@ -186,6 +193,16 @@ public class EBCreateUtils {
 
         // set length for key section
         EBCommUtils.setShort(buffer, keyLengthOffset, (short) (tempOffset - keyBaseOffset));
+
+        // Not enough room for the RSA key
+        if (length > 0) {
+            if (length < (tempOffset - baseOffset)) {
+                throw new EBInvalidException("Key buffer is too short.");
+            }
+
+            // RSA serialization pickle: use all available space.
+            EBCommUtils.setShort(buffer, keyLengthOffset, (short) (length - EBCommUtils.UO_KEY_SIZE_LENGTH));
+        }
 
         // Return overall length that was inserted
         return (short) (tempOffset - baseOffset);

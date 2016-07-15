@@ -125,8 +125,7 @@ public class EBUOTemplateProcessor {
         final List<EBUOTemplateKeyOffset> keyOffsets = this.template.getKeyOffsets();
         for(EBUOTemplateKeyOffset offset : keyOffsets){
             final String type = offset.getType();
-            final EBUOTemplateKey key = keyMap.get(type);
-            EBUOTemplateKey keyToUse = key;
+            EBUOTemplateKey keyToUse = keyMap.get(type);
 
             if (keyToUse == null){
                 LOG.debug("Key not found: " + type);
@@ -160,27 +159,10 @@ public class EBUOTemplateProcessor {
                 }
             }
 
-            final byte[] keyVal = keyToUse.getKey();
-            if (keyVal.length*8 > offset.getLength()){
-                throw new EBCryptoException("Invalid key size, exp: " + offset.getLength()
-                        + ", given: " + keyVal.length*8
-                        + ", type: " + offset.getType());
-            }
-            else if (keyVal.length*8 != offset.getLength()){
-                LOG.debug("Invalid key size, exp: " + offset.getLength()
-                        + ", given: " + keyVal.length*8
-                        + ", type: " + offset.getType());
-            }
+            // Encode key to the provided buffer.
+            keyToUse.encodeTo(template, offset.getOffset(), offset.getLength());
 
-            final long cOffset = offset.getOffset();
-            if ((cOffset & 7) != 0){
-                throw new EBInvalidException("Key position has to be byte aligned, type: " + offset.getType());
-            }
-
-            for(int idx=0, len=keyVal.length; idx < len; ++idx){
-                template[(int)cOffset/8 + idx] = keyVal[idx];
-            }
-
+            // Store key used to the list. If the key was generated now, user may need it later (e.g., comm keys, billing key).
             getTemplateKeysUsed().add(keyToUse);
         }
     }
