@@ -191,17 +191,9 @@ public class EBCreateUtils {
         // Add spare bytes if required (used as compensation for tmaple objects generated later)
         tempOffset += spareBytes;
 
-        // set length for key section
-        EBCommUtils.setShort(buffer, keyLengthOffset, (short) (tempOffset - keyBaseOffset));
-
         // Not enough room for the RSA key
-        if (length > 0) {
-            if (length < (tempOffset - baseOffset)) {
-                throw new EBInvalidException("Key buffer is too short.");
-            }
-
-            // RSA serialization pickle: use all available space.
-            EBCommUtils.setShort(buffer, keyLengthOffset, (short) (length - EBCommUtils.UO_KEY_SIZE_LENGTH));
+        if (length > 0 && length < (tempOffset - baseOffset)) {
+            throw new EBInvalidException("Key buffer is too short.");
         }
 
         // Return overall length that was inserted

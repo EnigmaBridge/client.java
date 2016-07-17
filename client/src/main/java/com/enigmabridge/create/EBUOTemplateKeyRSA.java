@@ -34,7 +34,7 @@ public class EBUOTemplateKeyRSA extends EBUOTemplateKey {
         }
 
         // Warning: the length in current form indicates length of the RSA key, not the buffer.
-        EBCreateUtils.exportPrivateKeyUOStyle(buffer, (short)(offset/8), (short)(length/8 + EBCommUtils.UO_KEY_SIZE_LENGTH), wrapper);
+        EBCreateUtils.exportPrivateKeyUOStyle(buffer, (short)(offset/8), (short)(length/8), wrapper);
         return length;
     }
 
