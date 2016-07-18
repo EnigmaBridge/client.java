@@ -2,17 +2,17 @@ package com.enigmabridge.provider;
 
 import com.enigmabridge.EBEngine;
 import com.enigmabridge.provider.aes.AES;
+import com.enigmabridge.provider.keystore.BC;
+import com.enigmabridge.provider.keystore.PKCS12;
 import com.enigmabridge.provider.rsa.RSA;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
-import org.bouncycastle.jcajce.provider.asymmetric.rsa.*;
 import org.bouncycastle.jcajce.provider.config.ConfigurableProvider;
 import org.bouncycastle.jcajce.provider.config.ProviderConfiguration;
 import org.bouncycastle.jcajce.provider.util.AsymmetricKeyInfoConverter;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
-import javax.crypto.SecretKey;
 import java.lang.reflect.Constructor;
 import java.security.*;
 import java.util.HashMap;
@@ -85,6 +85,10 @@ public class EnigmaProvider extends Provider implements ConfigurableProvider {
 
         // AES
         new AES.Mappings().configure(this);
+
+        // KeyStore
+        new BC.Mappings().configure(this);
+        new PKCS12.Mappings().configure(this);
     }
 
     /**

@@ -3,6 +3,7 @@ package com.enigmabridge.provider.aes;
 import com.enigmabridge.provider.*;
 
 import com.enigmabridge.provider.BaseBlockCipher;
+import com.enigmabridge.provider.asn1.EBASNUtils;
 import org.bouncycastle.asn1.bc.BCObjectIdentifiers;
 import org.bouncycastle.asn1.cms.CCMParameters;
 import org.bouncycastle.asn1.cms.GCMParameters;
@@ -635,6 +636,8 @@ public class AES {
             provider.addAlgorithm("SecretKeyFactory", NISTObjectIdentifiers.id_aes128_CCM, PREFIX + "$KeyFact");
             provider.addAlgorithm("SecretKeyFactory", NISTObjectIdentifiers.id_aes192_CCM, PREFIX + "$KeyFact");
             provider.addAlgorithm("SecretKeyFactory", NISTObjectIdentifiers.id_aes256_CCM, PREFIX + "$KeyFact");
+
+            provider.addAlgorithm("SecretKeyFactory", EBASNUtils.eb_aes, PREFIX + "$KeyFact");
 
             provider.addAlgorithm("Mac.AESCMAC", PREFIX + "$AESCMAC");
 

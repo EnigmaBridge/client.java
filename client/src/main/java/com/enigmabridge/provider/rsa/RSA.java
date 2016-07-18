@@ -1,5 +1,6 @@
 package com.enigmabridge.provider.rsa;
 
+import com.enigmabridge.provider.asn1.EBASNUtils;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.oiw.OIWObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
@@ -81,6 +82,10 @@ public class RSA
             registerOidAlgorithmParameters(provider, X509ObjectIdentifiers.id_ea_rsa, "RSA");
             registerOidAlgorithmParameters(provider, PKCSObjectIdentifiers.id_RSAES_OAEP, "OAEP");
             registerOidAlgorithmParameters(provider, PKCSObjectIdentifiers.id_RSASSA_PSS, "PSS");
+
+            registerOidAlgorithmParameters(provider, EBASNUtils.eb_rsa, "RSA");
+            registerOidAlgorithmParameters(provider, EBASNUtils.eb_rsa_priv, "RSA");
+            registerOidAlgorithmParameters(provider, EBASNUtils.eb_rsa_pub, "RSA");
 
             provider.addAlgorithm("Signature.RSASSA-PSS", PREFIX + "PSSSignatureSpi$PSSwithRSA");
             provider.addAlgorithm("Signature." + PKCSObjectIdentifiers.id_RSASSA_PSS, PREFIXSIG + "PSSSignatureSpi$PSSwithRSA");
