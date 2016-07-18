@@ -2,16 +2,30 @@ package com.enigmabridge.provider;
 
 import com.enigmabridge.*;
 import com.enigmabridge.create.Constants;
+import com.enigmabridge.provider.asn1.EBASNUtils;
+import com.enigmabridge.provider.asn1.EBEncodableUOKey;
+import com.enigmabridge.provider.asn1.EBJSONEncodedUOKey;
+import com.enigmabridge.provider.specs.EBConfigurationUOKeySpec;
+import com.enigmabridge.provider.specs.EBJSONEncodedUOKeySpec;
 import com.enigmabridge.provider.specs.EBSecretKeySpec;
 import com.enigmabridge.provider.specs.EBSymmetricKeyGenTypes;
+import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
+import org.bouncycastle.asn1.pkcs.RSAPrivateKey;
+import org.bouncycastle.jcajce.provider.asymmetric.rsa.BCRSAPrivateCrtKey;
+import org.bouncycastle.jcajce.provider.asymmetric.rsa.BCRSAPrivateKey;
+import org.bouncycastle.jcajce.provider.asymmetric.rsa.RSAUtil;
 
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactorySpi;
 import javax.crypto.spec.SecretKeySpec;
+import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
+import java.security.spec.PKCS8EncodedKeySpec;
 
 /**
  * SecretKeyFactory translates between KeySpecs and Keys.
@@ -54,8 +68,21 @@ public class EBSecretKeyFactory extends SecretKeyFactorySpi {
         } else if(keySpec instanceof SecretKeySpec) {
             initFromSpecs(null);
 
-        } else {
+        } else if (keySpec instanceof PKCS8EncodedKeySpec) {
+            initFromSpecs(null);
 
+            final PKCS8EncodedKeySpec p8 = (PKCS8EncodedKeySpec) keySpec;
+            return fromPkcs8Encoded(p8);
+
+        } else if (keySpec instanceof EBJSONEncodedUOKeySpec){
+            // TODO: implement.
+            throw new UnsupportedOperationException("Not implemented yet");
+
+        } else if (keySpec instanceof EBConfigurationUOKeySpec){
+            // TODO: implement.
+            throw new UnsupportedOperationException("Not implemented yet");
+
+        } else {
             throw new InvalidKeySpecException("Unsupported spec: " + keySpec.getClass().getName());
         }
 
@@ -99,6 +126,28 @@ public class EBSecretKeyFactory extends SecretKeyFactorySpi {
         if (ebSpec != null){
             this.keyType = ebSpec.getKeyType();
         }
+    }
+
+    protected SecretKey fromPkcs8Encoded(PKCS8EncodedKeySpec p8) throws InvalidKeySpecException {
+        try {
+            final EBEncodableUOKey keyInfo = EBEncodableUOKey.getInstance(p8.getEncoded());
+            final ASN1ObjectIdentifier algOid = keyInfo.getPrivateKeyAlgorithm().getAlgorithm();
+
+            if (EBASNUtils.eb_aes.equals(algOid)) {
+                final EBJSONEncodedUOKey encKey = EBJSONEncodedUOKey.getInstance(keyInfo.parsePrivateKey());
+
+                return new EBSymmetricKey.Builder()
+                        .setEngine(engine)
+                        .setAsn(encKey)
+                        .build();
+
+            } else {
+                throw new InvalidKeySpecException("algorithm identifier " + algOid + " in key not recognised");
+            }
+        }catch (IOException io){
+            throw new InvalidKeySpecException("IOException when parsing key from PKCS8 encoded form", io);
+        }
+
     }
 
     @Override
