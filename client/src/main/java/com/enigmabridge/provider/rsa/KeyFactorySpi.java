@@ -6,7 +6,11 @@ import com.enigmabridge.create.EBCreateUOResponse;
 import com.enigmabridge.create.EBCreateUtils;
 import com.enigmabridge.create.misc.EBRSAPrivateCrtKey;
 import com.enigmabridge.create.misc.EBRSAPrivateCrtKeyWrapper;
+import com.enigmabridge.provider.EBSymmetricKey;
 import com.enigmabridge.provider.EnigmaProvider;
+import com.enigmabridge.provider.asn1.EBASNUtils;
+import com.enigmabridge.provider.asn1.EBEncodableUOKey;
+import com.enigmabridge.provider.asn1.EBJSONEncodedUOKey;
 import com.enigmabridge.provider.specs.EBKeyCreateSpec;
 import com.enigmabridge.provider.specs.EBRSAKeyCreateSpec;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
@@ -265,25 +269,7 @@ public class KeyFactorySpi
 
         if (keySpec instanceof PKCS8EncodedKeySpec)
         {
-            try
-            {
-                return generatePrivate(PrivateKeyInfo.getInstance(((PKCS8EncodedKeySpec)keySpec).getEncoded()), publicExponent);
-            }
-            catch (Exception e)
-            {
-                //
-                // in case it's just a RSAPrivateKey object... -- openSSL produces these
-                //
-                try
-                {
-                    return engineGeneratePrivate(new EBRSAPrivateCrtKeyWrapper(
-                            RSAPrivateKey.getInstance(((PKCS8EncodedKeySpec)keySpec).getEncoded())));
-                }
-                catch (Exception ex)
-                {
-                    throw new ExtendedInvalidKeySpecException("unable to process key spec: " + e.toString(), e);
-                }
-            }
+            return engineGeneratePrivate((PKCS8EncodedKeySpec)keySpec, publicExponent);
         }
         else if (keySpec instanceof RSAPrivateCrtKeySpec)
         {
@@ -302,6 +288,56 @@ public class KeyFactorySpi
         }
 
         throw new InvalidKeySpecException("Unknown KeySpec type: " + keySpec.getClass().getName());
+    }
+
+    protected PrivateKey engineGeneratePrivate(PKCS8EncodedKeySpec p8, BigInteger publicExponent) throws InvalidKeySpecException {
+        try {
+            final EBEncodableUOKey keyInfo = EBEncodableUOKey.getInstance(p8.getEncoded());
+            final ASN1ObjectIdentifier algOid = keyInfo.getPrivateKeyAlgorithm().getAlgorithm();
+
+            // Try EB wrapped
+            try {
+                if (EBASNUtils.eb_rsa_priv.equals(algOid)) {
+                    final EBJSONEncodedUOKey encKey = EBJSONEncodedUOKey.getInstance(keyInfo.parsePrivateKey());
+
+                    return new EBRSAPrivateKey.Builder()
+                            .setEngine(engine)
+                            .setAsn(encKey)
+                            .build();
+
+                } else if (EBASNUtils.eb_rsa_pub.equals(algOid)){
+                    throw new InvalidKeySpecException("public key serialization is not supported");
+
+                }
+
+            } catch (IOException io2){
+                throw new InvalidKeySpecException("IOException when parsing key from PKCS8 encoded form", io2);
+            }
+
+            // Try classical one.
+            try
+            {
+                return generatePrivate(PrivateKeyInfo.getInstance(p8.getEncoded()), publicExponent);
+            }
+            catch (Exception e)
+            {
+                //
+                // in case it's just a RSAPrivateKey object... -- openSSL produces these
+                //
+                try
+                {
+                    return engineGeneratePrivate(new EBRSAPrivateCrtKeyWrapper(
+                            RSAPrivateKey.getInstance(p8.getEncoded())));
+                }
+                catch (Exception ex)
+                {
+                    throw new ExtendedInvalidKeySpecException("unable to process key spec: " + e.toString(), e);
+                }
+            }
+
+        }catch (Exception io){
+            throw new InvalidKeySpecException("IOException when parsing key from PKCS8 encoded form", io);
+        }
     }
 
     protected PublicKey engineGeneratePublic(
