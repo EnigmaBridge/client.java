@@ -122,7 +122,7 @@ public class EBSymmetricKey extends EBKeyBase implements EBJSONSerializable, Sec
             inversionKey = new EBSymmetricKey();
             inversionKey.fromJSON(json.getJSONObject(FIELD_INVERSION_KEY), false);
             inversionKey.setInversionKey(this);
-            inversionKey.setEbEngine(getEBEngine());
+            inversionKey.setEbEngine(getEBEngine(), false);
         }
     }
 
@@ -177,9 +177,13 @@ public class EBSymmetricKey extends EBKeyBase implements EBJSONSerializable, Sec
 
     @Override
     protected void setEbEngine(EBEngine ebEngine) {
+        setEbEngine(ebEngine, true);
+    }
+
+    protected void setEbEngine(EBEngine ebEngine, boolean setToInversion) {
         super.setEbEngine(ebEngine);
-        if (this.inversionKey != null){
-            this.inversionKey.setEbEngine(ebEngine);
+        if (setToInversion && this.inversionKey != null){
+            this.inversionKey.setEbEngine(ebEngine, false);
         }
     }
 }
