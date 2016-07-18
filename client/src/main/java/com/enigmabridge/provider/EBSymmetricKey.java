@@ -120,6 +120,7 @@ public class EBSymmetricKey extends EBKeyBase implements EBJSONSerializable, Sec
         if (includeInversion && json.has(FIELD_INVERSION_KEY)){
             inversionKey = new EBSymmetricKey();
             inversionKey.fromJSON(json.getJSONObject(FIELD_INVERSION_KEY), false);
+            inversionKey.setInversionKey(this);
         }
     }
 
