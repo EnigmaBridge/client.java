@@ -92,7 +92,7 @@ public class EBCreateManyIT {
                 public void run() {
                     while(createdUOCalls.incrementAndGet() < objectsToCreate){
                         createObject();
-                        if ((createdUOCalls.intValue() % 100) == 0){
+                        if ((createdUOCalls.intValue() % 10) == 0){
                             LOG.debug(String.format("Created %d, success %d, handle: %s",
                                     createdUOCalls.intValue(), createdUOSuccess.intValue(), lastHandle));
                         }
