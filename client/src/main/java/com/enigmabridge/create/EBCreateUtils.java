@@ -2,7 +2,6 @@ package com.enigmabridge.create;
 
 import com.enigmabridge.EBInvalidException;
 import com.enigmabridge.comm.EBCommUtils;
-import com.enigmabridge.comm.EBCorruptedException;
 import com.enigmabridge.create.misc.EBRSAPrivateCrtKey;
 import com.enigmabridge.create.misc.EBRSAPrivateCrtKeyWrapper;
 
@@ -137,10 +136,6 @@ public class EBCreateUtils {
             byte spareBytes)
     {
         short tempOffset = baseOffset;
-
-        // Length of overall key section
-        short keyLengthOffset = tempOffset;
-        tempOffset += EBCommUtils.UO_KEY_SIZE_LENGTH;   // make space for total length value, set later
 
         // Separate parts of key
         short keyBaseOffset = tempOffset;
