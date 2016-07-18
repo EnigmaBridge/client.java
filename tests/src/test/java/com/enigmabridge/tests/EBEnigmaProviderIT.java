@@ -8,8 +8,10 @@ import com.enigmabridge.create.Constants;
 import com.enigmabridge.create.EBUOGetTemplateRequest;
 import com.enigmabridge.misc.EBTestingUtils;
 import com.enigmabridge.provider.EnigmaProvider;
-import com.enigmabridge.provider.specs.*;
-import org.bouncycastle.asn1.pkcs.RSAPrivateKey;
+import com.enigmabridge.provider.specs.EBRSAKeyGenParameterSpec;
+import com.enigmabridge.provider.specs.EBSecretKeySpec;
+import com.enigmabridge.provider.specs.EBSymmetricKeyGenParameterSpec;
+import com.enigmabridge.provider.specs.EBSymmetricKeyGenTypes;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,9 +20,13 @@ import org.testng.annotations.*;
 import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.security.*;
+import java.security.cert.*;
+import java.security.cert.Certificate;
 import java.security.spec.RSAPrivateCrtKeySpec;
-import java.security.spec.RSAPrivateKeySpec;
+import java.security.spec.RSAPublicKeySpec;
 
 import static org.testng.Assert.assertEquals;
 
@@ -306,5 +312,53 @@ public class EBEnigmaProviderIT {
 
         // Test
         assertEquals(decrypted, testInput, "AESdecrypt(AESencrypt(x)) != x");
+    }
+
+    @Test(groups = {"integration"}) //, timeOut = 100000
+    public void testAESKeyStore() throws Exception {
+        final SecureRandom rand = new SecureRandom();
+
+        // Create AES keys, for encryption & decryption.
+        final EBUOGetTemplateRequest tplReq = new EBUOGetTemplateRequest();
+        tplReq.setEnvironment(Constants.ENV_DEV);
+
+        final SecretKeyFactory kFact = SecretKeyFactory.getInstance("AES", "EB");
+
+        final byte[] aesKey = new byte[16];
+        rand.nextBytes(aesKey);
+
+        final EBSecretKeySpec spec = new EBSecretKeySpec(aesKey, "AES", engine);
+        spec.setKeyType(EBSymmetricKeyGenTypes.BOTH);
+        spec.setTplReq(tplReq);
+
+        // Method accepts SecretKeySpec (simple one) or EBSecretKeySpec
+        final SecretKey key = kFact.generateSecret(spec);
+
+        // Bouncy castle secret
+        final SecretKeySpec bcKey = new SecretKeySpec(aesKey, "AES");
+
+        // Test factory.
+        testAESFactoryKeys(key, bcKey);
+
+        // Serialize to keyStore.
+        final KeyStore ks = KeyStore.getInstance("BKS", "EB");
+        final String ksAlias = "aes";
+        final String ksPassword = "changeit";
+
+        ks.load(null, ksPassword.toCharArray());
+        ks.setKeyEntry(ksAlias, key, ksPassword.toCharArray(), new Certificate[]{});
+
+        final ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        ks.store(bos, ksPassword.toCharArray());
+        bos.close();
+        final byte[] ksBytes = bos.toByteArray();
+
+        // Open keystore again.
+        final KeyStore ks2 = KeyStore.getInstance("BKS", "EB");
+        ks2.load(new ByteArrayInputStream(ksBytes), ksPassword.toCharArray());
+        final Key aesKeyNew = ks2.getKey(ksAlias, ksPassword.toCharArray());
+
+        // Test factory.
+        testAESFactoryKeys(aesKeyNew, bcKey);
     }
 }
