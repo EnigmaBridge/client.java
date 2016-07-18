@@ -282,6 +282,9 @@ public class UserObjectKeyCreator {
         final EBCreateUOSimpleCall createCall = callBld.build();
         try {
             final EBCreateUOResponse response = createCall.create();
+            if (!response.isCodeOk()){
+                throw new EBEngineException("Could not create UO - response: " + response.toString());
+            }
 
             // Create UOKey
             final UserObjectKeyBase.Builder keyBld = new UserObjectKeyBase.Builder()
