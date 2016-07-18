@@ -1,5 +1,11 @@
 package com.enigmabridge.provider.rsa;
 
+import com.enigmabridge.provider.asn1.EBASNUtils;
+import com.enigmabridge.provider.asn1.EBJSONEncodedUOKey;
+import org.bouncycastle.asn1.ASN1Sequence;
+import org.json.JSONObject;
+
+import java.io.IOException;
 import java.security.interfaces.RSAPublicKey;
 
 /**
@@ -29,5 +35,37 @@ public class EBRSAPublicKey extends EBRSAKey implements RSAPublicKey {
         public EBRSAPublicKey build() {
             return parent;
         }
+    }
+
+    public static EBRSAPublicKey getInstance(
+            Object obj) throws IOException
+    {
+        if (obj instanceof EBRSAPublicKey)
+        {
+            return (EBRSAPublicKey)obj;
+        }
+
+        if (obj != null)
+        {
+            return new EBRSAPublicKey(EBJSONEncodedUOKey.getInstance(ASN1Sequence.getInstance(obj)));
+        }
+
+        return null;
+    }
+
+    public EBRSAPublicKey() {
+    }
+
+    public EBRSAPublicKey(JSONObject json) throws IOException {
+        super(json);
+    }
+
+    public EBRSAPublicKey(EBJSONEncodedUOKey key) throws IOException {
+        super(key);
+    }
+
+    @Override
+    public byte[] getEncoded() {
+        return super.getEncoded(EBASNUtils.eb_rsa_pub);
     }
 }

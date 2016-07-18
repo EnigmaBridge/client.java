@@ -2,15 +2,22 @@ package com.enigmabridge.provider;
 
 import com.enigmabridge.*;
 import com.enigmabridge.comm.EBConnectionSettings;
+import com.enigmabridge.provider.asn1.EBJSONEncodedUOKey;
+import com.enigmabridge.provider.asn1.EBASNUtils;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.DERNull;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 
 /**
  * Base class for all EB keys.
  * Created by dusanklinec on 26.04.16.
  */
-public abstract class EBKeyBase implements EBUOKey {
+public abstract class EBKeyBase implements EBUOKey, EBJSONSerializable {
     public static final String FORMAT_RAW = "RAW";
     public static final String FORMAT_X509 = "X.509";
     public static final String FORMAT_PKCS8 = "PKCS#8";
@@ -23,6 +30,8 @@ public abstract class EBKeyBase implements EBUOKey {
     protected boolean tokenObject = true;
     protected boolean sensitive = true;
     protected boolean extractable = false;
+
+    private static final String FIELD_UO = "uo";
 
     public static abstract class AbstractBuilder<T extends EBKeyBase, B extends AbstractBuilder> {
         public B setUo(UserObjectKeyBase uo) {
@@ -40,9 +49,60 @@ public abstract class EBKeyBase implements EBUOKey {
             return getThisBuilder();
         }
 
+        public B setJson(JSONObject json) throws IOException {
+            getObj().fromJSON(json);
+            return getThisBuilder();
+        }
+
+        public B setAsn(EBJSONEncodedUOKey encoded) throws IOException {
+            getObj().fromJSON(encoded.getJsonObject());
+            return getThisBuilder();
+        }
+
         public abstract T build();
         public abstract B getThisBuilder();
         public abstract T getObj();
+    }
+
+    public EBKeyBase() {
+    }
+
+    public EBKeyBase(JSONObject json) throws IOException {
+        fromJSON(json);
+    }
+
+    public EBKeyBase(EBJSONEncodedUOKey key) throws IOException {
+        fromJSON(key.getJsonObject());
+    }
+
+    /**
+     * Initializes object form the JSON.
+     * @param json
+     * @throws MalformedURLException
+     */
+    protected void fromJSON(JSONObject json) throws IOException {
+        if (json == null
+                || !json.has(FIELD_UO))
+        {
+            throw new IllegalArgumentException("Invalid JSON format");
+        }
+
+        UserObjectKeyBase.build(json.getJSONObject(FIELD_UO));
+    }
+
+    /**
+     * Serializes to JSON.
+     * @param json
+     * @return
+     */
+    @Override
+    public JSONObject toJSON(JSONObject json) {
+        if (json == null){
+            json = new JSONObject();
+        }
+
+        json.put(FIELD_UO, uo.toJSON(null));
+        return json;
     }
 
     @Override
@@ -57,14 +117,18 @@ public abstract class EBKeyBase implements EBUOKey {
 
     @Override
     public String getFormat() {
-        // TODO:
-        return null;
+        return FORMAT_PKCS8;
     }
 
     @Override
     public byte[] getEncoded() {
-        // TODO:
-        return null;
+        return getEncoded(EBASNUtils.eb_uoKey);
+    }
+
+    public byte[] getEncoded(ASN1ObjectIdentifier algorithmId) {
+        return EBASNUtils.getEncodedUOKey(
+                new AlgorithmIdentifier(algorithmId, DERNull.INSTANCE),
+                new EBJSONEncodedUOKey(this));
     }
 
     @Override
