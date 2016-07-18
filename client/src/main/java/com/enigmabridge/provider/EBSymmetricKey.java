@@ -1,5 +1,6 @@
 package com.enigmabridge.provider;
 
+import com.enigmabridge.EBEngine;
 import com.enigmabridge.EBJSONSerializable;
 import com.enigmabridge.UserObjectKeyBase;
 import com.enigmabridge.UserObjectType;
@@ -121,6 +122,7 @@ public class EBSymmetricKey extends EBKeyBase implements EBJSONSerializable, Sec
             inversionKey = new EBSymmetricKey();
             inversionKey.fromJSON(json.getJSONObject(FIELD_INVERSION_KEY), false);
             inversionKey.setInversionKey(this);
+            inversionKey.setEbEngine(getEBEngine());
         }
     }
 
@@ -171,5 +173,13 @@ public class EBSymmetricKey extends EBKeyBase implements EBJSONSerializable, Sec
     protected EBSymmetricKey setInversionKey(EBSymmetricKey inversionKey) {
         this.inversionKey = inversionKey;
         return this;
+    }
+
+    @Override
+    protected void setEbEngine(EBEngine ebEngine) {
+        super.setEbEngine(ebEngine);
+        if (this.inversionKey != null){
+            this.inversionKey.setEbEngine(ebEngine);
+        }
     }
 }
