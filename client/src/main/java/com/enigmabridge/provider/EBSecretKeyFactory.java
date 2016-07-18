@@ -16,6 +16,7 @@ import org.bouncycastle.asn1.pkcs.RSAPrivateKey;
 import org.bouncycastle.jcajce.provider.asymmetric.rsa.BCRSAPrivateCrtKey;
 import org.bouncycastle.jcajce.provider.asymmetric.rsa.BCRSAPrivateKey;
 import org.bouncycastle.jcajce.provider.asymmetric.rsa.RSAUtil;
+import org.json.JSONObject;
 
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactorySpi;
@@ -75,8 +76,22 @@ public class EBSecretKeyFactory extends SecretKeyFactorySpi {
             return fromPkcs8Encoded(p8);
 
         } else if (keySpec instanceof EBJSONEncodedUOKeySpec){
-            // TODO: implement.
-            throw new UnsupportedOperationException("Not implemented yet");
+            final JSONObject json = ((EBJSONEncodedUOKeySpec) keySpec).getJson();
+            try {
+                final EBSymmetricKey tmpKey = new EBSymmetricKey.Builder()
+                        .setEngine(engine)
+                        .setJson(json)
+                        .build();
+
+                if (tmpKey.getKeyType() != UserObjectKeyType.SECRET){
+                    throw new InvalidKeySpecException("Key type is invalid: " + tmpKey.getKeyType());
+                }
+
+                return tmpKey;
+
+            } catch (IOException e) {
+                throw new InvalidKeySpecException("Key could not be parsed", e);
+            }
 
         } else if (keySpec instanceof EBConfigurationUOKeySpec){
             // TODO: implement.

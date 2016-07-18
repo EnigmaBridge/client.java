@@ -11,6 +11,7 @@ import com.enigmabridge.provider.EnigmaProvider;
 import com.enigmabridge.provider.asn1.EBASNUtils;
 import com.enigmabridge.provider.asn1.EBEncodableUOKey;
 import com.enigmabridge.provider.asn1.EBJSONEncodedUOKey;
+import com.enigmabridge.provider.specs.EBJSONEncodedUOKeySpec;
 import com.enigmabridge.provider.specs.EBKeyCreateSpec;
 import com.enigmabridge.provider.specs.EBRSAKeyCreateSpec;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
@@ -19,6 +20,7 @@ import org.bouncycastle.asn1.pkcs.RSAPrivateKey;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.jcajce.provider.asymmetric.util.BaseKeyFactorySpi;
 import org.bouncycastle.jcajce.provider.asymmetric.util.ExtendedInvalidKeySpecException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -270,6 +272,25 @@ public class KeyFactorySpi
         if (keySpec instanceof PKCS8EncodedKeySpec)
         {
             return engineGeneratePrivate((PKCS8EncodedKeySpec)keySpec, publicExponent);
+        }
+        else if (keySpec instanceof EBJSONEncodedUOKeySpec)
+        {
+            final JSONObject json = ((EBJSONEncodedUOKeySpec) keySpec).getJson();
+            try {
+                final EBRSAPrivateKey tmpKey = new EBRSAPrivateKey.Builder()
+                        .setEngine(engine)
+                        .setJson(json)
+                        .build();
+
+                if (tmpKey.getKeyType() != UserObjectKeyType.PRIVATE) {
+                    throw new InvalidKeySpecException("Key type is invalid: " + tmpKey.getKeyType());
+                }
+
+                return tmpKey;
+
+            } catch (IOException e) {
+                throw new InvalidKeySpecException("Key could not be parsed", e);
+            }
         }
         else if (keySpec instanceof RSAPrivateCrtKeySpec)
         {
