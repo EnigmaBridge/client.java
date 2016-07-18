@@ -308,8 +308,17 @@ public class KeyFactorySpi
             KeySpec keySpec)
             throws InvalidKeySpecException
     {
-        // Public key import not yet supported.
-        return super.engineGeneratePublic(keySpec);
+        // Build public key using BC.
+        try {
+            final KeyFactory kf = KeyFactory.getInstance("RSA", "BC");
+            return kf.generatePublic(keySpec);
+
+        } catch (NoSuchAlgorithmException e) {
+            return super.engineGeneratePublic(keySpec);
+
+        } catch (NoSuchProviderException e) {
+            return super.engineGeneratePublic(keySpec);
+        }
     }
 
     public PrivateKey generatePrivate(PrivateKeyInfo keyInfo)
