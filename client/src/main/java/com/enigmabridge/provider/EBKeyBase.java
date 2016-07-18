@@ -87,7 +87,9 @@ public abstract class EBKeyBase implements EBUOKey, EBJSONSerializable {
             throw new IllegalArgumentException("Invalid JSON format");
         }
 
-        UserObjectKeyBase.build(json.getJSONObject(FIELD_UO));
+        uo = new UserObjectKeyBase.Builder()
+                .setJson(json.getJSONObject(FIELD_UO))
+                .build();
     }
 
     /**

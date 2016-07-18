@@ -54,6 +54,11 @@ public class UserObjectKeyBase extends UserObjectInfoBase implements UserObjectK
             return getThisBuilder();
         }
 
+        public B setJson(JSONObject json) throws MalformedURLException {
+            getObj().fromJSON(json);
+            return getThisBuilder();
+        }
+
         public abstract T build();
         public abstract B getThisBuilder();
         public abstract T getObj();
