@@ -1,13 +1,16 @@
 package com.enigmabridge.misc;
 
 import com.enigmabridge.EBUtils;
+import org.bouncycastle.jce.X509Principal;
+import org.bouncycastle.x509.X509V3CertificateGenerator;
 
 import java.math.BigInteger;
-import java.security.KeyFactory;
-import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
+import java.security.*;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPublicKeySpec;
+import java.util.Date;
 
 /**
  * Misc utilities & constants for testing.
@@ -51,5 +54,18 @@ public class EBTestingUtils {
         final BigInteger exp = BigInteger.valueOf(EBTestingUtils.RSA2k_PUB_EXP);
         final BigInteger mod = new BigInteger(EBUtils.hex2byte(EBTestingUtils.RSA2k_MODULUS));
         return createRSAPublicKey(mod, exp);
+    }
+
+    public static X509Certificate generateCertificate(KeyPair keyPair) throws NoSuchAlgorithmException, CertificateEncodingException, NoSuchProviderException, InvalidKeyException, SignatureException {
+        X509V3CertificateGenerator cert = new X509V3CertificateGenerator();
+        cert.setSerialNumber(BigInteger.valueOf(1));   //or generate a random number
+        cert.setSubjectDN(new X509Principal("CN=localhost"));  //see examples to add O,OU etc
+        cert.setIssuerDN(new X509Principal("CN=localhost")); //same since it is self-signed
+        cert.setPublicKey(keyPair.getPublic());
+        cert.setNotBefore(new Date());
+        cert.setNotAfter(new Date(System.currentTimeMillis() + 1000L*60L*60L*24L*365L*30L));
+        cert.setSignatureAlgorithm("SHA1WithRSAEncryption");
+        PrivateKey signingKey = keyPair.getPrivate();
+        return cert.generate(signingKey, "BC");
     }
 }

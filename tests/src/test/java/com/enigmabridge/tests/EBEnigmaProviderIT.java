@@ -150,6 +150,50 @@ public class EBEnigmaProviderIT {
         testRSAKeys(keyPair.getPublic(), ebPrivate);
     }
 
+    @Test(groups = {"integration"}) //, timeOut = 100000
+    public void testRSAKeyStore() throws Exception {
+        final EBUOGetTemplateRequest tplReq = new EBUOGetTemplateRequest();
+        tplReq.setEnvironment(Constants.ENV_DEV);
+
+        // At first, generate local RSA keys.
+        final KeyPairGenerator kpGen = KeyPairGenerator.getInstance("RSA", "BC");
+        kpGen.initialize(2048);
+        final KeyPair keyPair = kpGen.generateKeyPair();
+
+        // Use EB factory to import existing RSA key to EB.
+        final KeyFactory kFact = KeyFactory.getInstance("RSA", "EB");
+        final PrivateKey ebPrivate = (PrivateKey) kFact.translateKey(keyPair.getPrivate());
+
+        // Serialize to keyStore.
+        final KeyStore ks = KeyStore.getInstance("BKS", "EB");
+        final String ksAlias = "rsa";
+        final String ksPassword = "changeit";
+
+        // We need self signed certificate for KS store for PrivateKey.
+        final X509Certificate x509Certificate = EBTestingUtils.generateCertificate(keyPair);
+
+        ks.load(null, ksPassword.toCharArray());
+        ks.setKeyEntry(ksAlias, ebPrivate, ksPassword.toCharArray(), new Certificate[]{x509Certificate});
+
+        final ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        ks.store(bos, ksPassword.toCharArray());
+        bos.close();
+        final byte[] ksBytes = bos.toByteArray();
+
+        // Open keystore again.
+        final KeyStore ks2 = KeyStore.getInstance("BKS", "EB");
+        ks2.load(new ByteArrayInputStream(ksBytes), ksPassword.toCharArray());
+        final Key ebPrivateNew = ks2.getKey(ksAlias, ksPassword.toCharArray());
+
+        // Get public part from the private
+        final RSAPublicKeySpec pubKeySpec = kFact.getKeySpec(ebPrivateNew, RSAPublicKeySpec.class);
+        final PublicKey ebNewPubKey = kFact.generatePublic(pubKeySpec);
+
+        testRSAKeys(keyPair.getPublic(), (PrivateKey) ebPrivateNew);
+        testRSAKeys(ebNewPubKey, (PrivateKey) ebPrivateNew);
+        testRSAKeys(ebNewPubKey, keyPair.getPrivate());
+    }
+
     protected void testRSAKeys(PublicKey pub, PrivateKey priv) throws InvalidKeyException, NoSuchPaddingException, NoSuchAlgorithmException, BadPaddingException, IllegalBlockSizeException {
         // Generate random input to encrypt.
         final SecureRandom rand = new SecureRandom();
