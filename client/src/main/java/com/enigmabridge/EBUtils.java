@@ -176,4 +176,35 @@ public class EBUtils {
 
         return toret;
     }
+
+    public static JSONObject mergeInto(JSONObject src, JSONObject dst){
+        if (src == null){
+            throw new NullPointerException("Source cannot be null");
+        } else if (dst == null){
+            return src;
+        }
+
+        for(String key : JSONObject.getNames(dst)) {
+            src.put(key, dst.get(key));
+        }
+
+        return src;
+    }
+
+    public static JSONObject mergeObjects(JSONObject a, JSONObject b){
+        if (a == null && b != null){
+            return b;
+        } else if (a != null && b == null){
+            return a;
+        } else if (a == null && b == null){
+            return null;
+        }
+
+        final JSONObject merged = new JSONObject(a, JSONObject.getNames(a));
+        for(String key : JSONObject.getNames(b)) {
+            merged.put(key, b.get(key));
+        }
+
+        return merged;
+    }
 }
