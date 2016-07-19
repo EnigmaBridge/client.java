@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.concurrent.TimeUnit;
 
@@ -27,7 +28,7 @@ public class EBConnector {
     /**
      * Default trust object, with letsencrypt certificates included
      */
-    public static final EBAdditionalTrust DEFAULT_TRUST = new EBAdditionalTrust(true, true, null);
+    public static final EBAdditionalTrust DEFAULT_TRUST = new EBAdditionalTrust(true, true, (InputStream) null);
 
     /**
      * Request settings.
