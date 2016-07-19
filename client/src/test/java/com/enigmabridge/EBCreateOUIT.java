@@ -78,6 +78,22 @@ public class EBCreateOUIT {
     }
 
     @Test(groups = {"integration"}) //, timeOut = 100000
+    public void testStringConfig() throws Exception{
+        // Create text config from the current engine.
+        final EBStringConfig config = new EBStringConfig.Builder()
+                .setFromEngineIfNotSet(engine)
+                .build();
+
+        final String lineConfig = config.toString();
+        LOG.debug("Config:  " + lineConfig);
+
+        // Deserialize back.
+        final EBStringConfig config2 = new EBStringConfig.Builder().setStringConfig(lineConfig).build();
+        final String lineConfig2 = config2.toString();
+        LOG.debug("Config2: " + lineConfig);
+    }
+
+    @Test(groups = {"integration"}) //, timeOut = 100000
     public void testAES() throws Exception {
         final SecureRandom rand = new SecureRandom();
         final byte[] appKey = new byte[16];
