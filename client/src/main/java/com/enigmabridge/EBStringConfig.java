@@ -213,6 +213,14 @@ public class EBStringConfig implements EBSettings {
         return sb.toString();
     }
 
+    public JSONObject getJsonRoot() {
+        return new JSONObject(jsonRoot);
+    }
+
+    public JSONObject getElement(String field){
+        return jsonRoot.has(field) ? jsonRoot.getJSONObject(field) : null;
+    }
+
     public static JSONObject deserializeData(String queryString) throws UnsupportedEncodingException {
         if (queryString.startsWith("?")){
             queryString = queryString.substring(1);
