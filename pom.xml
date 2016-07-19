@@ -28,7 +28,7 @@
         <profile>
             <id>client</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <!--<activeByDefault>true</activeByDefault>-->
             </activation>
             <modules>
                 <module>client</module>
