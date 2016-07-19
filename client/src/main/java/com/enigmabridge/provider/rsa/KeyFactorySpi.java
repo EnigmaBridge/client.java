@@ -74,6 +74,12 @@ public class KeyFactorySpi
 
             return new RSAPublicKeySpec(k.getModulus(), k.getPublicExponent());
         }
+        else if (spec.isAssignableFrom(EBJSONEncodedUOKeySpec.class) && key instanceof EBRSAKey)
+        {
+            final EBRSAKey k = (EBRSAKey) key;
+
+            return new EBJSONEncodedUOKeySpec(k.toJSON(null));
+        }
         else if (spec.isAssignableFrom(RSAPublicKeySpec.class) && key instanceof RSAPublicKey)
         {
             RSAPublicKey k = (RSAPublicKey)key;

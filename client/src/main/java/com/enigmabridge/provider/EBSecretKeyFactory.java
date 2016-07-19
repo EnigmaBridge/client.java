@@ -167,6 +167,18 @@ public class EBSecretKeyFactory extends SecretKeyFactorySpi {
 
     @Override
     protected KeySpec engineGetKeySpec(SecretKey secretKey, Class aClass) throws InvalidKeySpecException {
+        // JSON export of the object.
+        if (secretKey instanceof EBSymmetricKey){
+            final EBSymmetricKey ebKey = (EBSymmetricKey) secretKey;
+
+            if(EBJSONEncodedUOKeySpec.class.isAssignableFrom(aClass)){
+                return new EBJSONEncodedUOKeySpec(ebKey.toJSON(null, true));
+
+            } else {
+                throw new UnsupportedOperationException("EB provider does not allow to extract keys");
+            }
+        }
+
         throw new UnsupportedOperationException("EB provider does not allow to extract keys");
     }
 
