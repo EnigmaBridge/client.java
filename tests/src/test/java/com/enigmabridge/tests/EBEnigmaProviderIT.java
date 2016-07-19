@@ -8,10 +8,7 @@ import com.enigmabridge.create.Constants;
 import com.enigmabridge.create.EBUOGetTemplateRequest;
 import com.enigmabridge.misc.EBTestingUtils;
 import com.enigmabridge.provider.EnigmaProvider;
-import com.enigmabridge.provider.specs.EBRSAKeyGenParameterSpec;
-import com.enigmabridge.provider.specs.EBSecretKeySpec;
-import com.enigmabridge.provider.specs.EBSymmetricKeyGenParameterSpec;
-import com.enigmabridge.provider.specs.EBSymmetricKeyGenTypes;
+import com.enigmabridge.provider.specs.*;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +22,7 @@ import java.io.ByteArrayOutputStream;
 import java.security.*;
 import java.security.cert.*;
 import java.security.cert.Certificate;
+import java.security.spec.KeySpec;
 import java.security.spec.RSAPrivateCrtKeySpec;
 import java.security.spec.RSAPublicKeySpec;
 
@@ -33,6 +31,7 @@ import static org.testng.Assert.assertEquals;
 /**
  * Basic tests of Enigma Bridge crypto provider.
  * Created by dusanklinec on 04.05.16.
+ * TODO: implement serialized from JSON factory.
  */
 public class EBEnigmaProviderIT {
     private static final Logger LOG = LoggerFactory.getLogger(EBEnigmaProviderIT.class);
@@ -130,6 +129,13 @@ public class EBEnigmaProviderIT {
 
         // test
         testRSAKeys(keyPair.getPublic(), ebPrivate);
+
+        // Get key spec - JSON encoded
+        final EBJSONEncodedUOKeySpec jsonSpec = kFact.getKeySpec(ebPrivate, EBJSONEncodedUOKeySpec.class);
+
+        // And back
+        final PrivateKey keyFromJson = kFact.generatePrivate(jsonSpec);
+        testRSAKeys(keyPair.getPublic(), keyFromJson);
     }
 
     @Test(groups = {"integration"}) //, timeOut = 100000
@@ -299,6 +305,13 @@ public class EBEnigmaProviderIT {
 
         // Test factory.
         testAESFactoryKeys(key, bcKey);
+
+        // Get key spec - JSON encoded
+        final EBJSONEncodedUOKeySpec jsonSpec = (EBJSONEncodedUOKeySpec) kFact.getKeySpec(key, EBJSONEncodedUOKeySpec.class);
+
+        // And back
+        final SecretKey keyFromJson = kFact.generateSecret(jsonSpec);
+        testAESFactoryKeys(keyFromJson, bcKey);
     }
 
     /**
