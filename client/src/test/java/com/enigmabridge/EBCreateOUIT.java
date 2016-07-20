@@ -3,7 +3,6 @@ package com.enigmabridge;
 import com.enigmabridge.comm.EBConnectionSettings;
 import com.enigmabridge.create.*;
 import com.enigmabridge.misc.EBTestingUtils;
-import com.enigmabridge.provider.EnigmaProvider;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,7 +79,7 @@ public class EBCreateOUIT {
     @Test(groups = {"integration"}) //, timeOut = 100000
     public void testStringConfig() throws Exception{
         // Create text config from the current engine.
-        final EBStringConfig config = new EBStringConfig.Builder()
+        final EBURLConfig config = new EBURLConfig.Builder()
                 .setFromEngineIfNotSet(engine)
                 .build();
 
@@ -88,7 +87,7 @@ public class EBCreateOUIT {
         LOG.debug("Config:  " + lineConfig);
 
         // Deserialize back.
-        final EBStringConfig config2 = new EBStringConfig.Builder().setStringConfig(lineConfig).build();
+        final EBURLConfig config2 = new EBURLConfig.Builder().setURLConfig(lineConfig).build();
         final String lineConfig2 = config2.toString();
         LOG.debug("Config2: " + lineConfig);
     }

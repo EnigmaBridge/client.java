@@ -77,7 +77,7 @@ public class EBEngine {
     }
 
     public String configureToURL() throws MalformedURLException {
-        return new EBStringConfig.Builder()
+        return new EBURLConfig.Builder()
                 .setFromSettings(getDefaultSettings())
                 .build()
                 .toString();
@@ -94,8 +94,8 @@ public class EBEngine {
     }
 
     public void configureFromURL(String url) throws MalformedURLException, UnsupportedEncodingException {
-        this.defaultSettings = new EBStringConfig.Builder()
-                .setStringConfig(url)
+        this.defaultSettings = new EBURLConfig.Builder()
+                .setURLConfig(url)
                 .build();
     }
 }

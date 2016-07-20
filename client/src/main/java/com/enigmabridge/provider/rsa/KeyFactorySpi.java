@@ -2,11 +2,8 @@ package com.enigmabridge.provider.rsa;
 
 import com.enigmabridge.*;
 import com.enigmabridge.create.Constants;
-import com.enigmabridge.create.EBCreateUOResponse;
-import com.enigmabridge.create.EBCreateUtils;
 import com.enigmabridge.create.misc.EBRSAPrivateCrtKey;
 import com.enigmabridge.create.misc.EBRSAPrivateCrtKeyWrapper;
-import com.enigmabridge.provider.EBSymmetricKey;
 import com.enigmabridge.provider.EnigmaProvider;
 import com.enigmabridge.provider.asn1.EBASNUtils;
 import com.enigmabridge.provider.asn1.EBEncodableUOKey;
@@ -88,7 +85,7 @@ public class KeyFactorySpi
         {
             final EBRSAKey k = (EBRSAKey) key;
             try {
-                return new EBConfigurationUOKeySpec(new EBStringConfig.Builder()
+                return new EBConfigurationUOKeySpec(new EBURLConfig.Builder()
                         .setFromEngine(engine)
                         .addElement(k, k instanceof EBRSAPrivateKey ? FIELD_RSA_PRIVATE : FIELD_RSA_PUBLIC)
                         .build()
@@ -320,7 +317,7 @@ public class KeyFactorySpi
         {
             final String configLine = ((EBConfigurationUOKeySpec) keySpec).getConfigLine();
             try {
-                final EBStringConfig config = new EBStringConfig.Builder().setStringConfig(configLine).build();
+                final EBURLConfig config = new EBURLConfig.Builder().setURLConfig(configLine).build();
                 final JSONObject rsaJson = config.getElement(FIELD_RSA_PRIVATE);
 
                 final EBRSAPrivateKey tmpKey = new EBRSAPrivateKey.Builder()

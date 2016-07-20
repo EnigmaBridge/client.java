@@ -1,7 +1,6 @@
 package com.enigmabridge;
 
 import com.enigmabridge.comm.EBConnectionSettings;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -14,10 +13,11 @@ import java.util.*;
 
 /**
  * Represents one-string configuration of EB engine / UO.
+ * Example: https://site2.enigmabridge.com:11180/?apiKey=API_TEST
  *
  * Created by dusanklinec on 05.07.16.
  */
-public class EBStringConfig implements EBSettings {
+public class EBURLConfig implements EBSettings {
     private static final String FIELD_API_KEY = "apiKey";
     private static final String FIELD_SETTINGS = "settings";
 
@@ -42,10 +42,10 @@ public class EBStringConfig implements EBSettings {
      */
     protected final JSONObject jsonRoot = new JSONObject();
 
-    public EBStringConfig() throws MalformedURLException {
+    public EBURLConfig() throws MalformedURLException {
     }
 
-    public static abstract class AbstractBuilder<T extends EBStringConfig, B extends EBStringConfig.AbstractBuilder> {
+    public static abstract class AbstractBuilder<T extends EBURLConfig, B extends EBURLConfig.AbstractBuilder> {
         public B setApiKey(String apiKey) {
             getObj().setApiKey(apiKey);
             return getThisBuilder();
@@ -66,7 +66,7 @@ public class EBStringConfig implements EBSettings {
             return getThisBuilder();
         }
 
-        public B setStringConfig(String config) throws MalformedURLException, UnsupportedEncodingException {
+        public B setURLConfig(String config) throws MalformedURLException, UnsupportedEncodingException {
             getObj().fromUrl(config);
             return getThisBuilder();
         }
@@ -112,24 +112,24 @@ public class EBStringConfig implements EBSettings {
         public abstract T getObj();
     }
 
-    public static class Builder extends AbstractBuilder<EBStringConfig, EBStringConfig.Builder> {
-        private final EBStringConfig parent = new EBStringConfig();
+    public static class Builder extends AbstractBuilder<EBURLConfig, EBURLConfig.Builder> {
+        private final EBURLConfig parent = new EBURLConfig();
 
         public Builder() throws MalformedURLException {
         }
 
         @Override
-        public EBStringConfig.Builder getThisBuilder() {
+        public EBURLConfig.Builder getThisBuilder() {
             return this;
         }
 
         @Override
-        public EBStringConfig getObj() {
+        public EBURLConfig getObj() {
             return parent;
         }
 
         @Override
-        public EBStringConfig build() {
+        public EBURLConfig build() {
             return parent;
         }
     }

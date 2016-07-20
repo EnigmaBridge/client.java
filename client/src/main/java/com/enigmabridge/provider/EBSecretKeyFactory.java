@@ -93,7 +93,7 @@ public class EBSecretKeyFactory extends SecretKeyFactorySpi {
         } else if (keySpec instanceof EBConfigurationUOKeySpec){
             final String configLine = ((EBConfigurationUOKeySpec) keySpec).getConfigLine();
             try {
-                final EBStringConfig config = new EBStringConfig.Builder().setStringConfig(configLine).build();
+                final EBURLConfig config = new EBURLConfig.Builder().setURLConfig(configLine).build();
                 final JSONObject keyJson = config.getElement(FIELD_SYMMETRIC_KEY);
 
                 final EBSymmetricKey tmpKey = new EBSymmetricKey.Builder()
@@ -190,7 +190,7 @@ public class EBSecretKeyFactory extends SecretKeyFactorySpi {
 
             } else if(EBConfigurationUOKeySpec.class.isAssignableFrom(aClass)){
                 try {
-                    return new EBConfigurationUOKeySpec(new EBStringConfig.Builder()
+                    return new EBConfigurationUOKeySpec(new EBURLConfig.Builder()
                             .setFromEngine(engine)
                             .addElement(ebKey, FIELD_SYMMETRIC_KEY)
                             .build()
