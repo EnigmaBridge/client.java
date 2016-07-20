@@ -238,13 +238,16 @@ public class EnigmaProvider extends Provider implements ConfigurableProvider {
      * @return
      */
     public static Provider getEnigmaProvider() {
-        if (Security.getProvider("EB") != null)
+        if (Security.getProvider(PROVIDER_NAME) != null)
         {
-            return Security.getProvider("EB");
+            return Security.getProvider(PROVIDER_NAME);
         }
         else
         {
-            return new EnigmaProvider();
+            final EnigmaProvider enigmaProvider = new EnigmaProvider();
+            Security.addProvider(enigmaProvider);
+
+            return enigmaProvider;
         }
     }
 
