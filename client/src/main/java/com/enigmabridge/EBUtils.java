@@ -180,7 +180,7 @@ public class EBUtils {
     public static JSONObject mergeInto(JSONObject src, JSONObject dst){
         if (src == null){
             throw new NullPointerException("Source cannot be null");
-        } else if (dst == null){
+        } else if (dst == null || dst.length() == 0){
             return src;
         }
 

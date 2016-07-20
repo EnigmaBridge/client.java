@@ -321,11 +321,14 @@ public class EBStringConfig implements EBSettings {
         List<ConfigEntry> config = new LinkedList<ConfigEntry>();
         if (obj instanceof JSONObject){
             final JSONObject jObj = (JSONObject) obj;
+            final String[] names = JSONObject.getNames(jObj);
 
-            for(String ckey : JSONObject.getNames(jObj)) {
-                final Object o = jObj.get(ckey);
+            if (names != null && names.length != 0) {
+                for (String ckey : names) {
+                    final Object o = jObj.get(ckey);
 
-                config.addAll(serializeObject(o, ckey, nodeMakePath(key, parent)));
+                    config.addAll(serializeObject(o, ckey, nodeMakePath(key, parent)));
+                }
             }
 
         } else if (obj instanceof JSONArray) {

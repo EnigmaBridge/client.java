@@ -21,20 +21,24 @@ public class EBConnectionSettings implements Serializable, EBJSONSerializable {
     public static final String FIELD_HTTP_METHOD = "httpMethod";
     public static final String FIELD_TRUST = "trust";
 
+    public static final int DEFAULT_CONNECT_TIMEOUT_MILLI = 60000;
+    public static final int DEFAULT_READ_TIMEOUT_MILLI = 60000;
+    public static final int DEFAULT_WRITE_TIMEOUT_MILLI = 60000;
+
     /**
      * Timeout for connecting to the endpoint in milliseconds.
      */
-    protected int connectTimeoutMilli = 60000;
+    protected int connectTimeoutMilli = DEFAULT_CONNECT_TIMEOUT_MILLI;
 
     /**
      * Timeout for reading data from the endpoint.
      */
-    protected int readTimeoutMilli = 60000;
+    protected int readTimeoutMilli = DEFAULT_READ_TIMEOUT_MILLI;
 
     /**
      * Timeout for writing data to the endpoint.
      */
-    protected int writeTimeoutMilli = 60000;
+    protected int writeTimeoutMilli = DEFAULT_WRITE_TIMEOUT_MILLI;
 
     /**
      * Method used for the API call.
@@ -58,21 +62,21 @@ public class EBConnectionSettings implements Serializable, EBJSONSerializable {
             throw new IllegalArgumentException("Invalid JSON format");
         }
 
-        if (json.has(FIELD_CONNECT_TIMEOUT)){
-            connectTimeoutMilli = EBUtils.getAsInteger(json, FIELD_CONNECT_TIMEOUT, 10);
-        }
+        connectTimeoutMilli = json.has(FIELD_CONNECT_TIMEOUT) ?
+                EBUtils.getAsInteger(json, FIELD_CONNECT_TIMEOUT, 10) :
+                DEFAULT_CONNECT_TIMEOUT_MILLI;
 
-        if (json.has(FIELD_READ_TIMEOUT)){
-            readTimeoutMilli = EBUtils.getAsInteger(json, FIELD_READ_TIMEOUT, 10);
-        }
+        readTimeoutMilli = json.has(FIELD_READ_TIMEOUT) ?
+                EBUtils.getAsInteger(json, FIELD_READ_TIMEOUT, 10) :
+                DEFAULT_READ_TIMEOUT_MILLI;
 
-        if (json.has(FIELD_WRITE_TIMEOUT)){
-            writeTimeoutMilli = EBUtils.getAsInteger(json, FIELD_WRITE_TIMEOUT, 10);
-        }
+        writeTimeoutMilli = json.has(FIELD_WRITE_TIMEOUT) ?
+                EBUtils.getAsInteger(json, FIELD_WRITE_TIMEOUT, 10) :
+                DEFAULT_WRITE_TIMEOUT_MILLI;
 
-        if (json.has(FIELD_HTTP_METHOD)){
-            method = EBUtils.getAsStringOrNull(json, FIELD_HTTP_METHOD);
-        }
+        method = json.has(FIELD_HTTP_METHOD) ?
+                EBUtils.getAsStringOrNull(json, FIELD_HTTP_METHOD) :
+                EBCommUtils.METHOD_DEFAULT;
 
         if (json.has(FIELD_TRUST)){
             setTrust(new EBAdditionalTrust(json.getJSONObject(FIELD_TRUST)));
@@ -85,10 +89,21 @@ public class EBConnectionSettings implements Serializable, EBJSONSerializable {
             json = new JSONObject();
         }
 
-        json.put(FIELD_CONNECT_TIMEOUT, getConnectTimeoutMilli());
-        json.put(FIELD_READ_TIMEOUT, getReadTimeoutMilli());
-        json.put(FIELD_WRITE_TIMEOUT, getWriteTimeoutMilli());
-        json.put(FIELD_HTTP_METHOD, getMethod());
+        if (getConnectTimeoutMilli() != DEFAULT_CONNECT_TIMEOUT_MILLI){
+            json.put(FIELD_CONNECT_TIMEOUT, getConnectTimeoutMilli());
+        }
+
+        if (getReadTimeoutMilli() != DEFAULT_READ_TIMEOUT_MILLI){
+            json.put(FIELD_READ_TIMEOUT, getReadTimeoutMilli());
+        }
+
+        if (getWriteTimeoutMilli() != DEFAULT_WRITE_TIMEOUT_MILLI){
+            json.put(FIELD_WRITE_TIMEOUT, getWriteTimeoutMilli());
+        }
+
+        if (!EBCommUtils.METHOD_DEFAULT.equals(getMethod())){
+            json.put(FIELD_HTTP_METHOD, getMethod());
+        }
 
         if (getTrust() != null){
             json.put(FIELD_TRUST, getTrust().toJSON(null));
