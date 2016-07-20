@@ -299,7 +299,7 @@ public class UserObjectInfoBase implements UserObjectInfo, EBJSONSerializable {
         }
 
         final UserObjectType type = this.getUserObjectType();
-        json.put(FIELD_UOID, this.getUoid());
+        json.put(FIELD_UOID, Long.toHexString(this.getUoid()));
         if (type != null){
             type.toJSON(json, FIELD_UOTYPE);
         }

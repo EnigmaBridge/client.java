@@ -384,7 +384,7 @@ public class UserObjectType implements Serializable{
             return null;
         }
 
-        return valueOf(parent.getLong(key));
+        return valueOf(EBUtils.getAsLong(parent, key, 10));
     }
 
     @Override
