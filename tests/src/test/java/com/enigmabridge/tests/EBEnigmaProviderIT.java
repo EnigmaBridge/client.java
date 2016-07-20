@@ -320,6 +320,13 @@ public class EBEnigmaProviderIT {
         // And back
         final SecretKey keyFromJson = kFact.generateSecret(jsonSpec);
         testAESFactoryKeys(keyFromJson, bcKey);
+
+        // Config encoded
+        final EBConfigurationUOKeySpec urlSpec = (EBConfigurationUOKeySpec) kFact.getKeySpec(key, EBConfigurationUOKeySpec.class);
+
+        // Try to decode config line
+        final SecretKey keyFromUrl = kFact.generateSecret(urlSpec);
+        testAESFactoryKeys(keyFromUrl, bcKey);
     }
 
     /**
