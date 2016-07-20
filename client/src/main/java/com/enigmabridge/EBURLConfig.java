@@ -179,8 +179,17 @@ public class EBURLConfig implements EBSettings {
         EBUtils.mergeInto(this.jsonRoot, root);
     }
 
+    /**
+     * Serializes object under given key to the settings. Can be retrieved with getElement().
+     *
+     * @param ebjsonSerializable
+     * @param key, if contains dot, considered as path, descends.
+     */
     protected void addElement(EBJSONSerializable ebjsonSerializable, String key){
-        jsonRoot.put(key, ebjsonSerializable.toJSON(null));
+        final String[] path = key.split("\\.");
+        final String last = path[path.length];
+        final JSONObject parent = getParentNode(jsonRoot, path, true);
+        parent.put(last, ebjsonSerializable.toJSON(null));
     }
 
     /**
@@ -240,11 +249,14 @@ public class EBURLConfig implements EBSettings {
      * by the key. Elements are serialized using addElement(elem, key).
      * This call is for reversal process - deserialization.
      *
-     * @param field key to extract
+     * @param field key to extract. If contains dot, considered as path (package like).
      * @return
      */
     public JSONObject getElement(String field){
-        return jsonRoot.has(field) ? jsonRoot.getJSONObject(field) : null;
+        final String[] path = field.split("\\.");
+        final String last = path[path.length];
+        final JSONObject parent = getParentNode(jsonRoot, path, false);
+        return parent != null && parent.has(last) ? parent.getJSONObject(last) : null;
     }
 
     /**
