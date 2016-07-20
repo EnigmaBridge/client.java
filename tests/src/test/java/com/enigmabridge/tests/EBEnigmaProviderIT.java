@@ -136,6 +136,14 @@ public class EBEnigmaProviderIT {
         // And back
         final PrivateKey keyFromJson = kFact.generatePrivate(jsonSpec);
         testRSAKeys(keyPair.getPublic(), keyFromJson);
+
+        // Config encoded
+        final EBConfigurationUOKeySpec urlSpec = kFact.getKeySpec(ebPrivate, EBConfigurationUOKeySpec.class);
+        LOG.debug("Config: " + urlSpec.getConfigLine());
+
+        // Try to decode config line
+        final PrivateKey keyFromUrl = kFact.generatePrivate(urlSpec);
+        testRSAKeys(keyPair.getPublic(), keyFromUrl);
     }
 
     @Test(groups = {"integration"}) //, timeOut = 100000
