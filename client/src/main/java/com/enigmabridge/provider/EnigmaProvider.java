@@ -12,8 +12,11 @@ import org.bouncycastle.jcajce.provider.config.ConfigurableProvider;
 import org.bouncycastle.jcajce.provider.config.ProviderConfiguration;
 import org.bouncycastle.jcajce.provider.util.AsymmetricKeyInfoConverter;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Constructor;
+import java.net.MalformedURLException;
 import java.security.*;
 import java.util.HashMap;
 import java.util.Map;
@@ -226,5 +229,42 @@ public class EnigmaProvider extends Provider implements ConfigurableProvider {
 
     public EBEngine getEngine() {
         return engine;
+    }
+
+    /**
+     * Returns enigma provider from the JCA/JCE.
+     * New one is created if not found in JCA/JCE.
+     *
+     * @return
+     */
+    public static Provider getEnigmaProvider() {
+        if (Security.getProvider("EB") != null)
+        {
+            return Security.getProvider("EB");
+        }
+        else
+        {
+            return new EnigmaProvider();
+        }
+    }
+
+    public JSONObject configureToJSON() {
+        return engine.configureToJSON();
+    }
+
+    public String configureToURL() throws MalformedURLException {
+        return engine.configureToURL();
+    }
+
+    public void configureFromJSON(String str) throws MalformedURLException {
+        engine.configureFromJSON(str);
+    }
+
+    public void configureFromJSON(JSONObject obj) throws MalformedURLException {
+        engine.configureFromJSON(obj);
+    }
+
+    public void configureFromURL(String url) throws MalformedURLException, UnsupportedEncodingException {
+        engine.configureFromURL(url);
     }
 }

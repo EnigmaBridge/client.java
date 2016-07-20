@@ -1,7 +1,10 @@
 package com.enigmabridge;
 
 import com.enigmabridge.comm.EBConnectorManager;
+import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
 import java.security.SecureRandom;
 
 /**
@@ -64,5 +67,35 @@ public class EBEngine {
         }
 
         return enrollmentEndpoint;
+    }
+
+    public JSONObject configureToJSON(){
+        return new EBSettingsBase.Builder()
+                .setSettings(getDefaultSettings())
+                .build()
+                .toJSON(null);
+    }
+
+    public String configureToURL() throws MalformedURLException {
+        return new EBStringConfig.Builder()
+                .setFromSettings(getDefaultSettings())
+                .build()
+                .toString();
+    }
+
+    public void configureFromJSON(String str) throws MalformedURLException {
+        configureFromJSON(new JSONObject(str));
+    }
+
+    public void configureFromJSON(JSONObject obj) throws MalformedURLException {
+        this.defaultSettings = new EBSettingsBase.Builder()
+                .setJson(obj)
+                .build();
+    }
+
+    public void configureFromURL(String url) throws MalformedURLException, UnsupportedEncodingException {
+        this.defaultSettings = new EBStringConfig.Builder()
+                .setStringConfig(url)
+                .build();
     }
 }
