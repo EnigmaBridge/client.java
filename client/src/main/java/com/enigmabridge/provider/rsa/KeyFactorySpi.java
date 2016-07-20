@@ -11,6 +11,7 @@ import com.enigmabridge.provider.EnigmaProvider;
 import com.enigmabridge.provider.asn1.EBASNUtils;
 import com.enigmabridge.provider.asn1.EBEncodableUOKey;
 import com.enigmabridge.provider.asn1.EBJSONEncodedUOKey;
+import com.enigmabridge.provider.specs.EBConfigurationUOKeySpec;
 import com.enigmabridge.provider.specs.EBJSONEncodedUOKeySpec;
 import com.enigmabridge.provider.specs.EBKeyCreateSpec;
 import com.enigmabridge.provider.specs.EBRSAKeyCreateSpec;
@@ -43,6 +44,9 @@ public class KeyFactorySpi
 
     protected final UserObjectKeyCreator.Builder keyCreatorBld = new UserObjectKeyCreator.Builder();
     protected UserObjectKeyCreator keyCreator;
+
+    private static final String FIELD_RSA_PRIVATE = "rsaPriv";
+    private static final String FIELD_RSA_PUBLIC = "rsaPub";
 
     public KeyFactorySpi(EnigmaProvider provider)
     {
@@ -79,6 +83,20 @@ public class KeyFactorySpi
             final EBRSAKey k = (EBRSAKey) key;
 
             return new EBJSONEncodedUOKeySpec(k.toJSON(null));
+        }
+        else if (spec.isAssignableFrom(EBConfigurationUOKeySpec.class) && key instanceof EBRSAKey)
+        {
+            final EBRSAKey k = (EBRSAKey) key;
+            try {
+                return new EBConfigurationUOKeySpec(new EBStringConfig.Builder()
+                        .setFromEngine(engine)
+                        .addElement(k, k instanceof EBRSAPrivateKey ? FIELD_RSA_PRIVATE : FIELD_RSA_PUBLIC)
+                        .build()
+                        .toString());
+
+            } catch (MalformedURLException e) {
+                throw new InvalidKeySpecException("Exception in generating specs", e);
+            }
         }
         else if (spec.isAssignableFrom(RSAPublicKeySpec.class) && key instanceof RSAPublicKey)
         {
@@ -286,6 +304,28 @@ public class KeyFactorySpi
                 final EBRSAPrivateKey tmpKey = new EBRSAPrivateKey.Builder()
                         .setEngine(engine)
                         .setJson(json)
+                        .build();
+
+                if (tmpKey.getKeyType() != UserObjectKeyType.PRIVATE) {
+                    throw new InvalidKeySpecException("Key type is invalid: " + tmpKey.getKeyType());
+                }
+
+                return tmpKey;
+
+            } catch (IOException e) {
+                throw new InvalidKeySpecException("Key could not be parsed", e);
+            }
+        }
+        else if (keySpec instanceof EBConfigurationUOKeySpec)
+        {
+            final String configLine = ((EBConfigurationUOKeySpec) keySpec).getConfigLine();
+            try {
+                final EBStringConfig config = new EBStringConfig.Builder().setStringConfig(configLine).build();
+                final JSONObject rsaJson = config.getElement(FIELD_RSA_PRIVATE);
+
+                final EBRSAPrivateKey tmpKey = new EBRSAPrivateKey.Builder()
+                        .setEngine(engine)
+                        .setJson(rsaJson)
                         .build();
 
                 if (tmpKey.getKeyType() != UserObjectKeyType.PRIVATE) {
