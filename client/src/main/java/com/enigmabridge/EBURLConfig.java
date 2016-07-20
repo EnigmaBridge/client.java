@@ -325,6 +325,19 @@ public class EBURLConfig implements EBSettings {
      * @return JSONObject
      */
     public static JSONObject getParentNode(JSONObject root, String[] path){
+        return getParentNode(root, path, true);
+    }
+
+    /**
+     * Returns corresponding JSON object when traversed from root using path of the keys.
+     * If object does not exists, it is created. Similar to mkdir -p path
+     *
+     * @param root JSON object to start traversal.
+     * @param path path down the hierarchy from root
+     * @param createIfDoesNotExist if true, behaves like mkdir -p, otherwise returns null.
+     * @return JSONObject
+     */
+    public static JSONObject getParentNode(JSONObject root, String[] path, boolean createIfDoesNotExist){
         if (path.length == 1){
             return root;
         }
@@ -333,9 +346,11 @@ public class EBURLConfig implements EBSettings {
         for(int i = 0, ln = path.length - 1; i < ln; ++i){
             if (current.has(path[i])){
                 current = current.getJSONObject(path[i]);
-            } else {
+            } else if (createIfDoesNotExist) {
                 current.put(path[i], new JSONObject());
                 current = current.getJSONObject(path[i]);
+            } else {
+                return null;
             }
         }
 
