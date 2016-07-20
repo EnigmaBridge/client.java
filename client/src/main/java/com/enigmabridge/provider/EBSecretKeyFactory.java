@@ -9,19 +9,14 @@ import com.enigmabridge.provider.specs.EBConfigurationUOKeySpec;
 import com.enigmabridge.provider.specs.EBJSONEncodedUOKeySpec;
 import com.enigmabridge.provider.specs.EBSecretKeySpec;
 import com.enigmabridge.provider.specs.EBSymmetricKeyGenTypes;
-import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
-import org.bouncycastle.asn1.pkcs.RSAPrivateKey;
-import org.bouncycastle.jcajce.provider.asymmetric.rsa.BCRSAPrivateCrtKey;
-import org.bouncycastle.jcajce.provider.asymmetric.rsa.BCRSAPrivateKey;
-import org.bouncycastle.jcajce.provider.asymmetric.rsa.RSAUtil;
 import org.json.JSONObject;
 
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactorySpi;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.security.InvalidKeyException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
@@ -44,6 +39,8 @@ public class EBSecretKeyFactory extends SecretKeyFactorySpi {
     protected EBEngine engine;
     protected SecureRandom random;
     private EBSymmetricKeyGenTypes keyType = EBSymmetricKeyGenTypes.BOTH;
+
+    private static final String FIELD_SYMMETRIC_KEY = "symKey";
 
     public EBSecretKeyFactory(EnigmaProvider provider) {
         this.provider = provider;
@@ -94,8 +91,25 @@ public class EBSecretKeyFactory extends SecretKeyFactorySpi {
             }
 
         } else if (keySpec instanceof EBConfigurationUOKeySpec){
-            // TODO: implement.
-            throw new UnsupportedOperationException("Not implemented yet");
+            final String configLine = ((EBConfigurationUOKeySpec) keySpec).getConfigLine();
+            try {
+                final EBStringConfig config = new EBStringConfig.Builder().setStringConfig(configLine).build();
+                final JSONObject keyJson = config.getElement(FIELD_SYMMETRIC_KEY);
+
+                final EBSymmetricKey tmpKey = new EBSymmetricKey.Builder()
+                        .setEngine(engine)
+                        .setJson(keyJson)
+                        .build();
+
+                if (tmpKey.getKeyType() != UserObjectKeyType.SECRET){
+                    throw new InvalidKeySpecException("Key type is invalid: " + tmpKey.getKeyType());
+                }
+
+                return tmpKey;
+
+            } catch (IOException e) {
+                throw new InvalidKeySpecException("Key could not be parsed", e);
+            }
 
         } else {
             throw new InvalidKeySpecException("Unsupported spec: " + keySpec.getClass().getName());
@@ -173,6 +187,18 @@ public class EBSecretKeyFactory extends SecretKeyFactorySpi {
 
             if(EBJSONEncodedUOKeySpec.class.isAssignableFrom(aClass)){
                 return new EBJSONEncodedUOKeySpec(ebKey.toJSON(null, true));
+
+            } else if(EBConfigurationUOKeySpec.class.isAssignableFrom(aClass)){
+                try {
+                    return new EBConfigurationUOKeySpec(new EBStringConfig.Builder()
+                            .setFromEngine(engine)
+                            .addElement(ebKey, FIELD_SYMMETRIC_KEY)
+                            .build()
+                            .toString());
+
+                } catch (MalformedURLException e) {
+                    throw new InvalidKeySpecException("Exception in generating specs", e);
+                }
 
             } else {
                 throw new UnsupportedOperationException("EB provider does not allow to extract keys");
