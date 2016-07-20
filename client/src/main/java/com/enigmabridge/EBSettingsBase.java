@@ -48,6 +48,20 @@ public class EBSettingsBase implements EBSettings, Serializable {
             return getThisBuilder();
         }
 
+        public B setSettings(EBSettings settings){
+            getObj().setApiKey(settings.getApiKey());
+            getObj().setEndpointInfo(settings.getEndpointInfo());
+            getObj().setConnectionSettings(settings.getConnectionSettings());
+            return getThisBuilder();
+        }
+
+        public B setSettingsCopy(EBSettings settings){
+            getObj().setApiKey(settings.getApiKey());
+            getObj().setEndpointInfo(settings.getEndpointInfo().copy());
+            getObj().setConnectionSettings(settings.getConnectionSettings().copy());
+            return getThisBuilder();
+        }
+
         public B setJson(JSONObject json) throws MalformedURLException {
             getObj().fromJSON(json);
             return getThisBuilder();
