@@ -187,7 +187,7 @@ public class EBURLConfig implements EBSettings {
      */
     protected void addElement(EBJSONSerializable ebjsonSerializable, String key){
         final String[] path = key.split("\\.");
-        final String last = path[path.length];
+        final String last = path[path.length-1];
         final JSONObject parent = getParentNode(jsonRoot, path, true);
         parent.put(last, ebjsonSerializable.toJSON(null));
     }
@@ -254,7 +254,7 @@ public class EBURLConfig implements EBSettings {
      */
     public JSONObject getElement(String field){
         final String[] path = field.split("\\.");
-        final String last = path[path.length];
+        final String last = path[path.length-1];
         final JSONObject parent = getParentNode(jsonRoot, path, false);
         return parent != null && parent.has(last) ? parent.getJSONObject(last) : null;
     }
