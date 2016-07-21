@@ -1,6 +1,7 @@
 package com.enigmabridge.comm;
 
 import com.enigmabridge.EBEndpointInfo;
+import com.enigmabridge.comm.retry.*;
 import okhttp3.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,6 +10,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.concurrent.TimeUnit;
+
+import static org.bouncycastle.crypto.tls.ConnectionEnd.client;
 
 /**
  * Connector to EB endpoint. It enables to call raw requests on the EB API.
@@ -71,6 +74,46 @@ public class EBConnector {
 
         final OkHttpClient client = clientBuilder.build();
 
+        EBRetryStrategy retryStrategy = (settings != null && settings.getRetryStrategy() != null) ? settings.getRetryStrategy() : null;
+        if (retryStrategy != null) {
+            // New retry mechanism
+            final EBRetry<EBRawResponse, Throwable> ebRetry = new EBRetry<EBRawResponse, Throwable>(retryStrategy);
+
+            // Define retry job
+            ebRetry.setJob(new EBRetryJobSimple<EBRawResponse, Throwable>() {
+                @Override
+                public void runAsync(EBCallback<EBRawResponse, Throwable> callback) {
+                    try {
+                        final EBRawResponse ebRawResponse = requestInternal(client);
+                        callback.onSuccess(ebRawResponse);
+
+                    } catch(IOException exception) {
+                        callback.onFail(exception, false);
+                    } catch(Throwable th){
+                        callback.onFail(th, true);
+                    }
+                }
+            });
+
+            // Start the job synchronously.
+            try {
+                return ebRetry.runSync();
+
+            } catch (EBRetryFailedException e) {
+                final Object error = e.getError();
+                throw new IOException(error instanceof Throwable ? (Throwable)error : null);
+
+            } catch (EBRetryException e){
+                throw new IOException("Fatal request error", e);
+            }
+
+        } else {
+            // No retry mechanism - try call directly.
+            return requestInternal(client);
+        }
+    }
+
+    protected EBRawResponse requestInternal(OkHttpClient client) throws IOException {
         final HttpUrl url = new HttpUrl.Builder()
                 .scheme(endpoint.getScheme())
                 .host(endpoint.getHostname())
