@@ -36,6 +36,7 @@ public class EBRetry<Result, Error> implements EBCallback<Result,Error>, EBJSONS
     protected volatile boolean signalized = false;
     protected volatile boolean running = false;
     protected volatile boolean cancel = false;
+    protected volatile boolean abort = false;
 
     // Milliseconds for waiting.
     protected volatile long waitingUntilMilli;
@@ -112,12 +113,12 @@ public class EBRetry<Result, Error> implements EBCallback<Result,Error>, EBJSONS
     /**
      * Blocking version of the run.
      */
-    public Result runSync() throws EBRetryFailedException {
+    public Result runSync() throws EBRetryException {
         reset();
 
         running = true;
         startedAsBlocking = true;
-        for(int i = 0; retryStrategy.shouldContinue() && !cancel; i++){
+        for(int i = 0; retryStrategy.shouldContinue() && !cancel && !abort; i++){
             // Ask strategy if we are going to wait.
             final long waitMilli = retryStrategy.getWaitMilli();
             waitingUntilMilli = waitMilli >= 0 ? System.currentTimeMillis() + waitMilli : 0;
@@ -129,7 +130,7 @@ public class EBRetry<Result, Error> implements EBCallback<Result,Error>, EBJSONS
             }
 
             // Wait. If waitingUntilMilli is reset or modified, no waiting is done here.
-            while(!cancel && waitingUntilMilli > 0 && System.currentTimeMillis() < waitingUntilMilli){
+            while(!cancel && !abort && waitingUntilMilli > 0 && System.currentTimeMillis() < waitingUntilMilli){
                 try {
                     Thread.sleep(10);
                 } catch (InterruptedException e) {
@@ -138,14 +139,14 @@ public class EBRetry<Result, Error> implements EBCallback<Result,Error>, EBJSONS
             }
 
             // Run the async job. Result will be signalized to the onSuccess, onFail callbacks on completion.
-            if (!cancel) {
+            if (!cancel && !abort) {
                 runAsyncInternal();
             }
 
             // Wait until tasks signalizes the result.
             // If task is actually blocking, it signalizes result before returning control
             // thus no waiting is made.
-            while(!signalized && !cancel){
+            while(!signalized && !cancel && !abort){
                 try {
                     Thread.sleep(0, 100);
                 } catch (InterruptedException e) {
@@ -157,6 +158,13 @@ public class EBRetry<Result, Error> implements EBCallback<Result,Error>, EBJSONS
             if (lastWasSuccess){
                 break;
             }
+        }
+
+        if (abort){
+            throw new EBRetryAbortedException("Aborted");
+        }
+        if (cancel){
+            throw new EBRetryCancelledException("Cancelled");
         }
 
         // If job is actually blocking, it signalized callback before exiting thus lets check if it is so.
@@ -185,9 +193,10 @@ public class EBRetry<Result, Error> implements EBCallback<Result,Error>, EBJSONS
     /**
      * Job calls this callback.
      * @param error error causing the job to fail
+     * @param abort if true abort the call.
      */
     @Override
-    public void onFail(Error error) {
+    public void onFail(Error error, boolean abort) {
         signalized = true;
         lastWasSuccess = false;
         lastError = error;
@@ -196,8 +205,16 @@ public class EBRetry<Result, Error> implements EBCallback<Result,Error>, EBJSONS
         running = false;
         retryStrategy.onFail();
 
+        if (abort){
+            this.abort = true;
+            notifyListenerFailed(error);
+            return;
+        }
+
         if (logFails){
             LOG.debug("Fail: " + error);
+        } else {
+            LOG.trace("Fail: " + error);
         }
 
         if (retryStrategy.shouldContinue() || cancel){
@@ -242,6 +259,7 @@ public class EBRetry<Result, Error> implements EBCallback<Result,Error>, EBJSONS
         lastError = null;
         running = false;
         cancel = false;
+        abort = false;
         retryStrategy.reset();
     }
 
@@ -267,6 +285,10 @@ public class EBRetry<Result, Error> implements EBCallback<Result,Error>, EBJSONS
 
     public boolean isCancelled() {
         return cancel;
+    }
+
+    public boolean isAborted() {
+        return abort;
     }
 
     @Override

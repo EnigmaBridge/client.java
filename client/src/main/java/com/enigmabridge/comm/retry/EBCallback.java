@@ -15,6 +15,7 @@ public interface EBCallback<Result, Error> {
     /**
      * Called by job on fail.
      * @param error
+     * @param abort true if should terminate.
      */
-    void onFail(Error error);
+    void onFail(Error error, boolean abort);
 }

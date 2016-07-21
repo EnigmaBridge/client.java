@@ -4,7 +4,7 @@ package com.enigmabridge.comm.retry;
  * Exception thrown when calling sync job.
  * Created by dusanklinec on 21.07.16.
  */
-public class EBRetryFailedException extends Exception {
+public class EBRetryFailedException extends EBRetryException {
     protected Object error;
     protected EBRetry retry;
 
