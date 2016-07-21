@@ -1,6 +1,7 @@
 package com.enigmabridge.comm;
 
 import com.enigmabridge.*;
+import com.enigmabridge.comm.retry.*;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -245,7 +246,70 @@ public class EBProcessDataCall extends EBAPICall {
      * @throws IOException
      * @throws EBCorruptedException
      */
-    public EBProcessDataResponse doRequest(byte[] requestData, int offset, int length) throws IOException, EBCorruptedException {
+    public EBProcessDataResponse doRequest(final byte[] requestData, final int offset, final int length) throws IOException, EBCorruptedException {
+        if (settings == null || settings.getRetryStrategyApplication() == null){
+            return doRequestInternal(requestData, offset, length);
+        }
+
+        final EBRetryStrategy strategy = settings.getRetryStrategyApplication().copy();
+
+        // New retry mechanism
+        final EBRetry<EBProcessDataResponse, Throwable> ebRetry = new EBRetry<EBProcessDataResponse, Throwable>(strategy);
+
+        // Define retry job
+        ebRetry.setJob(new EBRetryJobSimple<EBProcessDataResponse, Throwable>() {
+            @Override
+            public void runAsync(EBCallback<EBProcessDataResponse, Throwable> callback) {
+                try {
+                    final EBProcessDataResponse ebResponse = doRequestInternal(requestData, offset, length);
+
+                    // Inspect the code
+                    if (ebResponse.isCodeOk()) {
+                        callback.onSuccess(ebResponse);
+                        return;
+                    }
+
+                    // Some error codes may be recoverable on retry.
+                    final short statusCode = ebResponse.getStatusCode();
+                    final boolean isRecoverable = statusCode == EBCommStatus.ERROR_CLASS_ERR_CHECK_ERRORS_6f;
+                    callback.onFail(new EBCryptoException("Invalid response: " + ebResponse), !isRecoverable);
+
+                } catch(IOException exception) {
+                    callback.onFail(exception, false);
+                } catch(Throwable th){
+                    callback.onFail(th, true);
+                }
+            }
+        });
+
+        // Start the job synchronously.
+        try {
+            return ebRetry.runSync();
+
+        } catch (EBRetryFailedException e) {
+            final Object error = e.getError();
+            if (error instanceof EBCorruptedException){
+                throw (EBCorruptedException)error;
+            } else if (error instanceof IOException){
+                throw (IOException)error;
+            }
+            throw new IOException(error instanceof Throwable ? (Throwable) error : null);
+
+        } catch(EBRetryAbortedException e) {
+            final Object error = e.getError();
+            if (error instanceof EBCorruptedException){
+                throw (EBCorruptedException)error;
+            } else if (error instanceof IOException){
+                throw (IOException)error;
+            }
+            throw new IOException(error instanceof Throwable ? (Throwable) error : null);
+
+        } catch (EBRetryException e){
+            throw new IOException("Fatal request error", e);
+        }
+    }
+
+    public EBProcessDataResponse doRequestInternal(byte[] requestData, int offset, int length) throws IOException, EBCorruptedException {
         if (apiBlock == null && requestData == null){
             throw new IllegalArgumentException("Call was not built with request data, cannot build now - no data");
         } else if (requestData != null){
