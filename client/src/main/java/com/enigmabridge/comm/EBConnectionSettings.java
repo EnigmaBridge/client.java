@@ -4,6 +4,8 @@ import com.enigmabridge.EBCommKeys;
 import com.enigmabridge.EBEndpointInfo;
 import com.enigmabridge.EBJSONSerializable;
 import com.enigmabridge.EBUtils;
+import com.enigmabridge.comm.retry.EBRetryStrategy;
+import com.enigmabridge.comm.retry.EBRetryStrategyFactory;
 import org.json.JSONObject;
 
 import java.io.Serializable;
@@ -20,6 +22,7 @@ public class EBConnectionSettings implements Serializable, EBJSONSerializable {
     public static final String FIELD_WRITE_TIMEOUT = "writeTimeout";
     public static final String FIELD_HTTP_METHOD = "httpMethod";
     public static final String FIELD_TRUST = "trust";
+    public static final String FIELD_RETRY_STRATEGY = "retry";
 
     public static final int DEFAULT_CONNECT_TIMEOUT_MILLI = 60000;
     public static final int DEFAULT_READ_TIMEOUT_MILLI = 60000;
@@ -49,6 +52,11 @@ public class EBConnectionSettings implements Serializable, EBJSONSerializable {
      * Custom trust roots for SSL/TLS.
      */
     protected EBAdditionalTrust trust;
+
+    /**
+     * Retry strategy.
+     */
+    protected EBRetryStrategy retryStrategy;
 
     public EBConnectionSettings() {
     }
@@ -81,6 +89,10 @@ public class EBConnectionSettings implements Serializable, EBJSONSerializable {
         if (json.has(FIELD_TRUST)){
             setTrust(new EBAdditionalTrust(json.getJSONObject(FIELD_TRUST)));
         }
+
+        if (json.has(FIELD_RETRY_STRATEGY)){
+            setRetryStrategy(EBRetryStrategyFactory.fromJSON(json.getJSONObject(FIELD_RETRY_STRATEGY)));
+        }
     }
 
     @Override
@@ -107,6 +119,10 @@ public class EBConnectionSettings implements Serializable, EBJSONSerializable {
 
         if (getTrust() != null){
             json.put(FIELD_TRUST, getTrust().toJSON(null));
+        }
+
+        if (getRetryStrategy() != null){
+            json.put(FIELD_RETRY_STRATEGY, EBRetryStrategyFactory.toJSON(getRetryStrategy(), null));
         }
 
         return json;
@@ -201,6 +217,15 @@ public class EBConnectionSettings implements Serializable, EBJSONSerializable {
 
     public EBConnectionSettings setTrust(EBAdditionalTrust trust) {
         this.trust = trust;
+        return this;
+    }
+
+    public EBRetryStrategy getRetryStrategy() {
+        return retryStrategy;
+    }
+
+    public EBConnectionSettings setRetryStrategy(EBRetryStrategy retryStrategy) {
+        this.retryStrategy = retryStrategy;
         return this;
     }
 }
