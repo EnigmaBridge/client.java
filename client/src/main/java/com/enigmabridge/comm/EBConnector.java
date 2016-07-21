@@ -76,10 +76,10 @@ public class EBConnector {
 
         EBRetryStrategy retryStrategy = (settings != null && settings.getRetryStrategyNetwork() != null) ?
                 settings.getRetryStrategyNetwork() : null;
-        
+
         if (retryStrategy != null) {
             // New retry mechanism
-            final EBRetry<EBRawResponse, Throwable> ebRetry = new EBRetry<EBRawResponse, Throwable>(retryStrategy);
+            final EBRetry<EBRawResponse, Throwable> ebRetry = new EBRetry<EBRawResponse, Throwable>(retryStrategy.copy());
 
             // Define retry job
             ebRetry.setJob(new EBRetryJobSimple<EBRawResponse, Throwable>() {

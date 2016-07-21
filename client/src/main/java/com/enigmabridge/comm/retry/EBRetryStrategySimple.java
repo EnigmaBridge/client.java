@@ -72,6 +72,11 @@ public class EBRetryStrategySimple implements EBRetryStrategy {
         }
     }
 
+    @Override
+    public EBRetryStrategy copy() {
+        return new EBRetryStrategySimple(maxAttempts);
+    }
+
     public int getMaxAttempts() {
         return maxAttempts;
     }

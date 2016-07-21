@@ -22,6 +22,11 @@ public class EBRetryStrategyBackoff extends EBRetryStrategySimple {
     }
 
     @Override
+    public EBRetryStrategy copy() {
+        return super.copy();
+    }
+
+    @Override
     public String getName() {
         return NAME;
     }

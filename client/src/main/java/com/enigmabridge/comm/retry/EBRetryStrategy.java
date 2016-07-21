@@ -15,4 +15,6 @@ public interface EBRetryStrategy extends EBJSONSerializable {
     void reset();
     boolean shouldContinue();
     long getWaitMilli();
+
+    EBRetryStrategy copy();
 }
