@@ -22,7 +22,8 @@ public class EBConnectionSettings implements Serializable, EBJSONSerializable {
     public static final String FIELD_WRITE_TIMEOUT = "writeTimeout";
     public static final String FIELD_HTTP_METHOD = "httpMethod";
     public static final String FIELD_TRUST = "trust";
-    public static final String FIELD_RETRY_STRATEGY = "retry";
+    public static final String FIELD_RETRY_STRATEGY_NETWORK = "retryNet";
+    public static final String FIELD_RETRY_STRATEGY_APPLICATION = "retryApp";
 
     public static final int DEFAULT_CONNECT_TIMEOUT_MILLI = 60000;
     public static final int DEFAULT_READ_TIMEOUT_MILLI = 60000;
@@ -54,9 +55,14 @@ public class EBConnectionSettings implements Serializable, EBJSONSerializable {
     protected EBAdditionalTrust trust;
 
     /**
-     * Retry strategy.
+     * Retry strategy for network.
      */
-    protected EBRetryStrategy retryStrategy;
+    protected EBRetryStrategy retryStrategyNetwork;
+
+    /**
+     * Retry strategy for application.
+     */
+    protected EBRetryStrategy retryStrategyApplication;
 
     public EBConnectionSettings() {
     }
@@ -90,8 +96,12 @@ public class EBConnectionSettings implements Serializable, EBJSONSerializable {
             setTrust(new EBAdditionalTrust(json.getJSONObject(FIELD_TRUST)));
         }
 
-        if (json.has(FIELD_RETRY_STRATEGY)){
-            setRetryStrategy(EBRetryStrategyFactory.fromJSON(json.getJSONObject(FIELD_RETRY_STRATEGY)));
+        if (json.has(FIELD_RETRY_STRATEGY_NETWORK)){
+            setRetryStrategyNetwork(EBRetryStrategyFactory.fromJSON(json.getJSONObject(FIELD_RETRY_STRATEGY_NETWORK)));
+        }
+
+        if (json.has(FIELD_RETRY_STRATEGY_APPLICATION)){
+            setRetryStrategyApplication(EBRetryStrategyFactory.fromJSON(json.getJSONObject(FIELD_RETRY_STRATEGY_APPLICATION)));
         }
     }
 
@@ -121,8 +131,13 @@ public class EBConnectionSettings implements Serializable, EBJSONSerializable {
             json.put(FIELD_TRUST, getTrust().toJSON(null));
         }
 
-        if (getRetryStrategy() != null){
-            json.put(FIELD_RETRY_STRATEGY, EBRetryStrategyFactory.toJSON(getRetryStrategy(), null));
+        if (getRetryStrategyNetwork() != null){
+            json.put(FIELD_RETRY_STRATEGY_NETWORK, EBRetryStrategyFactory.toJSON(getRetryStrategyNetwork(), null));
+        }
+
+
+        if (getRetryStrategyApplication() != null){
+            json.put(FIELD_RETRY_STRATEGY_APPLICATION, EBRetryStrategyFactory.toJSON(getRetryStrategyApplication(), null));
         }
 
         return json;
@@ -220,12 +235,20 @@ public class EBConnectionSettings implements Serializable, EBJSONSerializable {
         return this;
     }
 
-    public EBRetryStrategy getRetryStrategy() {
-        return retryStrategy;
+    public EBRetryStrategy getRetryStrategyNetwork() {
+        return retryStrategyNetwork;
     }
 
-    public EBConnectionSettings setRetryStrategy(EBRetryStrategy retryStrategy) {
-        this.retryStrategy = retryStrategy;
+    public EBConnectionSettings setRetryStrategyNetwork(EBRetryStrategy retryStrategy) {
+        this.retryStrategyNetwork = retryStrategy;
+        return this;
+    }
+    public EBRetryStrategy getRetryStrategyApplication() {
+        return retryStrategyNetwork;
+    }
+
+    public EBConnectionSettings setRetryStrategyApplication(EBRetryStrategy retryStrategy) {
+        this.retryStrategyApplication = retryStrategy;
         return this;
     }
 }

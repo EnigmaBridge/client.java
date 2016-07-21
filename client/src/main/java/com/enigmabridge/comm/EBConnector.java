@@ -74,7 +74,9 @@ public class EBConnector {
 
         final OkHttpClient client = clientBuilder.build();
 
-        EBRetryStrategy retryStrategy = (settings != null && settings.getRetryStrategy() != null) ? settings.getRetryStrategy() : null;
+        EBRetryStrategy retryStrategy = (settings != null && settings.getRetryStrategyNetwork() != null) ?
+                settings.getRetryStrategyNetwork() : null;
+        
         if (retryStrategy != null) {
             // New retry mechanism
             final EBRetry<EBRawResponse, Throwable> ebRetry = new EBRetry<EBRawResponse, Throwable>(retryStrategy);
