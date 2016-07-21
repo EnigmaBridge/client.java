@@ -161,7 +161,7 @@ public class EBRetry<Result, Error> implements EBCallback<Result,Error>, EBJSONS
         }
 
         if (abort){
-            throw new EBRetryAbortedException("Aborted");
+            throw new EBRetryAbortedException(lastError, this);
         }
         if (cancel){
             throw new EBRetryCancelledException("Cancelled");
