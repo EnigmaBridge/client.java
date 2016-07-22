@@ -21,7 +21,7 @@ public class EBRetry<Result, Error> implements EBCallback<Result,Error>, EBJSONS
 
     // Current number of attempts
     protected int attempts = 0;
-    protected boolean logFails = false;
+    protected boolean logFails = true;
 
     // Retry strategy to use.
     protected EBRetryStrategy retryStrategy = new EBRetryStrategySimple(0);
@@ -231,7 +231,11 @@ public class EBRetry<Result, Error> implements EBCallback<Result,Error>, EBJSONS
             job.onRetry(this);
 
             // Start new waiting thread, signalizing onWaitFinished when done.
-            new WaitThread(this).start();
+            if (waitingUntilMilli > 0) {
+                new WaitThread(this).start();
+            } else {
+                onWaitFinished();
+            }
         }
     }
 
