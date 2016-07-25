@@ -13,6 +13,6 @@ public class EBDevSettings {
      * @return true if failed UO logging should be enabled.
      */
     public static boolean shouldLogFailedCreateUO(){
-        return false;
+        return true;
     }
 }
