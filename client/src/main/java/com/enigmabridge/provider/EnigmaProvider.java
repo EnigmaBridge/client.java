@@ -235,12 +235,12 @@ public class EnigmaProvider extends Provider implements ConfigurableProvider {
      * Returns enigma provider from the JCA/JCE.
      * New one is created if not found in JCA/JCE.
      *
-     * @return
+     * @return EnigmaProvider
      */
-    public static Provider getEnigmaProvider() {
+    public static EnigmaProvider getEnigmaProvider() {
         if (Security.getProvider(PROVIDER_NAME) != null)
         {
-            return Security.getProvider(PROVIDER_NAME);
+            return (EnigmaProvider) Security.getProvider(PROVIDER_NAME);
         }
         else
         {
