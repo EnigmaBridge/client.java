@@ -11,8 +11,6 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.concurrent.TimeUnit;
 
-import static org.bouncycastle.crypto.tls.ConnectionEnd.client;
-
 /**
  * Connector to EB endpoint. It enables to call raw requests on the EB API.
  * Wraps HTTP query library, processes connection settings. Can e.g., perform multiple attempts before failure.
@@ -81,17 +79,15 @@ public class EBConnector {
             final EBRetry<EBRawResponse, Throwable> ebRetry = new EBRetry<EBRawResponse, Throwable>(retryStrategy.copy());
 
             // Define retry job
-            ebRetry.setJob(new EBRetryJobSimple<EBRawResponse, Throwable>() {
+            ebRetry.setJob(new EBRetryJobSimpleSafeThrErr<EBRawResponse>() {
                 @Override
-                public void runAsync(EBCallback<EBRawResponse, Throwable> callback) {
+                public void runAsyncNoException(EBCallback<EBRawResponse, Throwable> callback) throws Throwable {
                     try {
                         final EBRawResponse ebRawResponse = requestInternal(client);
                         callback.onSuccess(ebRawResponse);
 
                     } catch(IOException exception) {
-                        callback.onFail(exception, false);
-                    } catch(Throwable th){
-                        callback.onFail(th, true);
+                        callback.onFail(new EBRetryJobErrorThrowable(exception), false);
                     }
                 }
             });

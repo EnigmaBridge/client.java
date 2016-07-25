@@ -45,7 +45,7 @@ public class EBRetry<Result, Error> implements EBCallback<Result,Error>, EBJSONS
     protected boolean lastWasSuccess = false;
     protected boolean startedAsBlocking = false;
     protected Result lastResult;
-    protected Error lastError;
+    protected EBRetryJobError<Error> lastError;
 
     public EBRetry() {
     }
@@ -196,7 +196,7 @@ public class EBRetry<Result, Error> implements EBCallback<Result,Error>, EBJSONS
      * @param abort if true abort the call.
      */
     @Override
-    public void onFail(Error error, boolean abort) {
+    public void onFail(EBRetryJobError<Error> error, boolean abort) {
         signalized = true;
         lastWasSuccess = false;
         lastError = error;
@@ -331,7 +331,7 @@ public class EBRetry<Result, Error> implements EBCallback<Result,Error>, EBJSONS
         }
     }
 
-    protected void notifyListenerFailed(Error error){
+    protected void notifyListenerFailed(EBRetryJobError<Error> error){
         for (EBRetryListener<Result, Error> listener : listeners) {
             listener.onFail(error, this);
         }

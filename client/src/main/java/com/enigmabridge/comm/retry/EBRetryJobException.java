@@ -53,4 +53,30 @@ public class EBRetryJobException extends Exception {
     public void setError(Object error) {
         this.error = error;
     }
+
+    /**
+     * Return an trhowable instance if the error object is of Throwable type.
+     * Null otherwise.
+     *
+     * @return Throwable or null
+     */
+    public Throwable getErrorCauseIfAny(){
+        return error != null && error instanceof Throwable ? (Throwable) error : null;
+    }
+
+    /**
+     * Overridden getCause that takes error object into account also.
+     * Original cause has the precedence, if null, error object is tested if is Throwable instance.
+     *
+     * @return cause or null
+     */
+    @Override
+    public synchronized Throwable getCause() {
+        final Throwable cause = super.getCause();
+        if (cause != null){
+            return cause;
+        }
+
+        return getErrorCauseIfAny();
+    }
 }

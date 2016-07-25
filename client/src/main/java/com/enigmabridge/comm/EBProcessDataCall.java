@@ -257,9 +257,9 @@ public class EBProcessDataCall extends EBAPICall {
         final EBRetry<EBProcessDataResponse, Throwable> ebRetry = new EBRetry<EBProcessDataResponse, Throwable>(strategy);
 
         // Define retry job
-        ebRetry.setJob(new EBRetryJobSimple<EBProcessDataResponse, Throwable>() {
+        ebRetry.setJob(new EBRetryJobSimpleSafeThrErr<EBProcessDataResponse>() {
             @Override
-            public void runAsync(EBCallback<EBProcessDataResponse, Throwable> callback) {
+            public void runAsyncNoException(EBCallback<EBProcessDataResponse, Throwable> callback) throws Throwable {
                 try {
                     final EBProcessDataResponse ebResponse = doRequestInternal(requestData, offset, length);
 
@@ -272,12 +272,10 @@ public class EBProcessDataCall extends EBAPICall {
                     // Some error codes may be recoverable on retry.
                     final short statusCode = ebResponse.getStatusCode();
                     final boolean isRecoverable = statusCode == EBCommStatus.ERROR_CLASS_ERR_CHECK_ERRORS_6f;
-                    callback.onFail(new EBCryptoException("Invalid response: " + ebResponse), !isRecoverable);
+                    callback.onFail(new EBRetryJobErrorThrowable(new EBCryptoException("Invalid response: " + ebResponse)), !isRecoverable);
 
                 } catch(IOException exception) {
-                    callback.onFail(exception, false);
-                } catch(Throwable th){
-                    callback.onFail(th, true);
+                    callback.onFail(new EBRetryJobErrorThrowable(exception), false);
                 }
             }
         });

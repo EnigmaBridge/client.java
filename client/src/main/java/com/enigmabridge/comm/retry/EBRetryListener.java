@@ -18,5 +18,5 @@ public interface EBRetryListener<Result, Error> {
      * Called by job on fail.
      * @param error
      */
-    void onFail(Error error, EBRetry<Result, Error> retry);
+    void onFail(EBRetryJobError<Error> error, EBRetry<Result, Error> retry);
 }
