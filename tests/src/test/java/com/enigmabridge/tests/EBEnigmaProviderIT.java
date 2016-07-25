@@ -4,6 +4,7 @@ import com.enigmabridge.EBEndpointInfo;
 import com.enigmabridge.EBEngine;
 import com.enigmabridge.EBSettingsBase;
 import com.enigmabridge.comm.EBConnectionSettings;
+import com.enigmabridge.comm.retry.EBRetryStrategySimple;
 import com.enigmabridge.create.Constants;
 import com.enigmabridge.create.EBUOGetTemplateRequest;
 import com.enigmabridge.misc.EBTestingUtils;
@@ -71,6 +72,8 @@ public class EBEnigmaProviderIT {
     public void setUpMethod() throws Exception {
         endpoint = new EBEndpointInfo(EBTestingUtils.CONNECTION_STRING);
         settings = new EBConnectionSettings();
+        settings.setRetryStrategyNetwork(new EBRetryStrategySimple(3));
+        settings.setRetryStrategyApplication(new EBRetryStrategySimple(3));
 
         defaultSettings = new EBSettingsBase.Builder()
                 .setApiKey(apiKey)
