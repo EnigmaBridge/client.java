@@ -9,7 +9,7 @@ public abstract class EBRetryJobSimpleSafeThrErr<Result> extends EBRetryJobSimpl
         try {
             runAsyncNoException(callback);
         } catch(Throwable th){
-            callback.onFail(new EBRetryJobErrorThrowable(th), true);
+            callback.onFail(new EBRetryJobErrorThr(th), true);
         }
     }
 

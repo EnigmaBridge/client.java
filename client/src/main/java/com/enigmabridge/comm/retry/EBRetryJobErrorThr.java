@@ -5,8 +5,8 @@ package com.enigmabridge.comm.retry;
  *
  * Created by dusanklinec on 25.07.16.
  */
-public class EBRetryJobErrorThrowable extends EBRetryJobError<Throwable> {
-    public EBRetryJobErrorThrowable(Throwable throwable) {
+public class EBRetryJobErrorThr extends EBRetryJobError<Throwable> {
+    public EBRetryJobErrorThr(Throwable throwable) {
         super(throwable, throwable);
     }
 }

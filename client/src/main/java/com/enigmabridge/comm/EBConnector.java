@@ -87,7 +87,7 @@ public class EBConnector {
                         callback.onSuccess(ebRawResponse);
 
                     } catch(IOException exception) {
-                        callback.onFail(new EBRetryJobErrorThrowable(exception), false);
+                        callback.onFail(new EBRetryJobErrorThr(exception), false);
                     }
                 }
             });
