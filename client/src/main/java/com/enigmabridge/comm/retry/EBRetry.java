@@ -212,9 +212,9 @@ public class EBRetry<Result, Error> implements EBCallback<Result,Error>, EBJSONS
         }
 
         if (logFails){
-            LOG.debug("Fail: " + error);
+            LOG.debug("Fail: " + error, error.getThrowable());
         } else {
-            LOG.trace("Fail: " + error);
+            LOG.trace("Fail: " + error, error.getThrowable());
         }
 
         if (retryStrategy.shouldContinue() || cancel){
