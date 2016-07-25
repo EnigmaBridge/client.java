@@ -7,7 +7,6 @@ import com.enigmabridge.create.EBCreateUOResponse;
 import com.enigmabridge.create.EBCreateUtils;
 import com.enigmabridge.provider.rsa.EBRSAPrivateKey;
 import com.enigmabridge.provider.specs.EBCreateUOTemplateSpec;
-import sun.security.rsa.RSAKeyFactory;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -124,19 +123,30 @@ public class EBKeyPairGenerator extends KeyPairGeneratorSpi {
                 throw new InvalidAlgorithmParameterException("RSA1024 and RSA2048 are supported");
             }
 
-            BigInteger var3 = this.rsaPublicExponent;
+            BigInteger publicExponent = this.rsaPublicExponent;
             if(params != null) {
-                var3 = ((RSAKeyGenParameterSpec)params).getPublicExponent();
+                publicExponent = ((RSAKeyGenParameterSpec)params).getPublicExponent();
             }
 
             try {
-                RSAKeyFactory.checkKeyLengths(keySize, var3, 512, 65536);
+                checkKeyLengths(keySize, publicExponent, 512, 65536);
             } catch (InvalidKeyException var5) {
                 throw new InvalidAlgorithmParameterException(var5.getMessage());
             }
 
         } else if(keySize < 512) {
             throw new InvalidAlgorithmParameterException("Key size must be at least 512 bit");
+        }
+    }
+
+    public static void checkKeyLengths(int keySize, BigInteger publicModulus, int var2, int var3) throws InvalidKeyException {
+        if(var2 > 0 && keySize < var2) {
+            throw new InvalidKeyException("RSA keys must be at least " + var2 + " bits long");
+        } else {
+            int var4 = Math.min(var3, 16384);
+            if(keySize > var4) {
+                throw new InvalidKeyException("RSA keys must be no longer than " + var4 + " bits");
+            }
         }
     }
 
