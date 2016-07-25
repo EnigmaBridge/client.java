@@ -31,6 +31,12 @@ public class EBConnector {
     public static final EBAdditionalTrust DEFAULT_TRUST = new EBAdditionalTrust(true, true, (InputStream) null);
 
     /**
+     * Default retry strategy for network related errors (IOExceptions).
+     * Strategy = 3 fast attempts.
+     */
+    public static final EBRetryStrategy DEFAULT_RETRY = new EBRetryStrategySimple(3);
+
+    /**
      * Request settings.
      */
     protected EBConnectionSettings settings;
@@ -74,42 +80,36 @@ public class EBConnector {
 
         final OkHttpClient client = clientBuilder.build();
 
-        EBRetryStrategy retryStrategy = (settings != null && settings.getRetryStrategyNetwork() != null) ?
-                settings.getRetryStrategyNetwork() : null;
+        // Take retry strategy from the settings. If not set, use default one.
+        final EBRetryStrategy retryStrategy = (settings != null && settings.getRetryStrategyNetwork() != null) ?
+                settings.getRetryStrategyNetwork() : DEFAULT_RETRY;
 
-        if (retryStrategy != null) {
-            // New retry mechanism
-            final EBRetry<EBRawResponse, Throwable> ebRetry = new EBRetry<EBRawResponse, Throwable>(retryStrategy.copy());
+        // New retry mechanism instance, for each request.
+        final EBRetry<EBRawResponse, Throwable> ebRetry = new EBRetry<EBRawResponse, Throwable>(retryStrategy.copy());
 
-            // Define retry job
-            ebRetry.setJob(new EBRetryJobSimpleSafeThrErr<EBRawResponse>() {
-                @Override
-                public void runAsyncNoException(EBCallback<EBRawResponse, Throwable> callback) throws Throwable {
-                    try {
-                        final EBRawResponse ebRawResponse = requestInternal(client);
-                        callback.onSuccess(ebRawResponse);
+        // Define retry job
+        ebRetry.setJob(new EBRetryJobSimpleSafeThrErr<EBRawResponse>() {
+            @Override
+            public void runAsyncNoException(EBCallback<EBRawResponse, Throwable> callback) throws Throwable {
+                try {
+                    final EBRawResponse ebRawResponse = requestInternal(client);
+                    callback.onSuccess(ebRawResponse);
 
-                    } catch(IOException exception) {
-                        callback.onFail(new EBRetryJobErrorThr(exception), false);
-                    }
+                } catch(IOException exception) {
+                    callback.onFail(new EBRetryJobErrorThr(exception), false);
                 }
-            });
-
-            // Start the job synchronously.
-            try {
-                return ebRetry.runSync();
-
-            } catch (EBRetryFailedException e) {
-                final Object error = e.getError();
-                throw new IOException(error instanceof Throwable ? (Throwable)error : null);
-
-            } catch (EBRetryException e){
-                throw new IOException("Fatal request error", e);
             }
+        });
 
-        } else {
-            // No retry mechanism - try call directly.
-            return requestInternal(client);
+        // Start the job synchronously.
+        try {
+            return ebRetry.runSync();
+
+        } catch (EBRetryFailedException e) {
+            throw new IOException(e);
+
+        } catch (EBRetryException e){
+            throw new IOException("Fatal request error", e);
         }
     }
 
