@@ -8,4 +8,10 @@
 #
 # When integration tests are started they use provider in the JAR file. 
 #
+if [ ! -f "client/main.properties" ]; then
+    echo "You need to setup \"client/main.properties\" file in order to build signed provider JAR file"
+    echo "Template file is available at client/main.properties.template"
+    exit -2
+fi
+
 cd client && mvn -DskipTests=true install -P release,client && cd -
