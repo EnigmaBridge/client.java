@@ -40,9 +40,9 @@ public class EBUtils {
 
     /**
      * Tries to extract json parameter as an integer.
-     * @param json
-     * @param key
-     * @return
+     * @param json target
+     * @param key field name
+     * @return extracted boolean
      * @throws JSONException
      */
     public static Boolean tryGetAsBoolean(JSONObject json, String key) throws JSONException {
@@ -72,9 +72,9 @@ public class EBUtils {
      * Tries to extract json parameter as a string.
      * If parameter is not present or is not a string, null is returned.
      *
-     * @param json
-     * @param key
-     * @return
+     * @param json target
+     * @param key field name
+     * @return extracted string
      * @throws JSONException
      */
     public static String getAsStringOrNull(JSONObject json, String key) {
@@ -91,9 +91,9 @@ public class EBUtils {
 
     /**
      * Tries to extract json parameter as an string.
-     * @param json
-     * @param key
-     * @return
+     * @param json target
+     * @param key field name
+     * @return extracted string
      * @throws JSONException
      */
     public static String tryGetAsString(JSONObject json, String key) throws JSONException {
@@ -102,9 +102,9 @@ public class EBUtils {
 
     /**
      * Tries to extract json parameter as an integer.
-     * @param json
-     * @param key
-     * @return
+     * @param json target
+     * @param key field name
+     * @return extracted integer
      * @throws JSONException
      */
     public static Integer tryGetAsInteger(JSONObject json, String key, int radix) throws JSONException {
@@ -127,9 +127,9 @@ public class EBUtils {
 
     /**
      * Tries to extract json parameter as a long.
-     * @param json
-     * @param key
-     * @return
+     * @param json target
+     * @param key field name
+     * @return extracted long
      * @throws JSONException
      */
     public static Long tryGetAsLong(JSONObject json, String key, int radix) throws JSONException {

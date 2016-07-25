@@ -249,8 +249,8 @@ public class UserObjectInfoBase implements UserObjectInfo, EBJSONSerializable {
 
     /**
      * Builds user object from string representation.
-     * @param json
-     * @return
+     * @param json to build from
+     * @return UserObjectInfoBase
      * @throws IOException
      * @throws ClassNotFoundException
      */
@@ -290,8 +290,8 @@ public class UserObjectInfoBase implements UserObjectInfo, EBJSONSerializable {
 
     /**
      * Serializes to JSON.
-     * @param json
-     * @return
+     * @param json where to serialize / null
+     * @return JSONObject
      */
     public JSONObject toJSON(JSONObject json){
         if (json == null){

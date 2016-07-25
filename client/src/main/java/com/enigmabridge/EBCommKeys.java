@@ -115,7 +115,7 @@ public class EBCommKeys implements SecretKey, CipherParameters, Length, Serializ
 
     /**
      * Converts to JSON representation.
-     * @param json parent/null
+     * @param json where to serialize / null
      * @return JSONObject
      */
     public JSONObject toJSON(JSONObject json){

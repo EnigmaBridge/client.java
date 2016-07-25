@@ -11,20 +11,20 @@ public class EBProcessDataResponse extends EBResponse {
     /**
      * Plain data parsed from the response.
      * Nor MACed neither encrypted.
-     * @output
+     * #output
      */
     protected byte[] plainData;
 
     /**
      * Protected data parsed from the response.
      * Protected by MAC, encrypted in transit.
-     * @output
+     * #output
      */
     protected byte[] protectedData;
 
     /**
      * USerObjectID parsed from the response.
-     * Ingeter, 4B.
+     * Integer, 4B.
      */
     protected long userObjectId;
 

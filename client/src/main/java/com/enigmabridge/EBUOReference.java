@@ -7,7 +7,7 @@ package com.enigmabridge;
 public interface EBUOReference {
     /**
      * Returns user object related to this key.
-     * @return
+     * @return UserObjectInfo
      */
     UserObjectInfo getUserObjectInfo();
 }

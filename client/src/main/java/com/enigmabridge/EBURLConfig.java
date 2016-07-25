@@ -183,7 +183,7 @@ public class EBURLConfig implements EBSettings {
      * Serializes object under given key to the settings. Can be retrieved with getElement().
      *
      * @param ebjsonSerializable
-     * @param key, if contains dot, considered as path, descends.
+     * @param key if contains dot, considered as path, descends.
      */
     protected void addElement(EBJSONSerializable ebjsonSerializable, String key){
         final String[] path = key.split("\\.");
@@ -250,7 +250,7 @@ public class EBURLConfig implements EBSettings {
      * This call is for reversal process - deserialization.
      *
      * @param field key to extract. If contains dot, considered as path (package like).
-     * @return
+     * @return JSONObject
      */
     public JSONObject getElement(String field){
         final String[] path = field.split("\\.");
