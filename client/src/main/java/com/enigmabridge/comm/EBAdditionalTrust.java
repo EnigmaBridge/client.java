@@ -378,6 +378,10 @@ public class EBAdditionalTrust implements EBJSONSerializable, Serializable {
      * operational complexity and limit your ability to migrate between certificate authorities. Do
      * not use custom trusted certificates in production without the blessing of your server's TLS
      * administrator.
+     *
+     * @param certificates
+     * @return the first trust manager identified
+     * @throws GeneralSecurityException if there is any security-related error
      */
     public static X509TrustManager trustManagerForCertificates(Collection<? extends Certificate> certificates)
             throws GeneralSecurityException
@@ -412,6 +416,8 @@ public class EBAdditionalTrust implements EBJSONSerializable, Serializable {
      * Tries to load default system trust managers with system CA list.
      *
      * @return array of a system trust managers.
+     * @throws NoSuchAlgorithmException - if cryptographic algorithm is unknown
+     * @throws KeyStoreException - error when accessing key store
      */
     public static TrustManager[] getSystemTrustManagers() throws NoSuchAlgorithmException, KeyStoreException {
         TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());

@@ -332,20 +332,20 @@ public class EBEnigmaProviderIT {
     }
 
     /**
-     * Test encryption & decryption of AES encryption keys generated with factory method.
+     * Test encryption and decryption of AES encryption keys generated with factory method.
      * One is generated for EB, another one directly with AES key. Operations should be compatible between each other
      * (encryption performed with EB should match decryption performed locally and vice versa).
      *
      * @param ebKey EB key
      * @param bcKey local key
      *
-     * @throws NoSuchPaddingException
-     * @throws NoSuchAlgorithmException
-     * @throws NoSuchProviderException
-     * @throws BadPaddingException
-     * @throws IllegalBlockSizeException
-     * @throws InvalidKeyException
-     * @throws InvalidAlgorithmParameterException
+     * @throws NoSuchPaddingException - if the padding scheme is unknown
+     * @throws NoSuchAlgorithmException - encryption algorithm is incorrect
+     * @throws NoSuchProviderException - crypto provider name is not registered
+     * @throws BadPaddingException - if the message padding is incorrect
+     * @throws IllegalBlockSizeException - encryption block size is wrong
+     * @throws InvalidKeyException - key value is invalid
+     * @throws InvalidAlgorithmParameterException - encryption parameters are incorrect
      */
     protected void testAESFactoryKeys(Key ebKey, Key bcKey) throws NoSuchPaddingException, NoSuchAlgorithmException, NoSuchProviderException, BadPaddingException, IllegalBlockSizeException, InvalidKeyException, InvalidAlgorithmParameterException {
         final SecureRandom rand = new SecureRandom();

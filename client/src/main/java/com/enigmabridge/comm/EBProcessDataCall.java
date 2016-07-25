@@ -368,7 +368,7 @@ public class EBProcessDataCall extends EBAPICall {
         return pdResponse.getProtectedData();
     }
 
-    // Getters & Setters.
+    // Getters and Setters.
     public String getProcessFunction() {
         return processFunction;
     }

@@ -13,7 +13,7 @@ import java.security.spec.RSAPublicKeySpec;
 import java.util.Date;
 
 /**
- * Misc utilities & constants for testing.
+ * Misc utilities and constants for testing.
  * Created by dusanklinec on 04.05.16.
  */
 public class EBTestingUtils {

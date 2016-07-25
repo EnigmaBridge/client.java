@@ -10,7 +10,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPublicKeySpec;
 
 /**
- * Misc utilities & constants for testing.
+ * Misc utilities and constants for testing.
  * Created by dusanklinec on 04.05.16.
  */
 public class EBTestingUtils {

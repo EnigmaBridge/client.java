@@ -187,7 +187,7 @@ public class EBAPICall {
 
 //    /**
 //     * Returns raw EB request for raw socket transport method.
-//     * For debugging & verification.
+//     * For debugging and verification.
 //     *
 //     * @returns {string}
 //     */

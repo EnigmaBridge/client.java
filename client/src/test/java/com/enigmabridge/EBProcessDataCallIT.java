@@ -340,7 +340,7 @@ public class EBProcessDataCallIT {
 
     /**
      * Extended remote RSA decryption test when public part of the key is known.
-     * Static pattern & random patterns are tested added.
+     * Static pattern and random patterns are tested added.
      *
      * @param uoid
      * @param mod
