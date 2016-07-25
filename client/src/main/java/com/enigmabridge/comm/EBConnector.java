@@ -164,6 +164,8 @@ public class EBConnector {
                 .setResponseTime(System.currentTimeMillis() - timeStart)
                 .setSuccessful(response.isSuccessful());
 
+        body.close();
+
         return ebResponse;
     }
 
