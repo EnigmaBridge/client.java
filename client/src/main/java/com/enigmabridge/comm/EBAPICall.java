@@ -4,6 +4,8 @@ import com.enigmabridge.EBEndpointInfo;
 import com.enigmabridge.EBEngine;
 import com.enigmabridge.EBSettings;
 import com.enigmabridge.UserObjectInfo;
+import com.enigmabridge.create.EBCreateUOCall;
+import com.enigmabridge.create.EBCreateUtils;
 
 /**
  * Base API call to the EB service.
@@ -129,7 +131,7 @@ public class EBAPICall {
      * Result is returned and set to the property.
      */
     public String buildApiBlock(){
-        return buildApiBlock(null, null);
+        return buildApiBlock(null, null, null);
     }
 
     /**
@@ -139,13 +141,15 @@ public class EBAPICall {
      * Result is returned and set to the property.
      *
      * @param apiKey API key string
-     * @param low4B  integer or hex-coded string.
+     * @param uoId  integer or hex-coded string.
+     * @param uoType  user object type. Integer or hex-coded string.
      */
-    public String buildApiBlock(String apiKey, Integer low4B){
+    public String buildApiBlock(String apiKey, Long uoId, Long uoType){
         String apiKeyToUser = apiKey == null ? this.getApiKey() : apiKey;
-        int low4b = low4B == null ? (int)this.getUo().getUoid() : low4B;
+        long uoIdr = uoId   == null ? this.getUo().getUoid() : uoId;
+        long type  = uoType == null ? this.getUo().getUserObjectType().getValue() : uoType;
 
-        this.apiBlock = String.format("%s%010x", apiKeyToUser, low4b);
+        this.apiBlock = EBCreateUtils.getUoHandle(apiKeyToUser, uoIdr, type);
         return this.apiBlock;
     }
 

@@ -12,6 +12,7 @@ import java.util.Arrays;
  */
 public class EBCreateUORequest implements Serializable {
     private long objectId;
+    private long objectType;
     private byte[] object;
     private String importKeyId;
     private String authorization;
@@ -44,6 +45,11 @@ public class EBCreateUORequest implements Serializable {
         return this;
     }
 
+    public EBCreateUORequest setObjectType(long objectType) {
+        this.objectType = objectType;
+        return this;
+    }
+
     // Getters
 
     public long getObjectId() {
@@ -64,6 +70,10 @@ public class EBCreateUORequest implements Serializable {
 
     public String getContextparams() {
         return contextparams;
+    }
+
+    public long getObjectType() {
+        return objectType;
     }
 
     @Override
@@ -98,7 +108,8 @@ public class EBCreateUORequest implements Serializable {
     public String toString() {
         return "EBCreateUORequest{" +
                 "objectId=" + objectId +
-                ", object=" + EBUtils.byte2hex(object) +
+                ", objectType=" + objectType +
+                ", object=" + Arrays.toString(object) +
                 ", importKeyId='" + importKeyId + '\'' +
                 ", authorization='" + authorization + '\'' +
                 ", contextparams='" + contextparams + '\'' +

@@ -134,7 +134,7 @@ public class EBGetPubKeyCall extends EBAPICall implements EBResponseParser{
      * Builds request data.
      */
     public void build() throws IOException {
-        this.buildApiBlock(getApiKey(), 0);
+        this.buildApiBlock(getApiKey(), 0L, 0L);
 
         // Build raw request.
         rawRequest = new EBRawRequest();

@@ -174,7 +174,7 @@ public class EBProcessDataCall extends EBAPICall {
      * @param length - number of bytes to read from request data
      */
     public void build(byte[] requestData, int offset, int length) throws IOException {
-        this.buildApiBlock(null, null);
+        this.buildApiBlock(null, null, null);
 
         // Build raw request.
         rawRequest = new EBRawRequest();

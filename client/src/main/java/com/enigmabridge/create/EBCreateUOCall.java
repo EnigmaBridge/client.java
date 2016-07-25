@@ -117,7 +117,7 @@ public class EBCreateUOCall extends EBAPICall implements EBResponseParser {
      * Builds request data.
      */
     public void build(EBCreateUORequest request) throws IOException {
-        this.buildApiBlock(getApiKey(), (int) request.getObjectId());
+        this.buildApiBlock(getApiKey(), request.getObjectId(), request.getObjectType());
 
         // Build raw request.
         rawRequest = new EBRawRequest();

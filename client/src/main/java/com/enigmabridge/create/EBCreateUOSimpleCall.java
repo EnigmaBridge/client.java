@@ -1,9 +1,6 @@
 package com.enigmabridge.create;
 
-import com.enigmabridge.EBEndpointInfo;
-import com.enigmabridge.EBEngine;
-import com.enigmabridge.EBInvalidException;
-import com.enigmabridge.EBSettings;
+import com.enigmabridge.*;
 import com.enigmabridge.comm.EBConnectionSettings;
 import com.enigmabridge.comm.EBCorruptedException;
 
@@ -177,6 +174,7 @@ public class EBCreateUOSimpleCall {
         final EBCreateUORequest createRequest = new EBCreateUORequest();
         createRequest
                 .setObjectId(templateResponse.getObjectId())
+                .setObjectType(tplRequest.getType())
                 .setObject(template)
                 .setImportKeyId(importKeyUsed.getId())
                 .setAuthorization(templateResponse.getAuthorization());

@@ -118,7 +118,7 @@ public class EBGetUOTemplateCall extends EBAPICall implements EBResponseParser {
      * Builds request data.
      */
     public void build(EBUOGetTemplateRequest request) throws IOException {
-        this.buildApiBlock(getApiKey(), 0);
+        this.buildApiBlock(getApiKey(), 0L, 0L);
 
         // Build raw request.
         rawRequest = new EBRawRequest();
