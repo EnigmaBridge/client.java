@@ -6,7 +6,7 @@ package com.enigmabridge;
 public interface EBLogger {
     /**
      * Change current logging level
-     * @param level new log level 1 <= level <= 6
+     * @param level new log level 1 &lt;= level &lt;= 6
      */
     public void setLogLevel(int level);
 

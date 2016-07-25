@@ -23,7 +23,7 @@ public interface UserObjectInfo extends EBSettings, Serializable {
     UserObjectType getUserObjectType();
 
      /**
-      * Communication encryption&MAC keys.
+      * Communication encryption &amp; MAC keys.
       * UO-specific. Strictly required for UO use.
       * @return EBCommKeys
       */

@@ -22,8 +22,8 @@ public class EBRSAKey extends EBKeyBase implements PrivateKey, RSAKey {
     static final long serialVersionUID = 1;
 
     /**
-     * If null for encryption operation -> operation fails.
-     * If null for decryption operation -> operation runs without blinding.
+     * If null for encryption operation -&gt; operation fails.
+     * If null for decryption operation -&gt; operation runs without blinding.
      */
     protected BigInteger publicExponent;
     protected BigInteger modulus;

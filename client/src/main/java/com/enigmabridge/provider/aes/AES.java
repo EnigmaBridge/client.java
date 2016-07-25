@@ -28,7 +28,7 @@ import java.security.spec.InvalidParameterSpecException;
 
 /**
  * AES cipher.
- * Provider registration & wrappers.
+ * Provider registration &amp; wrappers.
  *
  * Created by dusanklinec on 11.07.16.
  */

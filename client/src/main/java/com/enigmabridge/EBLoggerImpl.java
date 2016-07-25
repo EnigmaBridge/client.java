@@ -17,7 +17,7 @@ public class EBLoggerImpl {
 
     /**
      * Change current logging level
-     * @param level new log level 1 <= level <= 6
+     * @param level new log level 1 &lt;= level &lt;= 6
      */
     public static void setLogLevel(int level) {
         logLevel = level;
