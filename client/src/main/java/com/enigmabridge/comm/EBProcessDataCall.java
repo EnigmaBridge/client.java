@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.ObjectInput;
 
 /**
  * ProcessData() caller.
@@ -286,28 +287,22 @@ public class EBProcessDataCall extends EBAPICall {
 
         } catch (EBRetryFailedException e) {
             final Object error = e.getError();
-            if (error instanceof EBCorruptedException){
-                throw (EBCorruptedException)error;
-            } else if (error instanceof IOException){
-                throw (IOException)error;
-            }
-            throw new IOException(error instanceof Throwable ? (Throwable) error : null);
+            rethrowProcessDataError(error);
+
+            throw new IOException("ProcessData failed", e);
 
         } catch(EBRetryAbortedException e) {
             final Object error = e.getError();
-            if (error instanceof EBCorruptedException){
-                throw (EBCorruptedException)error;
-            } else if (error instanceof IOException){
-                throw (IOException)error;
-            }
-            throw new IOException(error instanceof Throwable ? (Throwable) error : null);
+            rethrowProcessDataError(error);
+
+            throw new IOException("ProcessData aborted", e);
 
         } catch (EBRetryException e){
             throw new IOException("Fatal request error", e);
         }
     }
 
-    public EBProcessDataResponse doRequestInternal(byte[] requestData, int offset, int length) throws IOException, EBCorruptedException {
+    protected EBProcessDataResponse doRequestInternal(byte[] requestData, int offset, int length) throws IOException, EBCorruptedException {
         if (apiBlock == null && requestData == null){
             throw new IllegalArgumentException("Call was not built with request data, cannot build now - no data");
         } else if (requestData != null){
@@ -378,5 +373,13 @@ public class EBProcessDataCall extends EBAPICall {
 
     protected void setProcessFunction(String processFunction) {
         this.processFunction = processFunction;
+    }
+
+    protected void rethrowProcessDataError(Object t) throws IOException, EBCorruptedException {
+        if (t instanceof EBCorruptedException){
+            throw (EBCorruptedException)t;
+        } else if (t instanceof IOException){
+            throw (IOException)t;
+        }
     }
 }
