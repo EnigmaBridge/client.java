@@ -31,6 +31,9 @@ public class EBCreateUOSimpleCall {
     // Keys to set to UO.
     protected List<EBUOTemplateKey> keys = null;
 
+    // Request used to create UO.
+    protected EBCreateUORequest createRequest;
+
     // Response from creating new UO.
     protected EBCreateUOResponse response;
 
@@ -171,7 +174,7 @@ public class EBCreateUOSimpleCall {
         this.templateKeysUsed = processor.getTemplateKeysUsed();
 
         // Create UO.
-        final EBCreateUORequest createRequest = new EBCreateUORequest();
+        createRequest = new EBCreateUORequest();
         createRequest
                 .setObjectId(templateResponse.getObjectId())
                 .setObjectType(tplRequest.getType())
@@ -217,5 +220,9 @@ public class EBCreateUOSimpleCall {
             templateKeysUsed = new LinkedList<EBUOTemplateKey>();
         }
         return templateKeysUsed;
+    }
+
+    public EBCreateUORequest getCreateRequest() {
+        return createRequest;
     }
 }
