@@ -1,5 +1,6 @@
 package com.enigmabridge;
 
+import com.enigmabridge.comm.EBCommStatus;
 import com.enigmabridge.comm.EBConnectionSettings;
 import com.enigmabridge.create.*;
 import com.enigmabridge.misc.EBTestingUtils;
@@ -136,6 +137,8 @@ public class EBCreateManyIT {
             if (response.isCodeOk()) {
                 createdUOSuccess.incrementAndGet();
                 lastHandle = response.getHandle().toString();
+            } else if (response.getStatusCode() == EBCommStatus.ERROR_CLASS_ERR_CHECK_ERRORS_6f) {
+                LOG.debug("6f00: " + callBld.getCreateRequest());
             }
         } catch(Exception e){
             //LOG.error("Create failed: " + e.getMessage(), e);
