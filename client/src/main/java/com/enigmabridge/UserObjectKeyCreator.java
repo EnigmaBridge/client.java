@@ -4,6 +4,8 @@ import com.enigmabridge.comm.EBCorruptedException;
 import com.enigmabridge.create.*;
 import com.enigmabridge.create.misc.EBRSAPrivateCrtKey;
 import com.enigmabridge.create.misc.EBRSAPrivateCrtKeyWrapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
@@ -20,6 +22,8 @@ import java.security.spec.RSAPrivateKeySpec;
  * Created by dusanklinec on 13.07.16.
  */
 public class UserObjectKeyCreator {
+    private static final Logger LOG = LoggerFactory.getLogger(UserObjectKeyCreator.class);
+
     protected SecureRandom random;
     protected EBEngine engine;
 
@@ -282,6 +286,9 @@ public class UserObjectKeyCreator {
         try {
             final EBCreateUOResponse response = createCall.create();
             if (!response.isCodeOk()){
+                if (EBDevSettings.shouldLogFailedCreateUO()){
+                    LOG.debug("Failed createUO: " + createCall.getCreateRequest());
+                }
                 throw new EBEngineException("Could not create UO - response: " + response.toString());
             }
 
