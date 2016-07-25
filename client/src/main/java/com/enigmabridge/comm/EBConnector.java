@@ -19,7 +19,6 @@ import static org.bouncycastle.crypto.tls.ConnectionEnd.client;
  * Lowest EB level of abstraction for remote calls.
  *
  * In future this may provide outputStream
- * TODO: implement multiple attempts in case of a network error.
  *
  * Created by dusanklinec on 26.04.16.
  */

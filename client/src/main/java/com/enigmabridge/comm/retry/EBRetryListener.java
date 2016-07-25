@@ -1,6 +1,10 @@
 package com.enigmabridge.comm.retry;
 
 /**
+ * Listener for Retry mechanism to listen for job retry status.
+ * Listener is notified if job succeeds or fails.
+ * It is added to the list of listeners in the EBRetry.
+ *
  * Created by dusanklinec on 21.07.16.
  */
 public interface EBRetryListener<Result, Error> {

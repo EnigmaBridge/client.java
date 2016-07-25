@@ -1,6 +1,9 @@
 package com.enigmabridge.comm.retry;
 
 /**
+ * Simple retry job implementation.
+ * Jobs can extend this abstract class anonymously to simplify the usage of retry mechanism.
+ *
  * Created by dusanklinec on 21.07.16.
  */
 public abstract class EBRetryJobSimple<Result, Error> implements EBRetryJob<Result, Error> {

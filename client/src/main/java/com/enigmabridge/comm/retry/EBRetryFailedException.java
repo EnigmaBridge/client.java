@@ -2,12 +2,12 @@ package com.enigmabridge.comm.retry;
 
 /**
  * Exception thrown when calling sync job.
+ * Semantics: job failed for some reason. E.g., maximum number of attempts failed.
+ * Underlying error is set.
+ *
  * Created by dusanklinec on 21.07.16.
  */
 public class EBRetryFailedException extends EBRetryException {
-    protected Object error;
-    protected EBRetry retry;
-
     public EBRetryFailedException() {
     }
 
@@ -24,33 +24,19 @@ public class EBRetryFailedException extends EBRetryException {
     }
 
     public EBRetryFailedException(Object error, EBRetry retry) {
-        this.error = error;
-        this.retry = retry;
+        super(error, retry);
     }
 
     public EBRetryFailedException(String message, Object error, EBRetry retry) {
-        super(message);
-        this.error = error;
-        this.retry = retry;
+        super(message, error, retry);
     }
 
     public EBRetryFailedException(String message, Throwable cause, Object error, EBRetry retry) {
-        super(message, cause);
-        this.error = error;
-        this.retry = retry;
+        super(message, cause, error, retry);
     }
 
     public EBRetryFailedException(Throwable cause, Object error, EBRetry retry) {
-        super(cause);
-        this.error = error;
-        this.retry = retry;
+        super(cause, error, retry);
     }
 
-    public Object getError() {
-        return error;
-    }
-
-    public EBRetry getRetry() {
-        return retry;
-    }
 }

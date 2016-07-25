@@ -1,35 +1,11 @@
 package com.enigmabridge.comm.retry;
 
 /**
+ * Retry exception - retry mechanism aborted, typically with fatal error.
+ *
  * Created by dusanklinec on 21.07.16.
  */
 public class EBRetryAbortedException extends EBRetryException {
-    protected Object error;
-    protected EBRetry retry;
-
-    public EBRetryAbortedException(Object error, EBRetry retry) {
-        this.error = error;
-        this.retry = retry;
-    }
-
-    public EBRetryAbortedException(String message, Object error, EBRetry retry) {
-        super(message);
-        this.error = error;
-        this.retry = retry;
-    }
-
-    public EBRetryAbortedException(String message, Throwable cause, Object error, EBRetry retry) {
-        super(message, cause);
-        this.error = error;
-        this.retry = retry;
-    }
-
-    public EBRetryAbortedException(Throwable cause, Object error, EBRetry retry) {
-        super(cause);
-        this.error = error;
-        this.retry = retry;
-    }
-
     public EBRetryAbortedException() {
     }
 
@@ -45,11 +21,19 @@ public class EBRetryAbortedException extends EBRetryException {
         super(cause);
     }
 
-    public Object getError() {
-        return error;
+    public EBRetryAbortedException(Object error, EBRetry retry) {
+        super(error, retry);
     }
 
-    public EBRetry getRetry() {
-        return retry;
+    public EBRetryAbortedException(String message, Object error, EBRetry retry) {
+        super(message, error, retry);
+    }
+
+    public EBRetryAbortedException(String message, Throwable cause, Object error, EBRetry retry) {
+        super(message, cause, error, retry);
+    }
+
+    public EBRetryAbortedException(Throwable cause, Object error, EBRetry retry) {
+        super(cause, error, retry);
     }
 }
