@@ -3,7 +3,6 @@ package com.enigmabridge.provider.parameters;
 import com.enigmabridge.*;
 import com.enigmabridge.comm.EBConnectionSettings;
 import com.enigmabridge.provider.EBUOKey;
-import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
 import org.bouncycastle.crypto.params.KeyParameter;
 
 /**

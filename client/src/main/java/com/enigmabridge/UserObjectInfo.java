@@ -1,7 +1,5 @@
 package com.enigmabridge;
 
-import com.enigmabridge.comm.EBConnectionSettings;
-
 import java.io.Serializable;
 
 /**

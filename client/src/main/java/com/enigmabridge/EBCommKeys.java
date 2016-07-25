@@ -1,15 +1,14 @@
 package com.enigmabridge;
 
-import com.enigmabridge.comm.EBCommUtils;
 import com.enigmabridge.comm.EBProcessDataCipher;
 import org.bouncycastle.crypto.CipherParameters;
 import org.json.JSONObject;
 import sun.security.util.Length;
 
+import javax.crypto.SecretKey;
 import java.io.Serializable;
 import java.security.SecureRandom;
 import java.util.Arrays;
-import javax.crypto.SecretKey;
 
 /**
  * EB communication keys.

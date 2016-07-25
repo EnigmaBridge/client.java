@@ -1,7 +1,5 @@
 package com.enigmabridge.comm;
 
-import com.enigmabridge.EBCommKeys;
-import com.enigmabridge.EBEndpointInfo;
 import com.enigmabridge.EBJSONSerializable;
 import com.enigmabridge.EBUtils;
 import okhttp3.OkHttpClient;
@@ -9,8 +7,6 @@ import org.json.JSONObject;
 
 import javax.net.ssl.*;
 import java.io.*;
-import java.nio.Buffer;
-import java.nio.ByteBuffer;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;

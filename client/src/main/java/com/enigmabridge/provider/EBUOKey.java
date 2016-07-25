@@ -3,7 +3,6 @@ package com.enigmabridge.provider;
 import com.enigmabridge.EBEngineReference;
 import com.enigmabridge.EBOperationConfigurationReference;
 import com.enigmabridge.UserObjectKey;
-import com.enigmabridge.provider.EBKey;
 
 /**
  * EB key represented with single UO.

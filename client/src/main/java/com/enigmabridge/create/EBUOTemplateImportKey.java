@@ -1,11 +1,5 @@
 package com.enigmabridge.create;
 
-import com.enigmabridge.EBEndpointInfo;
-import com.enigmabridge.EBSettingsBase;
-import com.enigmabridge.comm.EBConnectionSettings;
-import org.json.JSONObject;
-
-import java.net.MalformedURLException;
 import java.util.Arrays;
 
 /**

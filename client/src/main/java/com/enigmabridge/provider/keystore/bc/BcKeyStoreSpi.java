@@ -14,7 +14,6 @@ import org.bouncycastle.crypto.io.MacOutputStream;
 import org.bouncycastle.crypto.macs.HMac;
 import org.bouncycastle.jcajce.util.JcaJceHelper;
 import org.bouncycastle.jce.interfaces.BCKeyStore;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.util.Arrays;
 import org.bouncycastle.util.io.Streams;
 import org.bouncycastle.util.io.TeeOutputStream;

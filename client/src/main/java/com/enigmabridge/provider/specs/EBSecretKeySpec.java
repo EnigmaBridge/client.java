@@ -1,7 +1,6 @@
 package com.enigmabridge.provider.specs;
 
 import com.enigmabridge.EBEngine;
-import com.enigmabridge.EBEngineReference;
 import com.enigmabridge.create.EBUOGetTemplateRequest;
 
 import javax.crypto.spec.SecretKeySpec;

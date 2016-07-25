@@ -5,7 +5,7 @@ package com.enigmabridge.provider.aes;
  */
 
 import com.enigmabridge.provider.EnigmaProvider;
-import org.bouncycastle.crypto.engines.*;
+import org.bouncycastle.crypto.engines.RFC3394WrapEngine;
 
 /**
  * an implementation of the AES Key Wrapper from the NIST Key Wrap

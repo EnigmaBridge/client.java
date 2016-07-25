@@ -18,7 +18,6 @@ import org.bouncycastle.jcajce.PKCS12Key;
 import org.bouncycastle.jcajce.PKCS12StoreParameter;
 import org.bouncycastle.jcajce.spec.GOST28147ParameterSpec;
 import org.bouncycastle.jcajce.spec.PBKDF2KeySpec;
-import org.bouncycastle.jcajce.util.BCJcaJceHelper;
 import org.bouncycastle.jcajce.util.JcaJceHelper;
 import org.bouncycastle.jce.interfaces.BCKeyStore;
 import org.bouncycastle.jce.interfaces.PKCS12BagAttributeCarrier;

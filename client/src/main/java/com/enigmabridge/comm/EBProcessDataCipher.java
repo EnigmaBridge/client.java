@@ -6,11 +6,9 @@ import com.enigmabridge.EBEngineException;
 import org.bouncycastle.crypto.BlockCipher;
 import org.bouncycastle.crypto.InvalidCipherTextException;
 import org.bouncycastle.crypto.Mac;
-import org.bouncycastle.crypto.OutputLengthException;
 import org.bouncycastle.crypto.engines.AESLightEngine;
 import org.bouncycastle.crypto.macs.CBCBlockCipherMac;
 import org.bouncycastle.crypto.params.KeyParameter;
-import org.bouncycastle.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

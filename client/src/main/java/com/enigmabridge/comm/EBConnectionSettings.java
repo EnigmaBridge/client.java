@@ -1,7 +1,5 @@
 package com.enigmabridge.comm;
 
-import com.enigmabridge.EBCommKeys;
-import com.enigmabridge.EBEndpointInfo;
 import com.enigmabridge.EBJSONSerializable;
 import com.enigmabridge.EBUtils;
 import com.enigmabridge.comm.retry.EBRetryStrategy;
@@ -9,7 +7,6 @@ import com.enigmabridge.comm.retry.EBRetryStrategyFactory;
 import org.json.JSONObject;
 
 import java.io.Serializable;
-import java.net.MalformedURLException;
 
 /**
  * Misc connection preferences for connectors.

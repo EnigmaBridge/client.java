@@ -3,7 +3,6 @@ package com.enigmabridge.provider.parameters;
 import com.enigmabridge.EBEngine;
 import com.enigmabridge.EBOperationConfiguration;
 import com.enigmabridge.UserObjectKey;
-import com.enigmabridge.UserObjectKeyType;
 
 import java.math.BigInteger;
 

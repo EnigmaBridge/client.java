@@ -2,10 +2,9 @@ package com.enigmabridge.provider;
 
 import com.enigmabridge.*;
 import com.enigmabridge.comm.EBConnectionSettings;
-import com.enigmabridge.provider.asn1.EBJSONEncodedUOKey;
 import com.enigmabridge.provider.asn1.EBASNUtils;
+import com.enigmabridge.provider.asn1.EBJSONEncodedUOKey;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.json.JSONObject;

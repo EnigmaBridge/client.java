@@ -6,8 +6,6 @@ import org.bouncycastle.crypto.params.AEADParameters;
 import org.bouncycastle.crypto.params.ParametersWithIV;
 import org.bouncycastle.util.Arrays;
 
-import javax.crypto.Cipher;
-
 /**
  * Encrypt-then-MAC cipher.
  * Not implemented yet, do not use...

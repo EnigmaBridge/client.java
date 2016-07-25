@@ -1,6 +1,5 @@
 package com.enigmabridge;
 
-import com.enigmabridge.comm.EBCommUtils;
 import com.enigmabridge.comm.EBCorruptedException;
 import com.enigmabridge.create.*;
 import com.enigmabridge.create.misc.EBRSAPrivateCrtKey;

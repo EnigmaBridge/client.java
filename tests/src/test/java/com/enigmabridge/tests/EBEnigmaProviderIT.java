@@ -21,9 +21,8 @@ import javax.crypto.spec.SecretKeySpec;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.security.*;
-import java.security.cert.*;
 import java.security.cert.Certificate;
-import java.security.spec.KeySpec;
+import java.security.cert.X509Certificate;
 import java.security.spec.RSAPrivateCrtKeySpec;
 import java.security.spec.RSAPublicKeySpec;
 

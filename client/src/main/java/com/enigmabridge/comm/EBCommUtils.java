@@ -1,8 +1,5 @@
 package com.enigmabridge.comm;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.security.SecureRandom;
