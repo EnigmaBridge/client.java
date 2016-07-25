@@ -10,6 +10,8 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Represents one-string configuration of EB engine / UO.
@@ -20,6 +22,8 @@ import java.util.*;
 public class EBURLConfig implements EBSettings {
     private static final String FIELD_API_KEY = "apiKey";
     private static final String FIELD_SETTINGS = "settings";
+
+    private static final Pattern PATTERN_NODE = Pattern.compile("^[a-zA-Z_][a-zA-Z0-9_]*$", Pattern.CASE_INSENSITIVE);
 
     /**
      * API key for using EB service.
@@ -182,14 +186,57 @@ public class EBURLConfig implements EBSettings {
     /**
      * Serializes object under given key to the settings. Can be retrieved with getElement().
      *
-     * @param ebjsonSerializable
-     * @param key if contains dot, considered as path, descends.
+     * @param ebjsonSerializable serializable object to add to the URL configuration
+     * @param key name of the object to serialize. If contains dot, considered as path, descends.
      */
     protected void addElement(EBJSONSerializable ebjsonSerializable, String key){
-        final String[] path = key.split("\\.");
+        final String[] path = getKeyPath(key);
         final String last = path[path.length-1];
         final JSONObject parent = getParentNode(jsonRoot, path, true);
         parent.put(last, ebjsonSerializable.toJSON(null));
+    }
+
+    /**
+     * Sanitizes node path encoded in key.
+     * If path is not valid (sanity check) IllegalArgumentException is thrown.
+     *
+     * @param key key containing path to process
+     * @return path
+     */
+    public static String[] getKeyPath(String key){
+        final int componentCounts = getPathComponentCounts(key);
+        if (componentCounts > 32){
+            throw new IllegalArgumentException("Path represented by key is too deep");
+        }
+
+        final String[] path = key.split("\\.");
+        for(String node : path){
+            final int ln = node.length();
+            if (ln == 0){
+                throw new IllegalArgumentException("Path node cannot be empty");
+            }
+            if (ln > 256){
+                throw new IllegalArgumentException("Path node is too long");
+            }
+
+            final Matcher matcher = PATTERN_NODE.matcher(node);
+            if (!matcher.matches()){
+                throw new IllegalArgumentException("Path node contains illegal characters");
+            }
+        }
+
+        return path;
+    }
+
+    /**
+     * Counts number of node paths in the key.
+     * {@literal a.b.c} return 3, {@literal a} returns 1.
+     *
+     * @param key to process
+     * @return number of components in the path.
+     */
+    public static int getPathComponentCounts(String key){
+        return (key.length() - key.replace(".", "").length()) + 1;
     }
 
     /**
@@ -253,7 +300,7 @@ public class EBURLConfig implements EBSettings {
      * @return JSONObject
      */
     public JSONObject getElement(String field){
-        final String[] path = field.split("\\.");
+        final String[] path = getKeyPath(field);
         final String last = path[path.length-1];
         final JSONObject parent = getParentNode(jsonRoot, path, false);
         return parent != null && parent.has(last) ? parent.getJSONObject(last) : null;
@@ -301,7 +348,7 @@ public class EBURLConfig implements EBSettings {
         for (Map.Entry<String, String> eset : options.entrySet()) {
             final String hdr = eset.getKey();
             final String val = eset.getValue();
-            final String[] path = hdr.split("\\.");
+            final String[] path = getKeyPath(hdr);
             final JSONObject parent = getParentNode(root, path);
             parent.put(path[path.length-1], val);
         }
@@ -309,7 +356,7 @@ public class EBURLConfig implements EBSettings {
         for (Map.Entry<String, List<String>> eset : optionsList.entrySet()) {
             final String hdr = eset.getKey();
             final List<String> lst = eset.getValue();
-            final String[] path = hdr.split("\\.");
+            final String[] path = getKeyPath(hdr);
             final JSONObject parent = getParentNode(root, path);
             final StringBuilder sb = new StringBuilder().append("[");
             boolean first = true;
