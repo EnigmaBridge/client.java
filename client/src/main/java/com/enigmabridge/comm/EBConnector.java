@@ -96,6 +96,7 @@ public class EBConnector {
                     callback.onSuccess(ebRawResponse);
 
                 } catch(IOException exception) {
+                    LOG.debug("EB failed: " + rawRequest.getPath());
                     callback.onFail(new EBRetryJobErrorThr(exception), false);
                 }
             }
