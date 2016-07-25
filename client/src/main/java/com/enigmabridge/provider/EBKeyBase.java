@@ -93,8 +93,8 @@ public abstract class EBKeyBase implements EBUOKey, EBJSONSerializable {
 
     /**
      * Serializes to JSON.
-     * @param json
-     * @return
+     * @param json where to serialize / null
+     * @return JSONObject
      */
     @Override
     public JSONObject toJSON(JSONObject json) {

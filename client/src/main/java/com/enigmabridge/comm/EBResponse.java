@@ -14,13 +14,13 @@ public class EBResponse implements Serializable {
 
     /**
      * Parsed status code. 0x9000 = OK.
-     * @output
+     * #output
      */
     short statusCode = -1;
 
     /**
      * Parsed status detail.
-     * @output
+     * #output
      */
     String statusDetail;
 

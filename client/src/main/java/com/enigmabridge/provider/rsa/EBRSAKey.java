@@ -117,8 +117,8 @@ public class EBRSAKey extends EBKeyBase implements PrivateKey, RSAKey {
 
     /**
      * Serializes to JSON.
-     * @param json
-     * @return
+     * @param json where to serialize / null
+     * @return JSONObject
      */
     @Override
     public JSONObject toJSON(JSONObject json) {

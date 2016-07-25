@@ -35,7 +35,7 @@ public class EBRSAKeyParameter extends EBAsymmetricKeyParameter {
 
     /**
      * Returns true if blinding is possible with given parameters.
-     * @return
+     * @return true if blinding is possible
      */
     public boolean canBlind(){
         return modulus != null

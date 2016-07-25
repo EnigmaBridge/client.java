@@ -149,8 +149,8 @@ public class UserObjectType implements Serializable{
 
     /**
      * Builder from the backing buffer.
-     * @param buffer
-     * @return
+     * @param buffer numerical representation
+     * @return UserObjectType instance
      */
     public static UserObjectType valueOf(long buffer){
         return new UserObjectType(buffer);
@@ -368,7 +368,7 @@ public class UserObjectType implements Serializable{
      * Serializes to JSON.
      * @param parent
      * @param key
-     * @return
+     * @return JSONObject
      */
     public Object toJSON(JSONObject parent, String key){
         if (parent == null){

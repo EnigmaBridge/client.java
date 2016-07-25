@@ -125,8 +125,8 @@ public class EBSymmetricKey extends EBKeyBase implements EBJSONSerializable, Sec
 
     /**
      * Serializes to JSON.
-     * @param json
-     * @return
+     * @param json where to serialize / null
+     * @return JSONObject
      */
     @Override
     public JSONObject toJSON(JSONObject json) {
@@ -135,8 +135,9 @@ public class EBSymmetricKey extends EBKeyBase implements EBJSONSerializable, Sec
 
     /**
      * Serializes to JSON.
-     * @param json
-     * @return
+     * @param json where to serialize / null
+     * @param includeInversion true if inversion key should be serialized too
+     * @return JSONObject
      */
     public JSONObject toJSON(JSONObject json, boolean includeInversion) {
         if (json == null){
