@@ -37,7 +37,7 @@ public class EBAdditionalTrust implements EBJSONSerializable, Serializable {
     protected transient SSLSocketFactory sslSocketFactory;
 
     /**
-     * Initializes trust in a default way - with letsencrypt & system roots included.
+     * Initializes trust in a default way - with letsencrypt &amp; system roots included.
      */
     public EBAdditionalTrust() {
         letsEncryptFlag = true;
@@ -46,7 +46,7 @@ public class EBAdditionalTrust implements EBJSONSerializable, Serializable {
     }
 
     /**
-     * Initializes trust in a default way - with letsencrypt & system roots included + user can add
+     * Initializes trust in a default way - with letsencrypt &amp; system roots included + user can add
      * own trusted roots in PEM format in the input stream.
      * @param additionalRoots input stream of additional trusted roots in PEM format, concatenated. May be null.
      */

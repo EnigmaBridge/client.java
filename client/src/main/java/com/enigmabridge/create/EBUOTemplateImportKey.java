@@ -5,7 +5,7 @@ import java.util.Arrays;
 /**
  * Asymmetric public import key - for encryption for smartcard.
  *
- * {"id": <string>, "type":<"rsa2048"|"rsa1024">, "publickey": <string-serialized public key> },
+ * {@code {"id": <string>, "type":<"rsa2048"|"rsa1024">, "publickey": <string-serialized public key> } }
  *
  * Created by dusanklinec on 28.06.16.
  */

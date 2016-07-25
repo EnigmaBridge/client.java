@@ -75,6 +75,7 @@ public class EBRetry<Result, Error> implements EBCallback<Result,Error>, EBJSONS
 
     /**
      * Runs the job asynchronously.
+     * @return future for manipulating async job
      */
     public EBFuture<Result, Error> runAsync(){
         startedAsBlocking = false;
@@ -112,6 +113,8 @@ public class EBRetry<Result, Error> implements EBCallback<Result,Error>, EBJSONS
 
     /**
      * Blocking version of the run.
+     * @return Result of the sync operation
+     * @throws EBRetryException retry failed
      */
     public Result runSync() throws EBRetryException {
         reset();

@@ -29,6 +29,8 @@ public class EBProcessDataRequestBuilder {
      *
      * @param requestData - bitArray with userdata to perform operation on (will be encrypted, MAC protected)
      * @return request
+     * @throws IOException io
+     * @throws EBEngineException ex
      */
     public EBProcessDataRequest build(byte[] requestData) throws IOException, EBEngineException {
         return build(null, requestData, 0, requestData == null ? 0 : requestData.length);
@@ -41,6 +43,8 @@ public class EBProcessDataRequestBuilder {
      * @param offset - offset to start with request data
      * @param length - number of bytes to read from request data
      * @return request
+     * @throws IOException io
+     * @throws EBEngineException ex
      */
     public EBProcessDataRequest build(byte[] requestData, int offset, int length) throws IOException, EBEngineException {
         return build(null, requestData, offset, length);
@@ -52,6 +56,8 @@ public class EBProcessDataRequestBuilder {
      * @param plainData - bitArray of the plaintext data.
      * @param requestData - bitArray with userdata to perform operation on (will be encrypted, MAC protected)
      * @return request
+     * @throws IOException io
+     * @throws EBEngineException ex
      */
     public EBProcessDataRequest build(byte[] plainData, byte[] requestData) throws IOException, EBEngineException {
         return build(plainData, requestData, 0, requestData == null ? 0 : requestData.length);
@@ -65,6 +71,8 @@ public class EBProcessDataRequestBuilder {
      * @param requestDataOffset - offset to start with request data
      * @param requestDataLength - number of bytes to read from request data
      * @return request
+     * @throws IOException io
+     * @throws EBEngineException ex
      */
     public EBProcessDataRequest build(byte[] plainData, byte[] requestData, int requestDataOffset, int requestDataLength)
             throws IOException, EBEngineException

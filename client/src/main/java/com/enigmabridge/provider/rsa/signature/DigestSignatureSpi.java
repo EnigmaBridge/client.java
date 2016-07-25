@@ -196,7 +196,7 @@ public class DigestSignatureSpi
     }
 
     /**
-     * @deprecated replaced with <a href = "#engineSetParameter(java.security.spec.AlgorithmParameterSpec)">
+     * @deprecated replaced with <a href = "#engineSetParameter(java.security.spec.AlgorithmParameterSpec)">engineSetParameter</a>
      */
     protected void engineSetParameter(
         String param,

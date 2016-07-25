@@ -50,6 +50,7 @@ public class EBEndpointInfo implements Serializable, Cloneable {
      * Set a new connection string.
      * @param connectionString a new connection string to set
      * @return EndpointInfo (builder pattern)
+     * @throws MalformedURLException bad url
      */
     public EBEndpointInfo setConnectionString(String connectionString) throws MalformedURLException {
         final Matcher m = PROTOCOL_PATTERN.matcher(connectionString);

@@ -57,7 +57,7 @@ public class EBCommStatus {
     public final static short SW_AUTHUSERCTX_WRAP_LEN_MISMATCH =    (short)(ERROR_CLASS_CRITICAL | 0x013); /** SC this should cause immediate reset -  mismatch of length of wrapped and newly wrapped blob **/
     public final static short SW_CRYPTO_ENGINE_NOT_ALLOCATED =      (short)(ERROR_CLASS_CRITICAL | 0x00e); /** crypto engine not allocated - reject process request **/
     public static final short SW_STAT_NO_PERMISSIONS =              (short)(ERROR_CLASS_CRITICAL | 0x015);
-    public final static short SW_WRONG_INTERNAL_STATE =             (short)(ERROR_CLASS_CRITICAL | 0x018); /** from SC -> reset **/
+    public final static short SW_WRONG_INTERNAL_STATE =             (short)(ERROR_CLASS_CRITICAL | 0x018); /** from SC -&gt; reset **/
     public final static short SW_STAT_INVALID_USAGES_PROVIDED =     (short)(ERROR_CLASS_CRITICAL | 0x030); /** internal error of SC - unexpected negative number **/
     public final static short SW_STAT_NO_USER_OBJECT_VALUE =        (short)(ERROR_CLASS_CRITICAL | 0x035); /** set UO - no data - it must have passed crypto check **/
     public final static short SW_DATA_NOT_PROPERLY_ALLIGNED =       (short)(ERROR_CLASS_CRITICAL | 0x045); /** for derivation data for est. SC **/
@@ -67,8 +67,8 @@ public class EBCommStatus {
 
 
     // ERROR_CLASS_WRONGDATA
-    public final static short SW_STAT_NO_SUCH_FUNCTION =            (short)(ERROR_CLASS_WRONGDATA | 0x001); /** from SC -> reset **/
-    public final static short SW_PROCESS_FUNCTION_NOT_IMPLEMENTED = (short)(ERROR_CLASS_WRONGDATA | 0x004); /** wrong UO - deserialize => reject UO **/
+    public final static short SW_STAT_NO_SUCH_FUNCTION =            (short)(ERROR_CLASS_WRONGDATA | 0x001); /** from SC -&gt; reset **/
+    public final static short SW_PROCESS_FUNCTION_NOT_IMPLEMENTED = (short)(ERROR_CLASS_WRONGDATA | 0x004); /** wrong UO - deserialize =&gt; reject UO **/
     public final static short SW_STAT_DATA_NOT_PROCESSED =          (short)(ERROR_CLASS_WRONGDATA | 0x007); /** not from SE - incorrect parsing of request in JSONRequest **/
     public final static short SW_BASESE_FUNCTION_NOT_ALLOWED =      (short)(ERROR_CLASS_WRONGDATA | 0x00c); /** command not implemented by this SC type **/
     public static final short SW_SC_WRONG_LENGTH =                  (short)(ERROR_CLASS_WRONGDATA | 0x016); /** wrong APDU length - terminal error **/
@@ -136,7 +136,7 @@ public class EBCommStatus {
     public final static short SW_PUBLIC_KEY_NOT_AVAILABLE_YET =     (short)(ERROR_CLASS_SYNC | 0x080); /** export of ID public key before it's available **/
     public final static short SW_INCORRECT_APPLET_STATE =           (short)(ERROR_CLASS_SYNC | 0x081); /** mostly that SE is not operational OR when key not generated **/
     public static final short SW_STAT_ENROLSE_EXISTS =              (short)(ERROR_CLASS_SYNC | 0x082); /** not from SE **/
-    public static final short SW_NO_BILLING_INFO =                  (short)(ERROR_CLASS_SYNC | 0x084); /** no UO on SE -> no billing info **/
+    public static final short SW_NO_BILLING_INFO =                  (short)(ERROR_CLASS_SYNC | 0x084); /** no UO on SE -&gt; no billing info **/
     public final static short SW_COUNTER_OVERFLOW =                 (short)(ERROR_CLASS_SYNC | 0x085); /** billing info counter **/
     public final static short SW_STAT_SEEDSE_NOT_EXISTS =           (short)(ERROR_CLASS_SYNC | 0x087); /** not from SE **/
     public final static short SW_STAT_NO_APIKEY =                   (short)(ERROR_CLASS_SYNC | 0x088); /** not from SE **/

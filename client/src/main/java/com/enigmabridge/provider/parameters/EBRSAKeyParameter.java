@@ -12,7 +12,7 @@ import java.math.BigInteger;
  */
 public class EBRSAKeyParameter extends EBAsymmetricKeyParameter {
     /**
-     * Modulus & public exponents are required for blinding.
+     * Modulus &amp; public exponents are required for blinding.
      */
     protected BigInteger modulus;
     protected BigInteger publicExponent;

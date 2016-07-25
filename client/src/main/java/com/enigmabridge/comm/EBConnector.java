@@ -46,6 +46,9 @@ public class EBConnector {
 
     /**
      * Do the request, performs real service call.
+     *
+     * @return EBRawResponse
+     * @throws IOException IO
      */
     public EBRawResponse request() throws IOException {
         final OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder();
