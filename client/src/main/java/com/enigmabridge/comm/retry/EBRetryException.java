@@ -66,11 +66,10 @@ public class EBRetryException extends Exception {
     }
 
     protected void updateCauseIfApplicable(){
-        if (this.error == null || !(this.error instanceof Throwable)){
-            return;
+        final Throwable cause = getErrorCauseIfAny();
+        if (cause != null){
+            initCause(cause);
         }
-
-        initCause((Throwable) this.error);
     }
 
     /**
@@ -80,7 +79,23 @@ public class EBRetryException extends Exception {
      * @return Throwable or null
      */
     public Throwable getErrorCauseIfAny(){
-        return error != null && error instanceof Throwable ? (Throwable) error : null;
+        if (error == null){
+            return null;
+        }
+
+        if (error instanceof Throwable){
+            return (Throwable) error;
+        }
+
+        if (this.error instanceof EBRetryJobErrorThr){
+            return ((EBRetryJobErrorThr) this.error).getThrowable();
+        }
+
+        if (this.error instanceof EBRetryJobError){
+            return ((EBRetryJobError) this.error).getThrowable();
+        }
+
+        return null;
     }
 
     /**
