@@ -19,7 +19,7 @@ public class EBResponseParserBase implements EBResponseParser{
      * Parses common JSON headers from the response, e.g., status, to the provided message.
      * @param resp
      * @param data
-     * @returns {eb.comm.response}
+     * @return Response builder
      */
     public EBResponse.ABuilder parseCommonHeaders(EBResponse.ABuilder resp, JSONObject data){
         if (data == null || !data.has(FIELD_STATUS) || !data.has(FIELD_FUNCTION)){
@@ -40,7 +40,7 @@ public class EBResponseParserBase implements EBResponseParser{
      * @param data - json response
      * @param resp - response object to put data to.
      * @param options
-     * @returns request unwrapped response.
+     * @return request unwrapped response.
      */
     public EBResponse.ABuilder parseResponse(JSONObject data, EBResponse.ABuilder resp, EBResponseParserOptions options) throws EBCorruptedException{
         if (resp == null){

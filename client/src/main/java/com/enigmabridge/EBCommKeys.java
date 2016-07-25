@@ -115,8 +115,8 @@ public class EBCommKeys implements SecretKey, CipherParameters, Length, Serializ
 
     /**
      * Converts to JSON representation.
-     * @param json
-     * @return
+     * @param json parent/null
+     * @return JSONObject
      */
     public JSONObject toJSON(JSONObject json){
         if (json == null){
@@ -158,7 +158,7 @@ public class EBCommKeys implements SecretKey, CipherParameters, Length, Serializ
 
     /**
      * Returns true if commkeys are initialized correctly.
-     * @return
+     * @return true if keys can be used
      */
     public boolean areKeysOK(){
         return encKey != null && macKey != null && encKey.length == ENC_KEY_LEN && macKey.length == MAC_KEY_LEN;

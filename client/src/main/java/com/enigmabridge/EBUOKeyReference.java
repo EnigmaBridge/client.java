@@ -7,7 +7,7 @@ package com.enigmabridge;
 public interface EBUOKeyReference extends EBUOReference{
     /**
      * Returns EB key reference
-     * @return
+     * @return UserObjectKey
      */
     UserObjectKey getUserObjectKey();
 }

@@ -104,8 +104,8 @@ public class EBProcessDataCipher {
 
     /**
      * Gets output buffer size needed for the operation depending on the size of the input.
-     * @param inputSize
-     * @return
+     * @param inputSize input size
+     * @return size of the output buffer needed
      */
     public int getOutputBufferSize(int inputSize){
         final int cipherBlockSize = enc.getBlockSize();
@@ -133,9 +133,10 @@ public class EBProcessDataCipher {
      * Performs cipher operation on the given input data.
      * In case of invalid MAC, exception is thrown.
      *
-     * @param input
-     * @param inputOffset
-     * @return
+     * @param input buffer to process
+     * @param inputOffset offset
+     * @param length length
+     * @return result of process data operation
      * @throws EBCryptoException
      */
     public byte[] processBuffer(byte[] input, int inputOffset, int length) throws EBCryptoException {
@@ -162,7 +163,7 @@ public class EBProcessDataCipher {
      * @param inputLength
      * @param output
      * @param outputOffset
-     * @return
+     * @return result of process data operation
      */
     public int processBuffer(byte[] input, int inputOffset, int inputLength, byte[] output, int outputOffset) throws EBCryptoException
     {

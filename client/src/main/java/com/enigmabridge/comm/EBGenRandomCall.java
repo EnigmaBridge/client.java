@@ -106,8 +106,8 @@ public class EBGenRandomCall {
 
     /**
      * Generates random data remotely.
-     * @param length
-     * @return
+     * @param length number of bytes to generate
+     * @return random data generated
      * @throws IOException
      * @throws EBException
      */

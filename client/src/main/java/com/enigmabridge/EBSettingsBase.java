@@ -131,8 +131,8 @@ public class EBSettingsBase implements EBSettings, Serializable {
 
     /**
      * Serializes to JSON.
-     * @param json
-     * @return
+     * @param json parent/null
+     * @return JSONObject
      */
     public JSONObject toJSON(JSONObject json){
         if (json == null){

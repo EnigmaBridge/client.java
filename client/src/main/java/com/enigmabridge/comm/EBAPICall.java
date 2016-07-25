@@ -109,7 +109,7 @@ public class EBAPICall {
      * Returns response parser when is needed. May lazily initialize parser.
      * Override point.
      *
-     * @returns Response parser to use
+     * @return Response parser to use
      */
     public EBResponseParser getResponseParser(){
         return new EBResponseParserBase();

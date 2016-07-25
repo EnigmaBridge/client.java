@@ -24,7 +24,7 @@ public class EBProcessDataResponseParser extends EBResponseParserBase{
      * @param data - json response
      * @param resp - response object to put data to.
      * @param options
-     * @returns request unwrapped response.
+     * @return request unwrapped response.
      */
     public EBResponse.ABuilder parseResponse(JSONObject data, EBResponse.ABuilder resp, EBResponseParserOptions options) throws EBCorruptedException{
         if (resp == null){

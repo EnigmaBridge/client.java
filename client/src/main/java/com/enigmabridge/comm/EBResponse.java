@@ -102,7 +102,7 @@ public class EBResponse implements Serializable {
 
     /**
      * Returns true if after parsing, code is OK.
-     * @returns {boolean}
+     * @return boolean, true if code is SW_STAT_OK
      */
     public boolean isCodeOk(){
         return this.statusCode == EBCommStatus.SW_STAT_OK;
