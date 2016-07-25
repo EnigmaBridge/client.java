@@ -16,29 +16,29 @@ public class EBResponse implements Serializable {
      * Parsed status code. 0x9000 = OK.
      * #output
      */
-    short statusCode = -1;
+    protected short statusCode = -1;
 
     /**
      * Parsed status detail.
      * #output
      */
-    String statusDetail;
+    protected String statusDetail;
 
     /**
      * Function name extracted from the request.
      */
-    String function;
+    protected String function;
 
     /**
      * Raw result of the call.
      * Usually processed by child classes.
      */
-    Object result;
+    protected Object result;
 
     /**
      * Raw response as a reference.
      */
-    EBRawResponse rawResponse;
+    protected EBRawResponse rawResponse;
 
     public EBResponse() {
     }
