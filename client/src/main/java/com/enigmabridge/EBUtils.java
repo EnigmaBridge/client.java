@@ -38,7 +38,7 @@ public class EBUtils {
         return new String(new char[n]).replace("\0", s);
     }
 
-    /**
+    /***
      * Tries to extract json parameter as an integer.
      * @param json target
      * @param key field name
@@ -75,7 +75,6 @@ public class EBUtils {
      * @param json target
      * @param key field name
      * @return extracted string
-     * @throws JSONException
      */
     public static String getAsStringOrNull(JSONObject json, String key) {
         if (!json.has(key)){
@@ -89,23 +88,24 @@ public class EBUtils {
         }
     }
 
-    /**
+    /***
      * Tries to extract json parameter as an string.
      * @param json target
      * @param key field name
      * @return extracted string
-     * @throws JSONException
+     * @throws JSONException - if the JSON object doesn't contain the item or is malformed
      */
     public static String tryGetAsString(JSONObject json, String key) throws JSONException {
         return json.getString(key);
     }
 
-    /**
+    /***
      * Tries to extract json parameter as an integer.
      * @param json target
      * @param key field name
+     * @param radix radix for string / int conversion
      * @return extracted integer
-     * @throws JSONException
+     * @throws JSONException - if the JSON object doesn't contain the item or is malformed
      */
     public static Integer tryGetAsInteger(JSONObject json, String key, int radix) throws JSONException {
         final Object obj = json.get(key);
@@ -129,8 +129,9 @@ public class EBUtils {
      * Tries to extract json parameter as a long.
      * @param json target
      * @param key field name
+     * @param radix radix for string / int conversion
      * @return extracted long
-     * @throws JSONException
+     * @throws JSONException - if the JSON object doesn't contain the item or is malformed
      */
     public static Long tryGetAsLong(JSONObject json, String key, int radix) throws JSONException {
         final Object obj = json.get(key);
