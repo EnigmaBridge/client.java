@@ -9,15 +9,26 @@ import java.io.Serializable;
 public class EBRawRequest implements Serializable{
     public static final long serialVersionUID = 1L;
 
+    /**
+     * HTTP method to use for the request (POST/GET)
+     */
     protected String method = EBCommUtils.METHOD_DEFAULT;
-    protected String query;
+
+    /**
+     * URL path. If POST is used, this is still added as the path segment.
+     */
+    protected String path;
+
+    /**
+     * Request body
+     */
     protected String body;
 
     @Override
     public String toString() {
         return "EBRawRequest{" +
                 "method='" + method + '\'' +
-                ", query='" + query + '\'' +
+                ", path='" + path + '\'' +
                 ", body='" + body + '\'' +
                 '}';
     }
@@ -30,12 +41,12 @@ public class EBRawRequest implements Serializable{
         this.method = method;
     }
 
-    public String getQuery() {
-        return query;
+    public String getPath() {
+        return path;
     }
 
-    public void setQuery(String query) {
-        this.query = query;
+    public void setPath(String path) {
+        this.path = path;
     }
 
     public String getBody() {

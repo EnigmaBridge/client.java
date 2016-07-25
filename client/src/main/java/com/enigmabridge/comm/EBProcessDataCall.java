@@ -196,7 +196,7 @@ public class EBProcessDataCall extends EBAPICall {
             JSONObject jsonBody = new JSONObject();
             jsonBody.put("data", pdRequest.getRequest());
             rawRequest.setBody(jsonBody.toString());
-            rawRequest.setQuery(String.format("%s/%s/%s/%s",
+            rawRequest.setPath(String.format("%s/%s/%s/%s",
                     this.apiVersion,
                     this.apiBlock,
                     this.callFunction,
@@ -205,7 +205,7 @@ public class EBProcessDataCall extends EBAPICall {
         } else {
             // GET
             rawRequest.setBody(null);
-            rawRequest.setQuery(String.format("%s/%s/%s/%s/%s",
+            rawRequest.setPath(String.format("%s/%s/%s/%s/%s",
                     this.apiVersion,
                     this.apiBlock,
                     this.callFunction,

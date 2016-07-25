@@ -144,7 +144,7 @@ public class EBGetPubKeyCall extends EBAPICall implements EBResponseParser{
 
         // Build request - headers.
         rawRequest.setBody(null);
-        rawRequest.setQuery(String.format("%s/%s/%s/%s",
+        rawRequest.setPath(String.format("%s/%s/%s/%s",
                 this.apiVersion,
                 this.apiBlock,
                 this.callFunction,

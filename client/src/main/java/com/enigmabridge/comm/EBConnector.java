@@ -118,7 +118,7 @@ public class EBConnector {
                 .scheme(endpoint.getScheme())
                 .host(endpoint.getHostname())
                 .port(endpoint.getPort())
-                .addPathSegments(rawRequest.getQuery())
+                .addPathSegments(rawRequest.getPath())
                 .build();
 
         final Request.Builder requestBuilder = new Request.Builder()

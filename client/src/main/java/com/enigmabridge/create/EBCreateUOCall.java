@@ -140,7 +140,7 @@ public class EBCreateUOCall extends EBAPICall implements EBResponseParser {
 
         // Build the rest of the request - headers.
         rawRequest.setBody(jreq.toString());
-        rawRequest.setQuery(String.format("%s/%s/%s/%s",
+        rawRequest.setPath(String.format("%s/%s/%s/%s",
                 this.apiVersion,
                 this.apiBlock,
                 this.callFunction,
