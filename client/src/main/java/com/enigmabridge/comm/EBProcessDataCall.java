@@ -341,7 +341,7 @@ public class EBProcessDataCall extends EBAPICall {
 
     /**
      * Returns process data output in one call.
-     * @return
+     * @return result of process data call
      * @throws IOException
      * @throws EBCorruptedException
      */
@@ -351,8 +351,8 @@ public class EBProcessDataCall extends EBAPICall {
 
     /**
      * Returns process data output in one call.
-     * @param input
-     * @return
+     * @param input buffer to process
+     * @return result of process data call
      * @throws IOException
      * @throws EBCorruptedException
      */

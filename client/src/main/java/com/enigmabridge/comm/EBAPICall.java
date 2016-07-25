@@ -109,7 +109,7 @@ public class EBAPICall {
      * Returns response parser when is needed. May lazily initialize parser.
      * Override point.
      *
-     * @returns {*}
+     * @returns Response parser to use
      */
     public EBResponseParser getResponseParser(){
         return new EBResponseParserBase();
@@ -167,7 +167,7 @@ public class EBAPICall {
 
     /**
      * Returns true if HTTP POST method should be used for this service call.
-     * @return
+     * @return true if HTTP method is GET
      */
     public boolean isMethodGet(){
         final String method = getRequestMethod();
@@ -177,7 +177,7 @@ public class EBAPICall {
 
     /**
      * Returns true if HTTP POST method should be used for this service call.
-     * @return
+     * @return true if HTTP method is POST
      */
     public boolean isMethodPost(){
         final String method = getRequestMethod();

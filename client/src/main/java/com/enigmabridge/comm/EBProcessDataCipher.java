@@ -47,9 +47,9 @@ public class EBProcessDataCipher {
 
     /**
      * Creates a new cipher instance with given keys.
-     * @param forEncryption
-     * @param keys
-     * @return
+     * @param forEncryption true for encryption, false for encryption
+     * @param keys communication keys to use for EB secure channel
+     * @return EBProcessDataCipher to use
      */
     public static EBProcessDataCipher initCipher(boolean forEncryption, EBCommKeys keys) throws EBEngineException {
         try {

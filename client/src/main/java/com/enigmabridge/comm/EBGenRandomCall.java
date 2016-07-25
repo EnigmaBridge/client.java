@@ -80,8 +80,8 @@ public class EBGenRandomCall {
 
     /**
      * Main method for generating randomness.
-     * @param length
-     * @return
+     * @param length number of random bytes to generate
+     * @return EBGenRandomResponse with random data generated in EB
      */
     public EBGenRandomResponse genRandom(int length) throws IOException, EBCorruptedException {
         EBGenRandomResponse resp = new EBGenRandomResponse();

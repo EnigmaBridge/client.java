@@ -14,7 +14,7 @@ public class EBConnectorManager {
      * It may reuse already opened connector to the EB endpoint from the pool.
      *
      * @param endpoint Endpoint to construct connector to.
-     * @return
+     * @return Connector to use
      */
     public EBConnector getConnector(EBEndpointInfo endpoint){
         // TODO: implement.
@@ -24,7 +24,7 @@ public class EBConnectorManager {
     /**
      * Called when caller is done with the connector.
      * It is returned to the pool of connectors for given endpoint.
-     * @return
+     * @return EBConnectorManager
      */
     public EBConnectorManager doneWithConnector(EBConnector connector){
         // TODO: implement.

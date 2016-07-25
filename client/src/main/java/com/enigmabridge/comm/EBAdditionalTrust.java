@@ -178,7 +178,7 @@ public class EBAdditionalTrust implements EBJSONSerializable, Serializable {
     /**
      * Installs this trust to the client builder.
      * @param builder
-     * @return
+     * @return EBAdditionalTrust
      */
     public EBAdditionalTrust install(OkHttpClient.Builder builder){
         builder.sslSocketFactory(sslSocketFactory);

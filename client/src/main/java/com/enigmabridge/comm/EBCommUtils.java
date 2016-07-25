@@ -28,10 +28,9 @@ public class EBCommUtils {
      * Converts mangled nonce value to the original one in ProcessData response.
      * ProcessData response has nonce return value response_nonce[i] = request_nonce[i] + 0x1
      *
-     * @param nonce
-     * @param offset
-     * @param len
-     * @return
+     * @param nonce nonce to process
+     * @param offset offset to process from
+     * @param len length of the buffer to process, from offset
      */
     public static void demangleNonce(byte[] nonce, int offset, int len){
         int i = 0;
