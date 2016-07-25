@@ -263,8 +263,8 @@ public class EBUOTemplateResponse extends EBResponse {
                 ", policyOffset=" + policyOffset +
                 ", scriptOffset=" + scriptOffset +
                 ", keyOffsets=" + keyOffsets +
-                ", template=" + EBUtils.byte2hex(template) +
-                ", templateHs=" + EBUtils.byte2hex(templateHs) +
+                ", template=" + EBUtils.byte2hexNullable(template) +
+                ", templateHs=" + EBUtils.byte2hexNullable(templateHs) +
                 ", importKeys=" + importKeys +
                 ", authorization='" + authorization + '\'' +
                 "} " + super.toString();

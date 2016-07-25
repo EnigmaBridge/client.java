@@ -103,7 +103,7 @@ public class EBUOTemplateKey {
     public String toString() {
         return "EBUOTemplateKey{" +
                 "type='" + type + '\'' +
-                ", key=" + EBUtils.byte2hex(key) +
+                ", key=" + EBUtils.byte2hexNullable(key) +
                 '}';
     }
 }

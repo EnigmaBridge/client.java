@@ -109,7 +109,7 @@ public class EBCreateUORequest implements Serializable {
         return "EBCreateUORequest{" +
                 "objectId=" + objectId +
                 ", objectType=" + objectType +
-                ", object=" + Arrays.toString(object) +
+                ", object=" + EBUtils.byte2hexNullable(object) +
                 ", importKeyId='" + importKeyId + '\'' +
                 ", authorization='" + authorization + '\'' +
                 ", contextparams='" + contextparams + '\'' +

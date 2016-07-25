@@ -24,6 +24,14 @@ public class EBUtils {
         return DatatypeConverter.printHexBinary(bytes);
     }
 
+    public static String byte2hexNullable(byte[] bytes){
+        if (bytes == null){
+            return "";
+        }
+
+        return DatatypeConverter.printHexBinary(bytes);
+    }
+
     public static String byte2hex(byte[] bytes, int offset, int length){
         StringBuilder r = new StringBuilder((length-offset) * 2);
         for (int i = offset; i < offset+length; i++){

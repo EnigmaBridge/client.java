@@ -186,8 +186,8 @@ public class EBCommKeys implements SecretKey, CipherParameters, Length, Serializ
     @Override
     public String toString() {
         return "EBCommKeys{" +
-                "encKey=" + (encKey == null ? null : EBUtils.byte2hex(encKey)) +
-                ", macKey=" + (macKey == null ? null : EBUtils.byte2hex(macKey)) +
+                "encKey=" + EBUtils.byte2hexNullable(encKey) +
+                ", macKey=" + EBUtils.byte2hexNullable(macKey) +
                 '}';
     }
 
