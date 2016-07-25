@@ -35,12 +35,14 @@ public class EBRetryException extends Exception {
     public EBRetryException(Object error, EBRetry retry) {
         this.error = error;
         this.retry = retry;
+        updateCauseIfApplicable();
     }
 
     public EBRetryException(String message, Object error, EBRetry retry) {
         super(message);
         this.error = error;
         this.retry = retry;
+        updateCauseIfApplicable();
     }
 
     public EBRetryException(String message, Throwable cause, Object error, EBRetry retry) {
@@ -63,12 +65,12 @@ public class EBRetryException extends Exception {
         return retry;
     }
 
-    public void setError(Object error) {
-        this.error = error;
-    }
+    protected void updateCauseIfApplicable(){
+        if (this.error == null || !(this.error instanceof Throwable)){
+            return;
+        }
 
-    public void setRetry(EBRetry retry) {
-        this.retry = retry;
+        initCause((Throwable) this.error);
     }
 
     /**
