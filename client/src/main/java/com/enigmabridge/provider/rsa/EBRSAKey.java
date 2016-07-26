@@ -161,8 +161,8 @@ public class EBRSAKey extends EBKeyBase implements PrivateKey, RSAKey {
     @Override
     public String toString() {
         return "EBRSAKey{" +
-                "publicExponent=" + publicExponent +
-                ", modulus=" + modulus +
+                "publicExponent=" + (publicExponent == null ? "" : publicExponent.toString(16)) +
+                ", modulus=" + (modulus == null ? "" : modulus.toString(16)) +
                 "} " + super.toString();
     }
 }
