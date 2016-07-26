@@ -187,20 +187,7 @@ public class EBAPICall {
         return (method == null && EBCommUtils.METHOD_DEFAULT.equals(EBCommUtils.METHOD_POST))
                 || "POST".equalsIgnoreCase(method);
     }
-
-//    /**
-//     * Returns raw EB request for raw socket transport method.
-//     * For debugging and verification.
-//     *
-//     * @returns {string}
-//     */
-//    TODO: getSocketRequest: function(){
-//        this._socketRequest = {};
-//        $.extend(true, this._socketRequest, this.reqHeader || {});
-//        $.extend(true, this._socketRequest, this.reqBody || {});
-//        return this._socketRequest;
-//    },
-
+    
     public byte[] getNonce() {
         if (nonce == null){
             nonce = EBCommUtils.genProcessDataNonce();
