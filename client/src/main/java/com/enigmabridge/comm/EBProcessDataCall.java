@@ -271,7 +271,7 @@ public class EBProcessDataCall extends EBAPICall {
 
                     // Some error codes may be recoverable on retry.
                     final short statusCode = ebResponse.getStatusCode();
-                    final boolean isRecoverable = statusCode == EBCommStatus.ERROR_CLASS_ERR_CHECK_ERRORS_6f;
+                    final boolean isRecoverable = statusCode == EBCommStatus.SW_TIMEOUT;
 
                     LOG.debug("UO fail: " + rawRequest.getPath());
                     callback.onFail(new EBRetryJobErrorThr(new EBCryptoException("Invalid response: " + ebResponse)), !isRecoverable);

@@ -199,4 +199,6 @@ public class EBCommStatus {
     //ERROR_CLASS_OTHER_SE
     public final static short SW_SC_ERROR_SLAVE_SE =              (short)(ERROR_CLASS_OTHER_SE | 0x0f0);
     public static final short SW_SC_ERROR_MASTER_SE =             (short)(ERROR_CLASS_OTHER_SE | 0x0f1);
+
+    public static final short SW_TIMEOUT =                        (short) 0x1006;
 }
