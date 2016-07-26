@@ -1,6 +1,9 @@
 package com.enigmabridge.create;
 
-import com.enigmabridge.*;
+import com.enigmabridge.EBEndpointInfo;
+import com.enigmabridge.EBEngine;
+import com.enigmabridge.EBInvalidException;
+import com.enigmabridge.EBSettings;
 import com.enigmabridge.comm.EBConnectionSettings;
 import com.enigmabridge.comm.EBCorruptedException;
 
