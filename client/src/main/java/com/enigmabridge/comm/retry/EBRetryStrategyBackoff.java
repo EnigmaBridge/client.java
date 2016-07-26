@@ -30,4 +30,9 @@ public class EBRetryStrategyBackoff extends EBRetryStrategySimple {
     public String getName() {
         return NAME;
     }
+
+    @Override
+    public String toString() {
+        return "EBRetryStrategyBackoff{} " + super.toString();
+    }
 }

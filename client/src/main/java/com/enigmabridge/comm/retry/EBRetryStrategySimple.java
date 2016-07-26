@@ -89,4 +89,27 @@ public class EBRetryStrategySimple implements EBRetryStrategy {
     public String getName() {
         return NAME;
     }
+
+    @Override
+    public String toString() {
+        return "EBRetryStrategySimple{" +
+                "maxAttempts=" + maxAttempts +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        EBRetryStrategySimple that = (EBRetryStrategySimple) o;
+
+        return maxAttempts == that.maxAttempts;
+
+    }
+
+    @Override
+    public int hashCode() {
+        return maxAttempts;
+    }
 }
