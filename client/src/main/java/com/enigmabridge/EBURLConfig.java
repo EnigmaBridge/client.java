@@ -49,6 +49,10 @@ public class EBURLConfig implements EBSettings {
     public EBURLConfig() throws MalformedURLException {
     }
 
+    public EBURLConfig(String url) throws MalformedURLException, UnsupportedEncodingException {
+        fromUrl(url);
+    }
+
     public static abstract class AbstractBuilder<T extends EBURLConfig, B extends EBURLConfig.AbstractBuilder> {
         public B setApiKey(String apiKey) {
             getObj().setApiKey(apiKey);
