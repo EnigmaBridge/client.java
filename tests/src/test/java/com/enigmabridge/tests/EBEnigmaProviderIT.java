@@ -3,6 +3,7 @@ package com.enigmabridge.tests;
 import com.enigmabridge.EBEndpointInfo;
 import com.enigmabridge.EBEngine;
 import com.enigmabridge.EBSettingsBase;
+import com.enigmabridge.EBUtils;
 import com.enigmabridge.comm.EBConnectionSettings;
 import com.enigmabridge.comm.retry.EBRetryStrategySimple;
 import com.enigmabridge.create.Constants;
@@ -210,25 +211,39 @@ public class EBEnigmaProviderIT {
         testRSAKeys(ebNewPubKey, keyPair.getPrivate());
     }
 
-    protected void testRSAKeys(PublicKey pub, PrivateKey priv) throws InvalidKeyException, NoSuchPaddingException, NoSuchAlgorithmException, BadPaddingException, IllegalBlockSizeException {
+    protected void testRSAKeys(PublicKey pub, PrivateKey priv) throws Exception {
         // Generate random input to encrypt.
         final SecureRandom rand = new SecureRandom();
         final byte[] testInput = new byte[32];
 
         for(int i=0; i<5; i++) {
             rand.nextBytes(testInput);
+            byte[] ciphertext = null;
+            byte[] decrypted = null;
 
-            final Cipher rsaEnc = Cipher.getInstance("RSA/ECB/PKCS1Padding");
-            rsaEnc.init(Cipher.ENCRYPT_MODE, pub);
-            final byte[] ciphertext = rsaEnc.doFinal(testInput);
+            try {
+                final Cipher rsaEnc = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+                rsaEnc.init(Cipher.ENCRYPT_MODE, pub);
+                ciphertext = rsaEnc.doFinal(testInput);
 
-            // Decrypt
-            final Cipher rsa = Cipher.getInstance("RSA/ECB/PKCS1Padding");
-            rsa.init(Cipher.DECRYPT_MODE, priv);
-            final byte[] decrypted = rsa.doFinal(ciphertext);
+                // Decrypt
+                final Cipher rsa = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+                rsa.init(Cipher.DECRYPT_MODE, priv);
+                decrypted = rsa.doFinal(ciphertext);
 
-            // Test
-            assertEquals(decrypted, testInput, "RSAdecrypt(RSAencrypt(x)) != x");
+                // Test
+                assertEquals(decrypted, testInput, "RSAdecrypt(RSAencrypt(x)) != x");
+            } catch (Exception t){
+                LOG.debug(String.format("Exception in RSA operation. " +
+                                "ciphertext[%s], decrypted[%s], " +
+                                "pubKey: [%s], privKey: [%s]",
+                        EBUtils.byte2hexNullable(ciphertext),
+                        EBUtils.byte2hexNullable(decrypted),
+                        pub,
+                        priv
+                ), t);
+                throw t;
+            }
         }
     }
 
