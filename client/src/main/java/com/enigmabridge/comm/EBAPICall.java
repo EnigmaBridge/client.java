@@ -256,4 +256,12 @@ public class EBAPICall {
     protected void setEngine(EBEngine engine) {
         this.engine = engine;
     }
+
+    public EBRawRequest getRawRequest() {
+        return rawRequest;
+    }
+
+    public EBRawResponse getRawResponse() {
+        return rawResponse;
+    }
 }
