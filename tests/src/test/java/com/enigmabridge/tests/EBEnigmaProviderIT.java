@@ -240,8 +240,9 @@ public class EBEnigmaProviderIT {
                 assertEquals(decrypted, testInput, "RSAdecrypt(RSAencrypt(x)) != x");
             } catch (Exception t){
                 LOG.debug(String.format("Exception in RSA operation. " +
-                                "ciphertext[%s], decrypted[%s], " +
+                                "testInput[%s], ciphertext[%s], decrypted[%s], " +
                                 "pubKey: [%s], privKey: [%s]",
+                        EBUtils.byte2hexNullable(testInput),
                         EBUtils.byte2hexNullable(ciphertext),
                         EBUtils.byte2hexNullable(decrypted),
                         pub,
