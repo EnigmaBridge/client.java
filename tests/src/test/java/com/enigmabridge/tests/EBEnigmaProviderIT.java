@@ -1,9 +1,6 @@
 package com.enigmabridge.tests;
 
-import com.enigmabridge.EBEndpointInfo;
-import com.enigmabridge.EBEngine;
-import com.enigmabridge.EBSettingsBase;
-import com.enigmabridge.EBUtils;
+import com.enigmabridge.*;
 import com.enigmabridge.comm.EBConnectionSettings;
 import com.enigmabridge.comm.retry.EBRetryStrategySimple;
 import com.enigmabridge.create.Constants;
@@ -107,7 +104,7 @@ public class EBEnigmaProviderIT {
         final KeyPair keyPair = kpGen.generateKeyPair();
 
         // Test
-        testRSAKeys(keyPair.getPublic(), keyPair.getPrivate());
+        testRSAKeys(keyPair.getPublic(), keyPair.getPrivate(), null);
     }
 
     @Test(groups = {"integration"}) //, timeOut = 100000
@@ -131,14 +128,14 @@ public class EBEnigmaProviderIT {
         final PrivateKey ebPrivate = kFact.generatePrivate(keySpec);
 
         // test
-        testRSAKeys(keyPair.getPublic(), ebPrivate);
+        testRSAKeys(keyPair.getPublic(), ebPrivate, keyPair);
 
         // Get key spec - JSON encoded
         final EBJSONEncodedUOKeySpec jsonSpec = kFact.getKeySpec(ebPrivate, EBJSONEncodedUOKeySpec.class);
 
         // And back
         final PrivateKey keyFromJson = kFact.generatePrivate(jsonSpec);
-        testRSAKeys(keyPair.getPublic(), keyFromJson);
+        testRSAKeys(keyPair.getPublic(), keyFromJson, keyPair);
 
         // Config encoded
         final EBConfigurationUOKeySpec urlSpec = kFact.getKeySpec(ebPrivate, EBConfigurationUOKeySpec.class);
@@ -146,7 +143,7 @@ public class EBEnigmaProviderIT {
 
         // Try to decode config line
         final PrivateKey keyFromUrl = kFact.generatePrivate(urlSpec);
-        testRSAKeys(keyPair.getPublic(), keyFromUrl);
+        testRSAKeys(keyPair.getPublic(), keyFromUrl, keyPair);
     }
 
     @Test(groups = {"integration"}) //, timeOut = 100000
@@ -164,7 +161,7 @@ public class EBEnigmaProviderIT {
         final PrivateKey ebPrivate = (PrivateKey) kFact.translateKey(keyPair.getPrivate());
 
         // Test.
-        testRSAKeys(keyPair.getPublic(), ebPrivate);
+        testRSAKeys(keyPair.getPublic(), ebPrivate, keyPair);
     }
 
     @Test(groups = {"integration"}) //, timeOut = 100000
@@ -206,12 +203,20 @@ public class EBEnigmaProviderIT {
         final RSAPublicKeySpec pubKeySpec = kFact.getKeySpec(ebPrivateNew, RSAPublicKeySpec.class);
         final PublicKey ebNewPubKey = kFact.generatePublic(pubKeySpec);
 
-        testRSAKeys(keyPair.getPublic(), (PrivateKey) ebPrivateNew);
-        testRSAKeys(ebNewPubKey, (PrivateKey) ebPrivateNew);
-        testRSAKeys(ebNewPubKey, keyPair.getPrivate());
+        testRSAKeys(keyPair.getPublic(), (PrivateKey) ebPrivateNew, keyPair);
+        testRSAKeys(ebNewPubKey, (PrivateKey) ebPrivateNew, keyPair);
+        testRSAKeys(ebNewPubKey, keyPair.getPrivate(), keyPair);
     }
 
-    protected void testRSAKeys(PublicKey pub, PrivateKey priv) throws Exception {
+    /**
+     * Performs simple identity tests DEC(ENC(X)) == X for given key pairs.
+     *
+     * @param pub public key
+     * @param priv private key
+     * @param locallyGeneratedKeyPair keypair if generated locally, for logging.
+     * @throws Exception exception
+     */
+    protected void testRSAKeys(PublicKey pub, PrivateKey priv, KeyPair locallyGeneratedKeyPair) throws Exception {
         // Generate random input to encrypt.
         final SecureRandom rand = new SecureRandom();
         final byte[] testInput = new byte[32];
@@ -241,7 +246,13 @@ public class EBEnigmaProviderIT {
                         EBUtils.byte2hexNullable(decrypted),
                         pub,
                         priv
-                ), t);
+                ));
+
+                if (locallyGeneratedKeyPair != null){
+                    LOG.debug(String.format("Locally generated keys. Public[%s], Private[%s]",
+                            locallyGeneratedKeyPair.getPublic(),
+                            locallyGeneratedKeyPair.getPrivate()));
+                }
                 throw t;
             }
         }
