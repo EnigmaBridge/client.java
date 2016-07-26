@@ -148,6 +148,8 @@ public class EBConnectionSettings implements Serializable, EBJSONSerializable {
                 ", writeTimeoutMilli=" + writeTimeoutMilli +
                 ", method='" + method + '\'' +
                 ", trust=" + trust +
+                ", retryStrategyNetwork=" + retryStrategyNetwork +
+                ", retryStrategyApplication=" + retryStrategyApplication +
                 '}';
     }
 
@@ -162,7 +164,10 @@ public class EBConnectionSettings implements Serializable, EBJSONSerializable {
         if (readTimeoutMilli != that.readTimeoutMilli) return false;
         if (writeTimeoutMilli != that.writeTimeoutMilli) return false;
         if (method != null ? !method.equals(that.method) : that.method != null) return false;
-        return trust != null ? trust.equals(that.trust) : that.trust == null;
+        if (trust != null ? !trust.equals(that.trust) : that.trust != null) return false;
+        if (retryStrategyNetwork != null ? !retryStrategyNetwork.equals(that.retryStrategyNetwork) : that.retryStrategyNetwork != null)
+            return false;
+        return retryStrategyApplication != null ? retryStrategyApplication.equals(that.retryStrategyApplication) : that.retryStrategyApplication == null;
 
     }
 
@@ -173,6 +178,8 @@ public class EBConnectionSettings implements Serializable, EBJSONSerializable {
         result = 31 * result + writeTimeoutMilli;
         result = 31 * result + (method != null ? method.hashCode() : 0);
         result = 31 * result + (trust != null ? trust.hashCode() : 0);
+        result = 31 * result + (retryStrategyNetwork != null ? retryStrategyNetwork.hashCode() : 0);
+        result = 31 * result + (retryStrategyApplication != null ? retryStrategyApplication.hashCode() : 0);
         return result;
     }
 
