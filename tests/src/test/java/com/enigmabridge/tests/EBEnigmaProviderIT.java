@@ -214,19 +214,22 @@ public class EBEnigmaProviderIT {
         // Generate random input to encrypt.
         final SecureRandom rand = new SecureRandom();
         final byte[] testInput = new byte[32];
-        rand.nextBytes(testInput);
 
-        final Cipher rsaEnc = Cipher.getInstance("RSA/ECB/PKCS1Padding");
-        rsaEnc.init(Cipher.ENCRYPT_MODE, pub);
-        final byte[] ciphertext = rsaEnc.doFinal(testInput);
+        for(int i=0; i<5; i++) {
+            rand.nextBytes(testInput);
 
-        // Decrypt
-        final Cipher rsa = Cipher.getInstance("RSA/ECB/PKCS1Padding");
-        rsa.init(Cipher.DECRYPT_MODE, priv);
-        final byte[] decrypted = rsa.doFinal(ciphertext);
+            final Cipher rsaEnc = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+            rsaEnc.init(Cipher.ENCRYPT_MODE, pub);
+            final byte[] ciphertext = rsaEnc.doFinal(testInput);
 
-        // Test
-        assertEquals(decrypted, testInput, "RSAdecrypt(RSAencrypt(x)) != x");
+            // Decrypt
+            final Cipher rsa = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+            rsa.init(Cipher.DECRYPT_MODE, priv);
+            final byte[] decrypted = rsa.doFinal(ciphertext);
+
+            // Test
+            assertEquals(decrypted, testInput, "RSAdecrypt(RSAencrypt(x)) != x");
+        }
     }
 
     @Test(groups = {"integration"}) //, timeOut = 100000
