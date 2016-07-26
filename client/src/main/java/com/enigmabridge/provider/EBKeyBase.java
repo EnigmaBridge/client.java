@@ -211,4 +211,12 @@ public abstract class EBKeyBase implements EBUOKey, EBJSONSerializable {
     protected void setExtractable(boolean extractable) {
         this.extractable = extractable;
     }
+
+    @Override
+    public String toString() {
+        return "EBKeyBase{" +
+                "uo=" + uo +
+                ", ebEngine=" + ebEngine +
+                '}';
+    }
 }

@@ -157,4 +157,12 @@ public class EBRSAKey extends EBKeyBase implements PrivateKey, RSAKey {
     protected void setPublicExponent(BigInteger publicExponent) {
         this.publicExponent = publicExponent;
     }
+
+    @Override
+    public String toString() {
+        return "EBRSAKey{" +
+                "publicExponent=" + publicExponent +
+                ", modulus=" + modulus +
+                "} " + super.toString();
+    }
 }

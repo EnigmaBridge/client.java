@@ -175,4 +175,13 @@ public class UserObjectKeyBase extends UserObjectInfoBase implements UserObjectK
             }
         }
     }
+
+    @Override
+    public String toString() {
+        return "UserObjectKeyBase{" +
+                "algorithm='" + algorithm + '\'' +
+                ", keyLength=" + keyLength +
+                ", keyType=" + keyType +
+                "} " + super.toString();
+    }
 }

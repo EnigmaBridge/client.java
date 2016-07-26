@@ -312,7 +312,7 @@ public class UserObjectInfoBase implements UserObjectInfo, EBJSONSerializable {
     @Override
     public String toString() {
         return "UserObjectInfoBase{" +
-                "uoid=" + uoid +
+                "uoid=" + Long.toHexString(uoid) +
                 ", userObjectType=" + userObjectType +
                 ", commKeys=" + commKeys +
                 ", settings=" + settings +
