@@ -14,4 +14,4 @@ if [ ! -f "client/main.properties" ]; then
     exit -2
 fi
 
-cd client && mvn -DskipTests=true install -P release,client && cd -
+cd client && mvn -DskipTests=true clean install -P release,client && cd -
