@@ -1,6 +1,8 @@
 package com.enigmabridge.provider.rsa.engine;
 
 import com.enigmabridge.EBCryptoException;
+import com.enigmabridge.EBDevSettings;
+import com.enigmabridge.comm.EBCommStatus;
 import com.enigmabridge.comm.EBCorruptedException;
 import com.enigmabridge.comm.EBProcessDataCall;
 import com.enigmabridge.comm.EBProcessDataResponse;
@@ -9,6 +11,8 @@ import com.enigmabridge.provider.parameters.EBRSAKeyParameter;
 import org.bouncycastle.crypto.CipherParameters;
 import org.bouncycastle.crypto.DataLengthException;
 import org.bouncycastle.crypto.params.ParametersWithRandom;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -18,6 +22,8 @@ import java.math.BigInteger;
  */
 class RSACoreEngine
 {
+    private static final Logger LOG = LoggerFactory.getLogger(RSACoreEngine.class);
+
     private EBRSAKeyParameter key;
     private boolean forEncryption;
 
@@ -168,8 +174,22 @@ class RSACoreEngine
                 .build();
 
         try {
-            final EBProcessDataResponse response = call.doRequest(convertOutput(input));
+            final byte[] inputBytes = convertOutput(input);
+            final EBProcessDataResponse response = call.doRequest(inputBytes);
+
             if (!response.isCodeOk()){
+                // 0x6f00 = data crypto error.
+                if (EBDevSettings.shouldLog6f00RequestResponse()
+                    && response.getStatusCode() == EBCommStatus.ERROR_CLASS_ERR_CHECK_ERRORS_6f){
+
+                    // Logging 6f00 errors to detect possible crypto errors / incompatibility.
+                    LOG.debug("RSA 0x6f00 error. encryption: %s, input size: %d \n  request [%s]\n  response [%s]",
+                            forEncryption,
+                            inputBytes.length,
+                            call.getRawRequest(),
+                            call.getRawResponse());
+                }
+
                 throw new EBCryptoException("Server returned invalid response");
             }
 
