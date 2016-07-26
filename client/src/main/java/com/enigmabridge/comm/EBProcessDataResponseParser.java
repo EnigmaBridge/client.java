@@ -42,7 +42,7 @@ public class EBProcessDataResponseParser extends EBResponseParserBase{
         final String resultBuffer = (String)resp.getObj().getResult();
         final byte[] baResult = EBUtils.hex2byte(removeUnderscores(resultBuffer));
         if (baResult == null || baResult.length < 2){
-            throw new EBCorruptedException("Returned response is too short");
+            throw new EBCorruptedException("Returned response is too short. Response: " + resp.getObj());
         }
 
         short offset = 0;

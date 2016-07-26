@@ -109,11 +109,12 @@ public class EBResponse implements Serializable {
     }
 
     public String toString(){
-        return String.format("Response{statusCode=0x%4X, statusDetail=[%s], function: [%s], result: [%s]}",
+        return String.format("Response{statusCode=0x%4X, statusDetail=[%s], function: [%s], result: [%s], raw: [%s]}",
                 this.statusCode,
                 this.statusDetail,
                 this.function,
-                this.result
+                this.result,
+                this.rawResponse
         );
     }
 

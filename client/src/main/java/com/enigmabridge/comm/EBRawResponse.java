@@ -1,5 +1,7 @@
 package com.enigmabridge.comm;
 
+import com.enigmabridge.EBUtils;
+
 import java.io.Serializable;
 
 /**
@@ -61,5 +63,16 @@ public class EBRawResponse implements Serializable {
     public EBRawResponse setSuccessful(boolean successful) {
         this.successful = successful;
         return this;
+    }
+
+    @Override
+    public String toString() {
+        return "EBRawResponse{" +
+                "successful=" + successful +
+                ", httpCode=" + httpCode +
+                ", bodyBytes=" + EBUtils.byte2hexNullable(bodyBytes) +
+                ", body='" + body + '\'' +
+                ", responseTime=" + responseTime +
+                '}';
     }
 }
