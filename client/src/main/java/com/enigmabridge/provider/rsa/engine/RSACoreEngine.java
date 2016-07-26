@@ -173,23 +173,14 @@ class RSACoreEngine
                 .setKey(key)
                 .build();
 
+        byte[] inputBytes = null;
+        EBProcessDataResponse response = null;
+
         try {
-            final byte[] inputBytes = convertOutput(input);
-            final EBProcessDataResponse response = call.doRequest(inputBytes);
+            inputBytes = convertOutput(input);
+            response = call.doRequest(inputBytes);
 
             if (!response.isCodeOk()){
-                // 0x6f00 = data crypto error.
-                if (EBDevSettings.shouldLog6f00RequestResponse()
-                    && response.getStatusCode() == EBCommStatus.ERROR_CLASS_ERR_CHECK_ERRORS_6f){
-
-                    // Logging 6f00 errors to detect possible crypto errors / incompatibility.
-                    LOG.debug("RSA 0x6f00 error. encryption: %s, input size: %d \n  request [%s]\n  response [%s]",
-                            forEncryption,
-                            inputBytes.length,
-                            call.getRawRequest(),
-                            call.getRawResponse());
-                }
-
                 throw new EBCryptoException("Server returned invalid response");
             }
 
@@ -199,6 +190,20 @@ class RSACoreEngine
         } catch (IOException e) {
             throw new EBCryptoException("ProcessData failed for: " + new EBUOHandle(key.getUserObjectInfo()), e);
         } catch (EBCorruptedException e) {
+            // 0x6f00 = data crypto error.
+            response = call.getPdResponse();
+            if (EBDevSettings.shouldLog6f00RequestResponse()
+                    && response != null
+                    && response.getStatusCode() == EBCommStatus.ERROR_CLASS_ERR_CHECK_ERRORS_6f){
+
+                // Logging 6f00 errors to detect possible crypto errors / incompatibility.
+                LOG.debug("RSA 0x6f00 error. encryption: %s, input size: %d \n  request [%s]\n  response [%s]",
+                        forEncryption,
+                        inputBytes.length,
+                        call.getRawRequest(),
+                        call.getRawResponse());
+            }
+
             throw new EBCryptoException("ProcessData failed for: " + new EBUOHandle(key.getUserObjectInfo()), e);
         }
     }

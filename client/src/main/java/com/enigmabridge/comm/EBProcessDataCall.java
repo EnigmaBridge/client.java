@@ -377,6 +377,10 @@ public class EBProcessDataCall extends EBAPICall {
         this.processFunction = processFunction;
     }
 
+    public EBProcessDataResponse getPdResponse() {
+        return pdResponse;
+    }
+
     protected void rethrowProcessDataError(Object t) throws IOException, EBCorruptedException {
         if (t instanceof EBCorruptedException){
             throw (EBCorruptedException)t;
