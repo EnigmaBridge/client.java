@@ -40,7 +40,7 @@ public class EBProcessDataResponseParser extends EBResponseParserBase{
 
         final EBProcessDataResponse.ABuilder pdResp = (EBProcessDataResponse.ABuilder) resp;
         final String resultBuffer = (String)resp.getObj().getResult();
-        final byte[] baResult = EBUtils.hex2byte(resultBuffer.substring(0, resultBuffer.indexOf('_')));
+        final byte[] baResult = EBUtils.hex2byte(removeUnderscores(resultBuffer));
 
         short offset = 0;
         final short plainLen = EBCommUtils.getShort(baResult, offset);
@@ -76,6 +76,22 @@ public class EBProcessDataResponseParser extends EBResponseParserBase{
         }
 
         return pdResp;
+    }
+
+    /**
+     * Removes potential underscore rubbish from the response.
+     *
+     * @param input input to process
+     * @return String without underscore
+     */
+    protected static String removeUnderscores(String input){
+        // Remove underscore if possible
+        final int firstUnderscoreIdx = input.indexOf('_');
+        if (firstUnderscoreIdx < 0){
+            return input;
+        }
+
+        return input.substring(0, firstUnderscoreIdx);
     }
 
     public UserObjectInfo getUo() {
