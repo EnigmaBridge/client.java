@@ -122,10 +122,13 @@ public class EBProcessDataRequestBuilder {
                 inDataWithUOID, (int)commOffset, (int)offset - commOffset,
                 inDataWithUOID, (int)commOffset);
 
-        final String requestBase = "Packet0_" + requestType + "_" + EBUtils.byte2hex(inDataWithUOID, 0, commOffset+processed);
-        //this.log('ProcessData request body: ' + requestBase);
-
+        final String requestBase = getRequestBase(EBUtils.byte2hex(inDataWithUOID, 0, commOffset+processed));
         return new EBProcessDataRequest(requestBase, null, uoInfo, nonce);
+    }
+
+    protected String getRequestBase(String hexCodedRequest){
+        //return "Packet0_" + requestType + "_" + hexCodedRequest;
+        return hexCodedRequest;
     }
 
     public UserObjectInfo getUoInfo() {
