@@ -5,6 +5,10 @@ import com.enigmabridge.UserObjectInfo;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import java.util.Date;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+
 
 import java.util.Arrays;
 
@@ -42,7 +46,9 @@ public class EBProcessDataResponseParser extends EBResponseParserBase{
         final String resultBuffer = (String)resp.getObj().getResult();
         final byte[] baResult = EBUtils.hex2byte(removeUnderscores(resultBuffer));
         if (baResult == null || baResult.length < 2){
-            throw new EBCorruptedException("Returned response is too short. Response: " + resp.getObj());
+            DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+            Date date = new Date();
+            throw new EBCorruptedException(dateFormat.format(date)+" Returned response is too short. Response: " + resp.getObj());
         }
 
         short offset = 0;
