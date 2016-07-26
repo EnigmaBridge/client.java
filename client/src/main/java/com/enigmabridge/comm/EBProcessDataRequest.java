@@ -1,5 +1,6 @@
 package com.enigmabridge.comm;
 
+import com.enigmabridge.EBUtils;
 import com.enigmabridge.UserObjectInfo;
 
 import java.io.Serializable;
@@ -63,5 +64,15 @@ public class EBProcessDataRequest implements Serializable {
 
     void setRequest(String request) {
         this.request = request;
+    }
+
+    @Override
+    public String toString() {
+        return "EBProcessDataRequest{" +
+                "nonce=" + EBUtils.byte2hexNullable(nonce) +
+                ", uo=" + uo +
+                ", requestBody=" + EBUtils.byte2hexNullable(requestBody) +
+                ", request='" + request + '\'' +
+                '}';
     }
 }
