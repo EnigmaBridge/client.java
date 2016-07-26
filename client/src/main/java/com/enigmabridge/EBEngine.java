@@ -98,4 +98,13 @@ public class EBEngine {
                 .setURLConfig(url)
                 .build();
     }
+
+    @Override
+    public String toString() {
+        return "EBEngine{" +
+                "conMgr=" + conMgr +
+                ", defaultSettings=" + defaultSettings +
+                ", enrollmentEndpoint=" + enrollmentEndpoint +
+                '}';
+    }
 }
