@@ -158,15 +158,15 @@ public class EBClient {
 
     // Getters
 
-    protected int getWorkerCount() {
+    public int getWorkerCount() {
         return workerCount;
     }
 
-    protected EBEngine getEngine() {
+    public EBEngine getEngine() {
         return engine;
     }
 
-    protected ExecutorService getExecutorService() {
+    public ExecutorService getExecutorService() {
         return executorService;
     }
 

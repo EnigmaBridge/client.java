@@ -10,7 +10,7 @@ public class EBAsyncCryptoEvent {
     /**
      * Client which started this call.
      */
-    protected WeakReference<EBClientObjectAsync> clientObject;
+    protected WeakReference<EBClientObjectAsyncSimple> clientObject;
 
     /**
      * Discriminator object, provided by the caller to differentiate between doFinal() calls. Null by default.
@@ -30,23 +30,23 @@ public class EBAsyncCryptoEvent {
     public EBAsyncCryptoEvent() {
     }
 
-    public EBAsyncCryptoEvent(EBClientObjectAsync clientObject) {
-        this.clientObject = new WeakReference<EBClientObjectAsync>(clientObject);
+    public EBAsyncCryptoEvent(EBClientObjectAsyncSimple clientObject) {
+        this.clientObject = new WeakReference<EBClientObjectAsyncSimple>(clientObject);
     }
 
-    public EBAsyncCryptoEvent(EBClientObjectAsync clientObject, Object discriminator) {
-        this.clientObject = new WeakReference<EBClientObjectAsync>(clientObject);
+    public EBAsyncCryptoEvent(EBClientObjectAsyncSimple clientObject, Object discriminator) {
+        this.clientObject = new WeakReference<EBClientObjectAsyncSimple>(clientObject);
         this.discriminator = discriminator;
     }
 
-    public EBAsyncCryptoEvent(EBClientObjectAsync clientObject, Object discriminator, byte[] resultBuffer) {
-        this.clientObject = new WeakReference<EBClientObjectAsync>(clientObject);
+    public EBAsyncCryptoEvent(EBClientObjectAsyncSimple clientObject, Object discriminator, byte[] resultBuffer) {
+        this.clientObject = new WeakReference<EBClientObjectAsyncSimple>(clientObject);
         this.discriminator = discriminator;
         this.resultBuffer = resultBuffer;
     }
 
-    public EBAsyncCryptoEvent(EBClientObjectAsync clientObject, Object discriminator, Boolean resultVerify) {
-        this.clientObject = new WeakReference<EBClientObjectAsync>(clientObject);
+    public EBAsyncCryptoEvent(EBClientObjectAsyncSimple clientObject, Object discriminator, Boolean resultVerify) {
+        this.clientObject = new WeakReference<EBClientObjectAsyncSimple>(clientObject);
         this.discriminator = discriminator;
         this.resultVerify = resultVerify;
     }
@@ -61,7 +61,7 @@ public class EBAsyncCryptoEvent {
 
     // Getters
 
-    public EBClientObjectAsync getClientObject() {
+    public EBClientObjectAsyncSimple getClientObject() {
         return clientObject != null ? clientObject.get() : null;
     }
 
@@ -79,8 +79,8 @@ public class EBAsyncCryptoEvent {
 
     // Setters
 
-    protected EBAsyncCryptoEvent setClientObject(EBClientObjectAsync clientObject) {
-        this.clientObject = new WeakReference<EBClientObjectAsync>(clientObject);
+    protected EBAsyncCryptoEvent setClientObject(EBClientObjectAsyncSimple clientObject) {
+        this.clientObject = new WeakReference<EBClientObjectAsyncSimple>(clientObject);
         return this;
     }
 

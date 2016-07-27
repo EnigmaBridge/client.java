@@ -9,15 +9,15 @@ public class EBAsyncCryptoEventUpdate extends EBAsyncCryptoEvent {
     public EBAsyncCryptoEventUpdate() {
     }
 
-    public EBAsyncCryptoEventUpdate(EBClientObjectAsync client) {
+    public EBAsyncCryptoEventUpdate(EBClientObjectAsyncSimple client) {
         super(client);
     }
 
-    public EBAsyncCryptoEventUpdate(EBClientObjectAsync client, Object discriminator) {
+    public EBAsyncCryptoEventUpdate(EBClientObjectAsyncSimple client, Object discriminator) {
         super(client, discriminator);
     }
 
-    public EBAsyncCryptoEventUpdate(EBClientObjectAsync client, Object discriminator, byte[] resultBuffer) {
+    public EBAsyncCryptoEventUpdate(EBClientObjectAsyncSimple client, Object discriminator, byte[] resultBuffer) {
         super(client, discriminator, resultBuffer);
     }
 

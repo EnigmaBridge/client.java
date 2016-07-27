@@ -5,22 +5,22 @@ package com.enigmabridge.client.async;
  */
 public class EBAsyncCryptoListenerBase implements EBAsyncCryptoListener {
     @Override
-    public void onUpdateSuccess(EBAsyncCryptoEventUpdate evt) {
+    public void onUpdateSuccess(EBClientObjectAsyncSimple clientObject, EBAsyncCryptoEventUpdate evt) {
 
     }
 
     @Override
-    public void onDoFinalSuccess(EBAsyncCryptoEventDoFinal evt) {
+    public void onDoFinalSuccess(EBClientObjectAsyncSimple clientObject, EBAsyncCryptoEventDoFinal evt) {
 
     }
 
     @Override
-    public void onVerifySuccess(EBAsyncCryptoEventVerify evt) {
+    public void onVerifySuccess(EBClientObjectAsyncSimple clientObject, EBAsyncCryptoEventVerify evt) {
 
     }
 
     @Override
-    public void onFail(EBAsyncCryptoEventFail evt) {
+    public void onFail(EBClientObjectAsyncSimple clientObject, EBAsyncCryptoEventFail evt) {
 
     }
 }

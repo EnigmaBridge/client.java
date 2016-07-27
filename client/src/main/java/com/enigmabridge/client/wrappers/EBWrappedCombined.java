@@ -111,7 +111,7 @@ public class EBWrappedCombined extends EBCommonCryptoBase {
         }
     }
 
-    protected void checkInit(){
+    public void checkInit(){
         int code = 0;
         code += cipher      == null ? 0 : 1;
         code += mac         == null ? 0 : 1;

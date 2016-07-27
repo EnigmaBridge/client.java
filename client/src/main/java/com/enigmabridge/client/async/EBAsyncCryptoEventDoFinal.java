@@ -19,15 +19,15 @@ public class EBAsyncCryptoEventDoFinal extends EBAsyncCryptoEvent {
     public EBAsyncCryptoEventDoFinal() {
     }
 
-    public EBAsyncCryptoEventDoFinal(EBClientObjectAsync client) {
+    public EBAsyncCryptoEventDoFinal(EBClientObjectAsyncSimple client) {
         super(client);
     }
 
-    public EBAsyncCryptoEventDoFinal(EBClientObjectAsync client, Object discriminator) {
+    public EBAsyncCryptoEventDoFinal(EBClientObjectAsyncSimple client, Object discriminator) {
         super(client, discriminator);
     }
 
-    public EBAsyncCryptoEventDoFinal(EBClientObjectAsync client, Object discriminator, byte[] resultBuffer) {
+    public EBAsyncCryptoEventDoFinal(EBClientObjectAsyncSimple client, Object discriminator, byte[] resultBuffer) {
         super(client, discriminator, resultBuffer);
     }
 

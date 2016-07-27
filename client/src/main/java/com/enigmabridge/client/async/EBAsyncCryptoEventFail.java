@@ -14,11 +14,11 @@ public class EBAsyncCryptoEventFail extends EBAsyncCryptoEvent {
     public EBAsyncCryptoEventFail() {
     }
 
-    public EBAsyncCryptoEventFail(EBClientObjectAsync client) {
+    public EBAsyncCryptoEventFail(EBClientObjectAsyncSimple client) {
         super(client);
     }
 
-    public EBAsyncCryptoEventFail(EBClientObjectAsync client, Object discriminator) {
+    public EBAsyncCryptoEventFail(EBClientObjectAsyncSimple client, Object discriminator) {
         super(client, discriminator);
     }
 
@@ -26,12 +26,12 @@ public class EBAsyncCryptoEventFail extends EBAsyncCryptoEvent {
         this.exception = exception;
     }
 
-    public EBAsyncCryptoEventFail(EBClientObjectAsync client, Exception exception) {
+    public EBAsyncCryptoEventFail(EBClientObjectAsyncSimple client, Exception exception) {
         super(client);
         this.exception = exception;
     }
 
-    public EBAsyncCryptoEventFail(EBClientObjectAsync client, Object discriminator, Exception exception) {
+    public EBAsyncCryptoEventFail(EBClientObjectAsyncSimple client, Object discriminator, Exception exception) {
         super(client, discriminator);
         this.exception = exception;
     }

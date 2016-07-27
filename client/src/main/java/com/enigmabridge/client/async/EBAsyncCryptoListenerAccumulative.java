@@ -14,8 +14,8 @@ public class EBAsyncCryptoListenerAccumulative extends EBAsyncCryptoListenerBase
     protected byte[] accumulated;
 
     @Override
-    public void onUpdateSuccess(EBAsyncCryptoEventUpdate evt) {
-        super.onUpdateSuccess(evt);
+    public void onUpdateSuccess(EBClientObjectAsyncSimple clientObject, EBAsyncCryptoEventUpdate evt) {
+        super.onUpdateSuccess(clientObject, evt);
         if (evt == null){
             return;
         }
@@ -29,8 +29,8 @@ public class EBAsyncCryptoListenerAccumulative extends EBAsyncCryptoListenerBase
     }
 
     @Override
-    public void onDoFinalSuccess(EBAsyncCryptoEventDoFinal evt) {
-        super.onDoFinalSuccess(evt);
+    public void onDoFinalSuccess(EBClientObjectAsyncSimple clientObject, EBAsyncCryptoEventDoFinal evt) {
+        super.onDoFinalSuccess(clientObject, evt);
 
         final byte[] buffer = evt.getResultBuffer();
         if (buffer != null && buffer.length > 0){
@@ -44,14 +44,14 @@ public class EBAsyncCryptoListenerAccumulative extends EBAsyncCryptoListenerBase
     }
 
     @Override
-    public void onVerifySuccess(EBAsyncCryptoEventVerify evt) {
-        super.onVerifySuccess(evt);
+    public void onVerifySuccess(EBClientObjectAsyncSimple clientObject, EBAsyncCryptoEventVerify evt) {
+        super.onVerifySuccess(clientObject, evt);
         updates.clear();
     }
 
     @Override
-    public void onFail(EBAsyncCryptoEventFail evt) {
-        super.onFail(evt);
+    public void onFail(EBClientObjectAsyncSimple clientObject, EBAsyncCryptoEventFail evt) {
+        super.onFail(clientObject, evt);
         updates.clear();
     }
 

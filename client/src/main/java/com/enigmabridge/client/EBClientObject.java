@@ -18,21 +18,6 @@ public class EBClientObject implements EBCommonCrypto {
     protected EBClient client;
     protected EBWrappedCombined cryptoWrapper;
 
-    /**
-     * If UO represents cipher, it is initialized here.
-     */
-    protected Cipher cipher;
-
-    /**
-     * If UO represents MAC, it is initialized here.
-     */
-    protected Mac mac;
-
-    /**
-     * If UO represents Signature, it is initialized here.
-     */
-    protected Signature signature;
-
     // TODO: INIT.
 
     // Common crypto
@@ -132,8 +117,6 @@ public class EBClientObject implements EBCommonCrypto {
     }
 
     protected void checkInit(){
-        if (cipher == null && mac == null && signature == null){
-            throw new IllegalStateException("Client object was not initialized properly");
-        }
+        cryptoWrapper.checkInit();
     }
 }

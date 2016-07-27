@@ -7,8 +7,8 @@ package com.enigmabridge.client.async;
  * Created by dusanklinec on 27.07.16.
  */
 public interface EBAsyncCryptoListener {
-    void onUpdateSuccess(EBAsyncCryptoEventUpdate evt);
-    void onDoFinalSuccess(EBAsyncCryptoEventDoFinal evt);
-    void onVerifySuccess(EBAsyncCryptoEventVerify evt);
-    void onFail(EBAsyncCryptoEventFail evt);
+    void onUpdateSuccess(EBClientObjectAsyncSimple clientObject, EBAsyncCryptoEventUpdate evt);
+    void onDoFinalSuccess(EBClientObjectAsyncSimple clientObject, EBAsyncCryptoEventDoFinal evt);
+    void onVerifySuccess(EBClientObjectAsyncSimple clientObject, EBAsyncCryptoEventVerify evt);
+    void onFail(EBClientObjectAsyncSimple clientObject, EBAsyncCryptoEventFail evt);
 }
