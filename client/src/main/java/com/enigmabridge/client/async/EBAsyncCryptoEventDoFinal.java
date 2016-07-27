@@ -1,8 +1,8 @@
 package com.enigmabridge.client.async;
 
-import java.lang.ref.WeakReference;
-
 /**
+ * Event used when doFinal() call returns successfully.
+ *
  * Created by dusanklinec on 27.07.16.
  */
 public class EBAsyncCryptoEventDoFinal extends EBAsyncCryptoEvent {

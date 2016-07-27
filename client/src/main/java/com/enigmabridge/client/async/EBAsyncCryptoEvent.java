@@ -4,6 +4,7 @@ import java.lang.ref.WeakReference;
 
 /**
  * Object passed to the listener on crypto operation finished.
+ *
  * Created by dusanklinec on 27.07.16.
  */
 public class EBAsyncCryptoEvent {

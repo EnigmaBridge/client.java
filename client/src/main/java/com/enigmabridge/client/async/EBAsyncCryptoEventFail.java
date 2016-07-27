@@ -1,8 +1,8 @@
 package com.enigmabridge.client.async;
 
-import java.lang.ref.WeakReference;
-
 /**
+ * Event used when any of the crypto API fails.
+ *
  * Created by dusanklinec on 27.07.16.
  */
 public class EBAsyncCryptoEventFail extends EBAsyncCryptoEvent {
