@@ -188,23 +188,26 @@ class RSACoreEngine
             return convertInput(respData, 0, respData.length);
 
         } catch (IOException e) {
+            test6f00(call, inputBytes);
             throw new EBCryptoException("ProcessData failed for: " + new EBUOHandle(key.getUserObjectInfo()), e);
         } catch (EBCorruptedException e) {
-            // 0x6f00 = data crypto error.
-            response = call.getPdResponse();
-            if (EBDevSettings.shouldLog6f00RequestResponse()
-                    && response != null
-                    && response.getStatusCode() == EBCommStatus.ERROR_CLASS_ERR_CHECK_ERRORS_6f){
-
-                // Logging 6f00 errors to detect possible crypto errors / incompatibility.
-                LOG.debug("RSA 0x6f00 error. encryption: %s, input size: %d \n  request [%s]\n  response [%s]",
-                        forEncryption,
-                        inputBytes.length,
-                        call.getRawRequest(),
-                        call.getRawResponse());
-            }
-
+            test6f00(call, inputBytes);
             throw new EBCryptoException("ProcessData failed for: " + new EBUOHandle(key.getUserObjectInfo()), e);
+        }
+    }
+
+    private void test6f00(EBProcessDataCall call, byte[] inputBytes){
+        EBProcessDataResponse response = call.getPdResponse();
+        if (EBDevSettings.shouldLog6f00RequestResponse()
+                && response != null
+                && response.getStatusCode() == EBCommStatus.ERROR_CLASS_ERR_CHECK_ERRORS_6f){
+
+            // Logging 6f00 errors to detect possible crypto errors / incompatibility.
+            LOG.debug(String.format("RSA 0x6f00 error. encryption: %s, input size: %d \n  request [%s]\n  response [%s]",
+                    forEncryption,
+                    inputBytes.length,
+                    call.getRawRequest(),
+                    call.getRawResponse()));
         }
     }
 }
