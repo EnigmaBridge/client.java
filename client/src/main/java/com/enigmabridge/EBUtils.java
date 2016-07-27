@@ -4,6 +4,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import javax.xml.bind.DatatypeConverter;
+import java.util.Collection;
 
 /**
  * Misc EB utils, general purpose.
@@ -215,5 +216,26 @@ public class EBUtils {
         }
 
         return merged;
+    }
+
+    public static byte[] concatByteArrays(Collection<byte[]> bytes){
+        if (bytes.size() == 0)
+            return null;
+        if (bytes.size() == 1)
+            return bytes.iterator().next();
+
+        int resultSize = 0;
+        for(byte[] sub : bytes){
+            resultSize += sub.length;
+        }
+
+        int offset = 0;
+        final byte[] result = new byte[resultSize];
+        for(byte[] sub : bytes){
+            System.arraycopy(sub, 0, result, offset, sub.length);
+            offset += sub.length;
+        }
+
+        return result;
     }
 }
