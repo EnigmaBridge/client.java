@@ -1,8 +1,5 @@
 package com.enigmabridge.client.async;
 
-import com.enigmabridge.client.EBClient;
-import com.enigmabridge.client.wrappers.EBWrappedCombined;
-
 import java.util.LinkedList;
 import java.util.concurrent.*;
 
