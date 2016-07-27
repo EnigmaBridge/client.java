@@ -208,6 +208,26 @@ public class EBEnigmaProviderIT {
         testRSAKeys(ebNewPubKey, keyPair.getPrivate(), keyPair);
     }
 
+    @Test(groups = {"integration"}, enabled = false) //, timeOut = 100000
+    public void testRSAMany() throws Exception {
+        final EBUOGetTemplateRequest tplReq = new EBUOGetTemplateRequest();
+        tplReq.setEnvironment(Constants.ENV_DEV);
+
+        // At first, generate local RSA keys.
+        final KeyPairGenerator kpGen = KeyPairGenerator.getInstance("RSA", "BC");
+        kpGen.initialize(2048);
+        final KeyPair keyPair = kpGen.generateKeyPair();
+
+        // Use EB factory to import existing RSA key to EB.
+        final KeyFactory kFact = KeyFactory.getInstance("RSA", "EB");
+        final PrivateKey ebPrivate = (PrivateKey) kFact.translateKey(keyPair.getPrivate());
+
+        // Test.
+        for (int i = 0; i < 512; i++) {
+            testRSAKeys(keyPair.getPublic(), ebPrivate, keyPair);
+        }
+    }
+
     /**
      * Performs simple identity tests DEC(ENC(X)) == X for given key pairs.
      *
