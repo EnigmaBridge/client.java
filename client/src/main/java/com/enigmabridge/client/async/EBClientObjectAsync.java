@@ -1,5 +1,6 @@
 package com.enigmabridge.client.async;
 
+import java.util.LinkedList;
 import java.util.concurrent.*;
 
 /**
@@ -8,7 +9,7 @@ import java.util.concurrent.*;
  *
  * Created by dusanklinec on 26.07.16.
  */
-public class EBClientObjectAsync extends EBClientObjectAsyncSimple {
+public class EBClientObjectAsync extends EBClientObjectAsyncSimple implements Future<EBAsyncCryptoEvent> {
     /**
      * Queue of async task, enqueued for processing in executor from client.
      */
@@ -20,56 +21,119 @@ public class EBClientObjectAsync extends EBClientObjectAsyncSimple {
      */
     protected boolean clearForSettingsChange = true;
 
-    // TODO: INIT.
+    /**
+     * Cancellation for async task.
+     */
+    protected volatile boolean cancelled = false;
 
     public synchronized boolean cancel(boolean mayInterruptIfRunning) {
         boolean cancelReturn = false;
+
+        // If there is some running / enqueued task, cancel it.
         if (future != null){
             cancelReturn = future.cancel(mayInterruptIfRunning);
+        }
+
+        // One way switch. After cancel no more tasks can be submitted.
+        cancelled = true;
+
+        // Copy of the worker queue, empty the queue.
+        final LinkedList<ObjectTask> queueCopy = new LinkedList<ObjectTask>(jobQueue);
+        jobQueue.clear();
+
+        // Notify listeners about fail - cancelled.
+        for(ObjectTask task : queueCopy) {
+            for (EBAsyncCryptoListener listener : listeners) {
+                listener.onFail(this, new EBAsyncCryptoEventFail(this, task.getDiscriminator(), new EBAsyncCancelledException()));
+            }
         }
 
         return cancelReturn;
     }
 
     public boolean isCancelled() {
-        return future.isCancelled();
+        return cancelled;
     }
 
     public boolean isDone() {
-        return future.isDone();
+        return jobQueue.isEmpty();
     }
 
-    public Object get() throws InterruptedException, ExecutionException {
-        return future.get();
+    public EBAsyncCryptoEvent get() throws InterruptedException, ExecutionException {
+        try {
+            return get(-1, TimeUnit.DAYS);
+        }catch (TimeoutException e){
+            // Should not happen
+            return null;
+        }
     }
 
-    public Object get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-        return future.get(timeout, unit);
+    /**
+     * Waits until the whole job queue gets processed.
+     * Returns the last processed event.
+     *
+     * @param timeout
+     * @param unit
+     * @return
+     * @throws InterruptedException
+     * @throws ExecutionException
+     * @throws TimeoutException
+     */
+    public EBAsyncCryptoEvent get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+        final long milliWait = unit.toMillis(timeout);
+        final long milliStart = System.currentTimeMillis();
+        while(!this.jobQueue.isEmpty()){
+            Thread.sleep(1);
+            if (milliWait >= 0 && (milliStart + milliWait) < System.currentTimeMillis()){
+                throw new TimeoutException();
+            }
+        }
+
+        return getLastEvent();
     }
 
     // Async interface for data processing.
 
-    public synchronized void update(byte[] buffer, int offset, int length){
+    public synchronized Future<EBAsyncCryptoEvent> update(byte[] buffer){
+        return update(buffer, 0, buffer != null ? buffer.length : 0);
+    }
+
+    public synchronized Future<EBAsyncCryptoEvent> update(byte[] buffer, int offset, int length){
+        if (cancelled){
+            throw new RuntimeException("Async cancelled");
+        }
+
         clearForSettingsChange = false;
         final ObjectTaskUpdate task = new ObjectTaskUpdate(this, discriminator, buffer, offset, length);
         jobQueue.add(task);
         checkQueue();
+        return this;
     }
 
-    public synchronized void processData(byte[] buffer, int offset, int length){
+    public synchronized Future<EBAsyncCryptoEvent> doFinal(byte[] buffer, int offset, int length){
+        if (cancelled){
+            throw new RuntimeException("Async cancelled");
+        }
+
         final ObjectTaskDoFinal task = new ObjectTaskDoFinal(this, discriminator, buffer, offset, length);
         jobQueue.add(task);
         checkQueue();
 
         clearForSettingsChange = true;
+        return this;
     }
 
-    public synchronized void verify(byte[] buffer, int offset, int length) {
+    public synchronized Future<EBAsyncCryptoEvent> verify(byte[] buffer, int offset, int length) {
+        if (cancelled){
+            throw new RuntimeException("Async cancelled");
+        }
+
         final ObjectTaskVerify task = new ObjectTaskVerify(this, discriminator, buffer, offset, length);
         jobQueue.add(task);
         checkQueue();
 
         clearForSettingsChange = true;
+        return this;
     }
 
     // Task management.
@@ -102,10 +166,20 @@ public class EBClientObjectAsync extends EBClientObjectAsyncSimple {
         final boolean wasVerify = event instanceof EBAsyncCryptoEventVerify;
 
         // Remove the task from the queue. There is max 1 task running from the queue all the time.
-        final ObjectTask polledTask = jobQueue.poll();
-        if (!polledTask.equals(task)){
-            throw new IllegalStateException("Finished task was not on the top of the queue, should not happen");
+        final ObjectTask polledTask = jobQueue.peek();
+        if (polledTask == null || !polledTask.equals(task)){
+            // Task was cancelled / removed. It was cancelled before.
+            checkQueue();
+            return;
         }
+
+        lastEvent = event;
+        if (wasFinal){
+            lastFinalEvent = (EBAsyncCryptoEventDoFinal) event;
+        }
+
+        // Remove now, we have observers on the queue, so remove after lastX is set.
+        jobQueue.poll();
 
         // If it was fail for update() remove all next updates and doFinals()
         if (wasFail && task instanceof ObjectTaskUpdate){
@@ -135,19 +209,6 @@ public class EBClientObjectAsync extends EBClientObjectAsyncSimple {
 
         // Check the queue again.
         checkQueue();
-    }
-
-    /**
-     * Removes tasks from the current job. If the current task fails, all next updates & final need to me removed
-     * from the queue.
-     *
-     * Examples of the queue transformation:
-     *
-     * update, update, update, final, update -> update
-     * final, update -> update
-     */
-    protected synchronized void removeRemainingTasks(){
-        // TODO:
     }
 
     // Getters

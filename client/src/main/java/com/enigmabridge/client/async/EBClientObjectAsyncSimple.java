@@ -30,7 +30,7 @@ public class EBClientObjectAsyncSimple {
     /**
      * Future object representing this task in the executor.
      */
-    protected Future future;
+    protected Future<EBAsyncCryptoEvent> future;
     protected EBClientObjectAsync.ObjectTask currentlyRunningTask;
 
     /**
@@ -44,6 +44,12 @@ public class EBClientObjectAsyncSimple {
      * It can be changed only before first update() call or after fresh init / doFinal (resets state).
      */
     protected Object discriminator;
+
+    /**
+     * The last final event produced.
+     */
+    protected volatile EBAsyncCryptoEventDoFinal lastFinalEvent;
+    protected volatile EBAsyncCryptoEvent lastEvent;
 
     // TODO: INIT.
 
@@ -64,12 +70,20 @@ public class EBClientObjectAsyncSimple {
         return future != null && future.isDone();
     }
 
-    public Object get() throws InterruptedException, ExecutionException {
-        return future != null ? future.get() : null;
+    public EBAsyncCryptoEvent get() throws InterruptedException, ExecutionException {
+        if (future != null){
+            return future.get();
+        }
+
+        return null;
     }
 
-    public Object get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-        return future != null ? future.get(timeout, unit) : null;
+    public EBAsyncCryptoEvent get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+        if (future != null) {
+            return future.get(timeout, unit);
+        }
+
+        return null;
     }
 
     // Bookkeeping
@@ -84,30 +98,32 @@ public class EBClientObjectAsyncSimple {
 
     // Async interface for data processing.
 
-    public synchronized void doFinal(byte[] buffer){
-        doFinal(buffer, 0, buffer == null ? 0 : buffer.length);
+    public synchronized Future<EBAsyncCryptoEvent> doFinal(byte[] buffer){
+        return doFinal(buffer, 0, buffer == null ? 0 : buffer.length);
     }
 
-    public synchronized void doFinal(byte[] buffer, int offset, int length){
-        processData(buffer, offset, length);
-    }
-
-    public synchronized void processData(byte[] buffer){
-        processData(buffer, 0, buffer == null ? 0 : buffer.length);
-    }
-
-    public synchronized void processData(byte[] buffer, int offset, int length){
+    public synchronized Future<EBAsyncCryptoEvent> doFinal(byte[] buffer, int offset, int length){
         currentlyRunningTask = new EBClientObjectAsync.ObjectTaskDoFinal(this, discriminator, buffer, offset, length);
         future = client.getExecutorService().submit(currentlyRunningTask);
+        return future;
     }
 
-    public synchronized void verify(byte[] buffer) {
-        verify(buffer, 0, buffer == null ? 0 : buffer.length);
+    public synchronized Future<EBAsyncCryptoEvent> processData(byte[] buffer){
+        return doFinal(buffer, 0, buffer == null ? 0 : buffer.length);
     }
 
-    public synchronized void verify(byte[] buffer, int offset, int length) {
+    public synchronized Future<EBAsyncCryptoEvent> processData(byte[] buffer, int offset, int length){
+        return doFinal(buffer, offset, length);
+    }
+
+    public synchronized Future<EBAsyncCryptoEvent> verify(byte[] buffer) {
+        return verify(buffer, 0, buffer == null ? 0 : buffer.length);
+    }
+
+    public synchronized Future<EBAsyncCryptoEvent> verify(byte[] buffer, int offset, int length) {
         currentlyRunningTask = new EBClientObjectAsync.ObjectTaskVerify(this, discriminator, buffer, offset, length);
         future = client.getExecutorService().submit(currentlyRunningTask);
+        return future;
     }
 
     /**
@@ -121,6 +137,11 @@ public class EBClientObjectAsyncSimple {
         final boolean wasFinal = event instanceof EBAsyncCryptoEventDoFinal;
         final boolean wasUpdate = event instanceof EBAsyncCryptoEventUpdate;
         final boolean wasVerify = event instanceof EBAsyncCryptoEventVerify;
+
+        lastEvent = event;
+        if (wasFinal){
+            lastFinalEvent = (EBAsyncCryptoEventDoFinal) event;
+        }
 
         // Trigger listeners.
         for (EBAsyncCryptoListener listener : listeners){
@@ -142,7 +163,7 @@ public class EBClientObjectAsyncSimple {
      * Represents current operation to be called.
      * update() / doFinal()
      */
-    static abstract class ObjectTask implements Runnable {
+    static abstract class ObjectTask implements Callable<EBAsyncCryptoEvent> {
         protected byte[] buffer;
         protected int offset;
         protected int length;
@@ -169,8 +190,12 @@ public class EBClientObjectAsyncSimple {
             this.discriminator = discriminator;
         }
 
+        public Object getDiscriminator() {
+            return discriminator;
+        }
+
         @Override
-        public void run() {
+        public EBAsyncCryptoEvent call() throws Exception {
             // This code runs in service executor.
             // Do the process operation.
             try {
@@ -178,8 +203,12 @@ public class EBClientObjectAsyncSimple {
 
                 // Handle the result to the client.
                 parent.onTaskFinished(this, event);
+                return event;
+
             } catch(Exception e){
-                parent.onTaskFinished(this, new EBAsyncCryptoEventFail(parent, discriminator, e));
+                final EBAsyncCryptoEventFail failEvent = new EBAsyncCryptoEventFail(parent, discriminator, e);
+                parent.onTaskFinished(this, failEvent);
+                return failEvent;
             }
         }
 
@@ -284,5 +313,13 @@ public class EBClientObjectAsyncSimple {
 
     public Object getDiscriminator() {
         return discriminator;
+    }
+
+    public EBAsyncCryptoEventDoFinal getLastFinalEvent() {
+        return lastFinalEvent;
+    }
+
+    public EBAsyncCryptoEvent getLastEvent() {
+        return lastEvent;
     }
 }

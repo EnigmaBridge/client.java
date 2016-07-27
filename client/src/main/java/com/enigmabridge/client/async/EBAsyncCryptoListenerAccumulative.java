@@ -6,6 +6,7 @@ import java.util.LinkedList;
 
 /**
  * Listener accumulating onUpdate() calls to the accumulator buffer.
+ *
  * Created by dusanklinec on 27.07.16.
  */
 public class EBAsyncCryptoListenerAccumulative extends EBAsyncCryptoListenerBase {

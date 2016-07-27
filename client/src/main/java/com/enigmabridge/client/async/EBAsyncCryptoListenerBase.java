@@ -1,6 +1,9 @@
 package com.enigmabridge.client.async;
 
 /**
+ * Basic implementation of the listener interface. Has empty logic.
+ * User can anonymously extend this class to get simpler code.
+ *
  * Created by dusanklinec on 27.07.16.
  */
 public class EBAsyncCryptoListenerBase implements EBAsyncCryptoListener {
