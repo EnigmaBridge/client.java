@@ -1,5 +1,8 @@
 package com.enigmabridge.client.async;
 
+import com.enigmabridge.client.EBClient;
+import com.enigmabridge.client.wrappers.EBWrappedCombined;
+
 import java.util.LinkedList;
 import java.util.concurrent.*;
 
@@ -25,6 +28,34 @@ public class EBClientObjectAsync extends EBClientObjectAsyncSimple implements Fu
      * Cancellation for async task.
      */
     protected volatile boolean cancelled = false;
+
+    public static abstract class AbstractBuilder<T extends EBClientObjectAsync, B extends EBClientObjectAsync.AbstractBuilder>
+            extends EBClientObjectAsyncSimple.AbstractBuilder<T, B> {
+        public abstract T build();
+
+        public abstract B getThisBuilder();
+
+        public abstract T getObj();
+    }
+
+    public static class Builder extends AbstractBuilder<EBClientObjectAsync, EBClientObjectAsync.Builder> {
+        private final EBClientObjectAsync child = new EBClientObjectAsync();
+
+        @Override
+        public EBClientObjectAsync getObj() {
+            return child;
+        }
+
+        @Override
+        public EBClientObjectAsync build() {
+            return child;
+        }
+
+        @Override
+        public EBClientObjectAsync.Builder getThisBuilder() {
+            return this;
+        }
+    }
 
     /**
      * Cancels all running jobs, the whole queue.

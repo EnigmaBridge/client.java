@@ -5,6 +5,8 @@ import com.enigmabridge.EBSettings;
 import com.enigmabridge.EBSettingsBase;
 import com.enigmabridge.EBURLConfig;
 import com.enigmabridge.client.async.EBClientObjectAsync;
+import com.enigmabridge.client.async.EBClientObjectAsyncSimple;
+import com.enigmabridge.client.wrappers.EBWrappedCombined;
 import com.enigmabridge.comm.EBConnectionSettings;
 import org.json.JSONObject;
 
@@ -115,6 +117,8 @@ public class EBClient {
         }
     }
 
+    // Simple sync API
+
     public EBClientObject initFromJSON(String json){
         return init(new JSONObject(json));
     }
@@ -124,12 +128,46 @@ public class EBClient {
     }
 
     public EBClientObject init(JSONObject json){
-        return null; // TODO: xx
+        final EBWrappedCombined wrapper = getCryptoWrapperInstance(json);
+        return new EBClientObject()
+            .setClient(this)
+            .setCryptoWrapper(wrapper);
     }
 
     public EBClientObject init(EBURLConfig urlConfig){
-        return null; // TODO: xx
+        final EBWrappedCombined wrapper = getCryptoWrapperInstance(urlConfig);
+        return new EBClientObject()
+                .setClient(this)
+                .setCryptoWrapper(wrapper);
     }
+
+    // Simple async API
+
+    public EBClientObjectAsyncSimple initAsyncSimpleFromJSON(String json){
+        return initAsyncSimple(new JSONObject(json));
+    }
+
+    public EBClientObjectAsyncSimple initAsyncSimple(String urlConfig) throws MalformedURLException, UnsupportedEncodingException {
+        return initAsyncSimple(new EBURLConfig(urlConfig));
+    }
+
+    public EBClientObjectAsyncSimple initAsyncSimple(JSONObject json){
+        final EBWrappedCombined wrapper = getCryptoWrapperInstance(json);
+        return new EBClientObjectAsyncSimple.Builder()
+                .setClient(this)
+                .setCryptoWrapper(wrapper)
+                .build();
+    }
+
+    public EBClientObjectAsyncSimple initAsyncSimple(EBURLConfig urlConfig) {
+        final EBWrappedCombined wrapper = getCryptoWrapperInstance(urlConfig);
+        return new EBClientObjectAsyncSimple.Builder()
+                .setClient(this)
+                .setCryptoWrapper(wrapper)
+                .build();
+    }
+
+    // Complex async API
 
     public EBClientObjectAsync initAsyncFromJSON(String json){
         return initAsync(new JSONObject(json));
@@ -140,21 +178,30 @@ public class EBClient {
     }
 
     public EBClientObjectAsync initAsync(JSONObject json){
-        final Future<Object> future = getExecutorService().submit(new Callable<Object>() {
-            @Override
-            public Object call() throws Exception {
-
-                return null;
-            }
-        });
-
-        return null; // TODO: xx
+        final EBWrappedCombined wrapper = getCryptoWrapperInstance(json);
+        return new EBClientObjectAsync.Builder()
+                .setClient(this)
+                .setCryptoWrapper(wrapper)
+                .build();
     }
 
-    public EBClientObjectAsync initAsync(EBURLConfig urlConfig){
-        return null; // TODO: xx
+    public EBClientObjectAsync initAsync(EBURLConfig urlConfig) {
+        final EBWrappedCombined wrapper = getCryptoWrapperInstance(urlConfig);
+        return new EBClientObjectAsync.Builder()
+                .setClient(this)
+                .setCryptoWrapper(wrapper)
+                .build();
     }
 
+    // Crypto wrapper factory
+
+    protected EBWrappedCombined getCryptoWrapperInstance(JSONObject json){
+        return null; // TODO: xxx
+    }
+
+    protected EBWrappedCombined getCryptoWrapperInstance(EBURLConfig urlConfig){
+        return null; // TODO: xxx
+    }
 
     // Getters
 

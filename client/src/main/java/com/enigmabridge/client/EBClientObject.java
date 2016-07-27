@@ -117,4 +117,14 @@ public class EBClientObject implements EBCommonCrypto {
     protected void checkInit(){
         cryptoWrapper.checkInit();
     }
+
+    public EBClientObject setClient(EBClient client) {
+        this.client = client;
+        return this;
+    }
+
+    public EBClientObject setCryptoWrapper(EBWrappedCombined cryptoWrapper) {
+        this.cryptoWrapper = cryptoWrapper;
+        return this;
+    }
 }

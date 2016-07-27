@@ -1,7 +1,9 @@
 package com.enigmabridge.client.async;
 
+import com.enigmabridge.EBEngine;
 import com.enigmabridge.client.EBClient;
 import com.enigmabridge.client.wrappers.EBWrappedCombined;
+import com.enigmabridge.comm.EBConnectionSettings;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
@@ -50,6 +52,41 @@ public class EBClientObjectAsyncSimple {
      */
     protected volatile EBAsyncCryptoEventDoFinal lastFinalEvent;
     protected volatile EBAsyncCryptoEvent lastEvent;
+
+    public static abstract class AbstractBuilder<T extends EBClientObjectAsyncSimple, B extends AbstractBuilder> {
+        public B setClient(EBClient client){
+            getObj().client = client;
+            return getThisBuilder();
+        }
+
+        public B setCryptoWrapper(EBWrappedCombined wrapper){
+            getObj().cryptoWrapper = wrapper;
+            return getThisBuilder();
+        }
+
+        public abstract T build();
+        public abstract B getThisBuilder();
+        public abstract T getObj();
+    }
+
+    public static class Builder extends AbstractBuilder<EBClientObjectAsyncSimple, EBClientObjectAsyncSimple.Builder> {
+        private final EBClientObjectAsyncSimple child = new EBClientObjectAsyncSimple();
+
+        @Override
+        public EBClientObjectAsyncSimple getObj() {
+            return child;
+        }
+
+        @Override
+        public EBClientObjectAsyncSimple build() {
+            return child;
+        }
+
+        @Override
+        public EBClientObjectAsyncSimple.Builder getThisBuilder() {
+            return this;
+        }
+    }
 
     public synchronized boolean cancel(boolean mayInterruptIfRunning) {
         boolean cancelReturn = false;
