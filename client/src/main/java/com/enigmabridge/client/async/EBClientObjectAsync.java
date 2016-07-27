@@ -26,6 +26,14 @@ public class EBClientObjectAsync extends EBClientObjectAsyncSimple implements Fu
      */
     protected volatile boolean cancelled = false;
 
+    /**
+     * Cancels all running jobs, the whole queue.
+     * After cancellation no more jobs can be accepted as it would leave us in the possible dangerous state
+     * w.r.t. race conditions (cancel, add new task, callback from old task, callback from task after cancellation)
+     *
+     * @param mayInterruptIfRunning {@see Future.cancel()}
+     * @return true/false
+     */
     public synchronized boolean cancel(boolean mayInterruptIfRunning) {
         boolean cancelReturn = false;
 
@@ -51,14 +59,31 @@ public class EBClientObjectAsync extends EBClientObjectAsyncSimple implements Fu
         return cancelReturn;
     }
 
+    /**
+     * isCancelled => no more tasks can be submitted, everything got aborted.
+     *
+     * @return true if jobs were cancelled
+     */
     public boolean isCancelled() {
         return cancelled;
     }
 
+    /**
+     * isDone == there are no more jobs in the queue.
+     *
+     * @return true if no more jobs
+     */
     public boolean isDone() {
         return jobQueue.isEmpty();
     }
 
+    /**
+     * Waits until the whole queue is processed
+     *
+     * @return last event
+     * @throws InterruptedException waiting thread was interrupted
+     * @throws ExecutionException job aborted by throwing an exception
+     */
     public EBAsyncCryptoEvent get() throws InterruptedException, ExecutionException {
         try {
             return get(-1, TimeUnit.DAYS);
@@ -72,12 +97,12 @@ public class EBClientObjectAsync extends EBClientObjectAsyncSimple implements Fu
      * Waits until the whole job queue gets processed.
      * Returns the last processed event.
      *
-     * @param timeout
-     * @param unit
-     * @return
-     * @throws InterruptedException
-     * @throws ExecutionException
-     * @throws TimeoutException
+     * @param timeout timeout value
+     * @param unit timeout TimeUnit
+     * @return last event
+     * @throws InterruptedException waiting thread was interrupted
+     * @throws ExecutionException job aborted by throwing an exception
+     * @throws TimeoutException given waiting time value was reached, job was not finished till then
      */
     public EBAsyncCryptoEvent get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
         final long milliWait = unit.toMillis(timeout);
@@ -94,10 +119,24 @@ public class EBClientObjectAsync extends EBClientObjectAsyncSimple implements Fu
 
     // Async interface for data processing.
 
+    /**
+     * Incremental API for crypto operation.
+     *
+     * @param buffer buffer to process
+     * @return future
+     */
     public synchronized Future<EBAsyncCryptoEvent> update(byte[] buffer){
         return update(buffer, 0, buffer != null ? buffer.length : 0);
     }
 
+    /**
+     * Incremental API for crypto operation.
+     *
+     * @param buffer buffer to process
+     * @param offset offset where to start the processing
+     * @param length number of bytes to process in buffer starting at offset
+     * @return future
+     */
     public synchronized Future<EBAsyncCryptoEvent> update(byte[] buffer, int offset, int length){
         if (cancelled){
             throw new RuntimeException("Async cancelled");

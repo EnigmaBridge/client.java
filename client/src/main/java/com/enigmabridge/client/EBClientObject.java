@@ -18,8 +18,6 @@ public class EBClientObject implements EBCommonCrypto {
     protected EBClient client;
     protected EBWrappedCombined cryptoWrapper;
 
-    // TODO: INIT.
-
     // Common crypto
 
     @Override

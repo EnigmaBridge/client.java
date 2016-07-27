@@ -51,8 +51,6 @@ public class EBClientObjectAsyncSimple {
     protected volatile EBAsyncCryptoEventDoFinal lastFinalEvent;
     protected volatile EBAsyncCryptoEvent lastEvent;
 
-    // TODO: INIT.
-
     public synchronized boolean cancel(boolean mayInterruptIfRunning) {
         boolean cancelReturn = false;
         if (future != null){
