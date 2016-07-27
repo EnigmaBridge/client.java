@@ -1,15 +1,18 @@
 package com.enigmabridge.client;
 
-import com.enigmabridge.EBEngine;
-import com.enigmabridge.EBSettings;
-import com.enigmabridge.EBSettingsBase;
-import com.enigmabridge.EBURLConfig;
+import com.enigmabridge.*;
 import com.enigmabridge.client.async.EBClientObjectAsync;
 import com.enigmabridge.client.async.EBClientObjectAsyncSimple;
 import com.enigmabridge.client.wrappers.EBWrappedCombined;
 import com.enigmabridge.comm.EBConnectionSettings;
+import com.enigmabridge.provider.EBKeyBase;
+import com.enigmabridge.provider.EBSecretKeyFactory;
+import com.enigmabridge.provider.EBSymmetricKey;
+import com.enigmabridge.provider.rsa.EBRSAPrivateKey;
+import com.enigmabridge.provider.rsa.KeyFactorySpi;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.util.concurrent.*;
@@ -123,7 +126,7 @@ public class EBClient {
         return init(new JSONObject(json));
     }
 
-    public EBClientObject init(String urlConfig) throws MalformedURLException, UnsupportedEncodingException {
+    public EBClientObject init(String urlConfig) throws IOException {
         return init(new EBURLConfig(urlConfig));
     }
 
@@ -134,8 +137,14 @@ public class EBClient {
             .setCryptoWrapper(wrapper);
     }
 
-    public EBClientObject init(EBURLConfig urlConfig){
+    public EBClientObject init(EBURLConfig urlConfig) throws IOException {
         final EBWrappedCombined wrapper = getCryptoWrapperInstance(urlConfig);
+        return new EBClientObject()
+                .setClient(this)
+                .setCryptoWrapper(wrapper);
+    }
+
+    public EBClientObject init(EBWrappedCombined wrapper) throws IOException {
         return new EBClientObject()
                 .setClient(this)
                 .setCryptoWrapper(wrapper);
@@ -147,7 +156,7 @@ public class EBClient {
         return initAsyncSimple(new JSONObject(json));
     }
 
-    public EBClientObjectAsyncSimple initAsyncSimple(String urlConfig) throws MalformedURLException, UnsupportedEncodingException {
+    public EBClientObjectAsyncSimple initAsyncSimple(String urlConfig) throws IOException {
         return initAsyncSimple(new EBURLConfig(urlConfig));
     }
 
@@ -159,8 +168,15 @@ public class EBClient {
                 .build();
     }
 
-    public EBClientObjectAsyncSimple initAsyncSimple(EBURLConfig urlConfig) {
+    public EBClientObjectAsyncSimple initAsyncSimple(EBURLConfig urlConfig) throws IOException {
         final EBWrappedCombined wrapper = getCryptoWrapperInstance(urlConfig);
+        return new EBClientObjectAsyncSimple.Builder()
+                .setClient(this)
+                .setCryptoWrapper(wrapper)
+                .build();
+    }
+
+    public EBClientObjectAsyncSimple initAsyncSimple(EBWrappedCombined wrapper) throws IOException {
         return new EBClientObjectAsyncSimple.Builder()
                 .setClient(this)
                 .setCryptoWrapper(wrapper)
@@ -173,7 +189,7 @@ public class EBClient {
         return initAsync(new JSONObject(json));
     }
 
-    public EBClientObjectAsync initAsync(String urlConfig) throws MalformedURLException, UnsupportedEncodingException {
+    public EBClientObjectAsync initAsync(String urlConfig) throws IOException {
         return initAsync(new EBURLConfig(urlConfig));
     }
 
@@ -185,8 +201,15 @@ public class EBClient {
                 .build();
     }
 
-    public EBClientObjectAsync initAsync(EBURLConfig urlConfig) {
+    public EBClientObjectAsync initAsync(EBURLConfig urlConfig) throws IOException {
         final EBWrappedCombined wrapper = getCryptoWrapperInstance(urlConfig);
+        return new EBClientObjectAsync.Builder()
+                .setClient(this)
+                .setCryptoWrapper(wrapper)
+                .build();
+    }
+
+    public EBClientObjectAsync initAsync(EBWrappedCombined wrapper) throws IOException {
         return new EBClientObjectAsync.Builder()
                 .setClient(this)
                 .setCryptoWrapper(wrapper)
@@ -196,11 +219,69 @@ public class EBClient {
     // Crypto wrapper factory
 
     protected EBWrappedCombined getCryptoWrapperInstance(JSONObject json){
-        return null; // TODO: xxx
+        // TODO: implement
+        throw new UnsupportedOperationException("Not implemented yet");
     }
 
-    protected EBWrappedCombined getCryptoWrapperInstance(EBURLConfig urlConfig){
-        return null; // TODO: xxx
+    protected EBWrappedCombined getCryptoWrapperInstance(EBURLConfig urlConfig) throws IOException {
+        // Try to find EB provider serialized keys. Can be directly used with cipher.
+        // Symmetric key. AES, for now.
+        final JSONObject symmetricJson = urlConfig.getElement(EBSecretKeyFactory.FIELD_SYMMETRIC_KEY);
+        if (symmetricJson != null){
+            final EBSymmetricKey tmpKey = new EBSymmetricKey.Builder()
+                    .setEngine(engine)
+                    .setJson(symmetricJson)
+                    .build();
+            // TODO: continue
+            return null;
+        }
+
+        // Asymmetric key, RSA. Can be used to encrypt (locally), decrypt(in EB), sign, verify.
+        final JSONObject rsaJson = urlConfig.getElement(KeyFactorySpi.FIELD_RSA_PRIVATE);
+        if (rsaJson != null){
+            final EBRSAPrivateKey tmpKey = new EBRSAPrivateKey.Builder()
+                    .setEngine(engine)
+                    .setJson(rsaJson)
+                    .build();
+            // TODO: continue
+            return null;
+        }
+
+        // General key
+        final JSONObject uoJson = urlConfig.getElement(EBKeyBase.FIELD_UO);
+        if (uoJson != null){
+            // Try UserObjectKey at first
+            try {
+                final UserObjectKeyBase tmpKey = new UserObjectKeyBase.Builder()
+                        .setEndpointInfo(urlConfig.getEndpointInfo())
+                        .setApiKey(urlConfig.getApiKey())
+                        .setConnectionSettings(urlConfig.getConnectionSettings())
+                        .setJson(uoJson)
+                        .build();
+                // TODO: continue;
+                return null;
+
+            } catch(Exception e){
+
+            }
+
+            // Try general UO
+            try {
+                final UserObjectInfoBase tmpKey = new UserObjectInfoBase.Builder()
+                        .setEndpointInfo(urlConfig.getEndpointInfo())
+                        .setApiKey(urlConfig.getApiKey())
+                        .setConnectionSettings(urlConfig.getConnectionSettings())
+                        .setJson(uoJson)
+                        .build();
+                // TODO: continue;
+                return null;
+
+            } catch(Exception e){
+
+            }
+        }
+
+        throw new IllegalArgumentException("Unrecognized user object");
     }
 
     // Getters

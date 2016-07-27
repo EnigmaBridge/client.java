@@ -43,7 +43,7 @@ public class EBSecretKeyFactory extends SecretKeyFactorySpi {
     protected SecureRandom random;
     private EBSymmetricKeyGenTypes keyType = EBSymmetricKeyGenTypes.BOTH;
 
-    private static final String FIELD_SYMMETRIC_KEY = "symKey";
+    public static final String FIELD_SYMMETRIC_KEY = "symKey";
 
     public EBSecretKeyFactory(EnigmaProvider provider) {
         this.provider = provider;

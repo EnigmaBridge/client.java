@@ -30,7 +30,7 @@ public abstract class EBKeyBase implements EBUOKey, EBJSONSerializable {
     protected boolean sensitive = true;
     protected boolean extractable = false;
 
-    private static final String FIELD_UO = "uo";
+    public static final String FIELD_UO = "uo";
 
     public static abstract class AbstractBuilder<T extends EBKeyBase, B extends AbstractBuilder> {
         public B setUo(UserObjectKeyBase uo) {

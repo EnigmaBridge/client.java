@@ -42,8 +42,8 @@ public class KeyFactorySpi
     protected final UserObjectKeyCreator.Builder keyCreatorBld = new UserObjectKeyCreator.Builder();
     protected UserObjectKeyCreator keyCreator;
 
-    private static final String FIELD_RSA_PRIVATE = "rsaPriv";
-    private static final String FIELD_RSA_PUBLIC = "rsaPub";
+    public static final String FIELD_RSA_PRIVATE = "rsaPriv";
+    public static final String FIELD_RSA_PUBLIC = "rsaPub";
 
     public KeyFactorySpi(EnigmaProvider provider)
     {

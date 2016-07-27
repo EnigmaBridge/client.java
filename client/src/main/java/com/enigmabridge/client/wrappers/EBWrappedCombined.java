@@ -8,6 +8,9 @@ import javax.crypto.ShortBufferException;
 import java.security.SignatureException;
 
 /**
+ * Unified interface to Cipher, Mac, Signature classes.
+ * Wraps those allowing unified access to their API, used in the client.
+ *
  * Created by dusanklinec on 26.07.16.
  */
 public class EBWrappedCombined extends EBCommonCryptoBase {
