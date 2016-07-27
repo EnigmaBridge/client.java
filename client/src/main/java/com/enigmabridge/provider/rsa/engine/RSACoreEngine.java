@@ -154,7 +154,7 @@ class RSACoreEngine
         }
         else
         {
-            if (output[0] == 0)        // have ended up with an extra zero byte, copy down.
+            if (output[0] == 0 && output.length > getOutputBlockSize())        // have ended up with an extra zero byte, copy down.
             {
                 byte[]  tmp = new byte[output.length - 1];
 
