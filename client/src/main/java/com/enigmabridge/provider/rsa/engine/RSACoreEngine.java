@@ -154,11 +154,20 @@ class RSACoreEngine
         }
         else
         {
-            if (output[0] == 0 && output.length > getOutputBlockSize())        // have ended up with an extra zero byte, copy down.
+            if (output[0] == 0 && output.length > getOutputBlockSize() + 1)        // have ended up with an extra zero byte, copy down.
             {
                 byte[]  tmp = new byte[output.length - 1];
 
                 System.arraycopy(output, 1, tmp, 0, tmp.length);
+
+                return tmp;
+            }
+
+            if (output.length < getOutputBlockSize() + 1)     // have ended up with less bytes than normal, lengthen
+            {
+                byte[]  tmp = new byte[getOutputBlockSize() + 1];
+
+                System.arraycopy(output, 0, tmp, tmp.length - output.length, output.length);
 
                 return tmp;
             }
