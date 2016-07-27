@@ -2,6 +2,7 @@ package com.enigmabridge.client.async;
 
 import com.enigmabridge.EBEngine;
 import com.enigmabridge.client.EBClient;
+import com.enigmabridge.client.EBCommonCrypto;
 import com.enigmabridge.client.wrappers.EBWrappedCombined;
 import com.enigmabridge.comm.EBConnectionSettings;
 
@@ -27,7 +28,7 @@ public class EBClientObjectAsyncSimple {
     /**
      * Wrapped crypto object, synchronous.
      */
-    protected EBWrappedCombined cryptoWrapper;
+    protected EBCommonCrypto cryptoWrapper;
 
     /**
      * Future object representing this task in the executor.
@@ -59,7 +60,7 @@ public class EBClientObjectAsyncSimple {
             return getThisBuilder();
         }
 
-        public B setCryptoWrapper(EBWrappedCombined wrapper){
+        public B setCryptoWrapper(EBCommonCrypto wrapper){
             getObj().cryptoWrapper = wrapper;
             return getThisBuilder();
         }
@@ -338,7 +339,7 @@ public class EBClientObjectAsyncSimple {
         return client;
     }
 
-    public EBWrappedCombined getCryptoWrapper() {
+    public EBCommonCrypto getCryptoWrapper() {
         return cryptoWrapper;
     }
 

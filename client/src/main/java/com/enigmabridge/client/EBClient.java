@@ -218,12 +218,12 @@ public class EBClient {
 
     // Crypto wrapper factory
 
-    protected EBWrappedCombined getCryptoWrapperInstance(JSONObject json){
+    public EBWrappedCombined getCryptoWrapperInstance(JSONObject json){
         // TODO: implement
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
-    protected EBWrappedCombined getCryptoWrapperInstance(EBURLConfig urlConfig) throws IOException {
+    public EBWrappedCombined getCryptoWrapperInstance(EBURLConfig urlConfig) throws IOException {
         // Try to find EB provider serialized keys. Can be directly used with cipher.
         // Symmetric key. AES, for now.
         final JSONObject symmetricJson = urlConfig.getElement(EBSecretKeyFactory.FIELD_SYMMETRIC_KEY);

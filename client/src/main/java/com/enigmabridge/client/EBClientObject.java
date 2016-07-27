@@ -16,7 +16,7 @@ import java.security.SignatureException;
  */
 public class EBClientObject implements EBCommonCrypto {
     protected EBClient client;
-    protected EBWrappedCombined cryptoWrapper;
+    protected EBCommonCrypto cryptoWrapper;
 
     // Common crypto
 
@@ -90,32 +90,8 @@ public class EBClientObject implements EBCommonCrypto {
         return cryptoWrapper.verify(buffer, offset, length);
     }
 
-    public EBWrappedCipher getCipher() {
-        return cryptoWrapper.getCipher();
-    }
-
-    public EBWrappedMac getMac() {
-        return cryptoWrapper.getMac();
-    }
-
-    public EBWrappedSignature getSignature() {
-        return cryptoWrapper.getSignature();
-    }
-
-    public Cipher getRawCipher() {
-        return cryptoWrapper.getCipher() != null ? cryptoWrapper.getCipher().getCipher() : null;
-    }
-
-    public Mac getRawMac() {
-        return cryptoWrapper.getMac() != null ? cryptoWrapper.getMac().getMac() : null;
-    }
-
-    public Signature getRawSignature() {
-        return cryptoWrapper.getSignature() != null ? cryptoWrapper.getSignature().getSignature() : null;
-    }
-
     protected void checkInit(){
-        cryptoWrapper.checkInit();
+
     }
 
     public EBClientObject setClient(EBClient client) {
@@ -123,7 +99,7 @@ public class EBClientObject implements EBCommonCrypto {
         return this;
     }
 
-    public EBClientObject setCryptoWrapper(EBWrappedCombined cryptoWrapper) {
+    public EBClientObject setCryptoWrapper(EBCommonCrypto cryptoWrapper) {
         this.cryptoWrapper = cryptoWrapper;
         return this;
     }
