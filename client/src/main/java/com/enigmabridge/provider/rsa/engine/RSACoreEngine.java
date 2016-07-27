@@ -203,9 +203,12 @@ class RSACoreEngine
                 && response.getStatusCode() == EBCommStatus.ERROR_CLASS_ERR_CHECK_ERRORS_6f){
 
             // Logging 6f00 errors to detect possible crypto errors / incompatibility.
-            LOG.debug(String.format("RSA 0x6f00 error. encryption: %s, input size: %d \n  request [%s]\n  response [%s]",
+            LOG.debug(String.format("RSA 0x6f00 error. encryption: %s, input size: %d, leading zero: %s \n" +
+                            "  request [%s]\n" +
+                            "  response [%s]",
                     forEncryption,
                     inputBytes.length,
+                    inputBytes[0] == 0,
                     call.getRawRequest(),
                     call.getRawResponse()));
         }
