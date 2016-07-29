@@ -61,6 +61,13 @@
             <version>20160212</version>
         </dependency>
 
+        <!-- Human JSON - for provider configuration -->
+        <dependency>
+            <groupId>org.hjson</groupId>
+            <artifactId>hjson</artifactId>
+            <version>1.1.4</version>
+        </dependency>
+
         <!-- HTTP client -->
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>
