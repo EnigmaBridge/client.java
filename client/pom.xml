@@ -110,28 +110,28 @@
         </repository>
     </distributionManagement>
 
-    <!-- Releasing: http://central.sonatype.org/pages/apache-maven.html -->
+
     <profiles>
-<profile>
-    <id>doclint-java8-disable</id>
-    <activation>
-      <jdk>[1.8,)</jdk>
-    </activation>
+        <!-- Disable failing build with Java8 if javadoc has warnings -->
+        <profile>
+            <id>doclint-java8-disable</id>
+            <activation>
+                <jdk>[1.8,)</jdk>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <configuration>
+                            <additionalparam>-Xdoclint:none</additionalparam>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
 
-    <build>
-      <plugins>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-javadoc-plugin</artifactId>
-          <configuration>
-            <additionalparam>-Xdoclint:none</additionalparam>
-          </configuration>
-        </plugin>
-      </plugins>
-    </build>
-  </profile>
-
-
+        <!-- Releasing: http://central.sonatype.org/pages/apache-maven.html -->
         <profile>
             <id>release</id>
             <build>
