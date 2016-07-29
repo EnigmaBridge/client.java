@@ -6,6 +6,7 @@ import com.enigmabridge.comm.retry.EBRetryStrategySimple;
 import com.enigmabridge.create.Constants;
 import com.enigmabridge.create.EBUOGetTemplateRequest;
 import com.enigmabridge.misc.EBTestingUtilsIT;
+import com.enigmabridge.misc.KpSizes;
 import com.enigmabridge.provider.EnigmaProvider;
 import com.enigmabridge.provider.specs.*;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -24,6 +25,8 @@ import java.security.cert.X509Certificate;
 import java.security.spec.RSAPrivateCrtKeySpec;
 import java.security.spec.RSAPublicKeySpec;
 import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 
 import static org.testng.Assert.assertEquals;
 
@@ -225,6 +228,7 @@ public class EBEnigmaProviderIT {
         // Use EB factory to import existing RSA key to EB.
         final KeyFactory kFact = KeyFactory.getInstance("RSA", "EB");
         final KeyFactory kFactBc = KeyFactory.getInstance("RSA", "BC");
+        final List<RSAPrivateCrtKeySpec> brokenKeys = new LinkedList<RSAPrivateCrtKeySpec>();
 
         // Test keys locally - no typos?
         for(RSAPrivateCrtKeySpec keySpec : testKeys){
@@ -249,6 +253,7 @@ public class EBEnigmaProviderIT {
 
             } catch(Exception e){
                 importErrors+=1;
+                brokenKeys.add(keySpec);
                 LOG.error("Exception during key import: " + ebPrivate, e);
                 continue;
             }
@@ -258,11 +263,18 @@ public class EBEnigmaProviderIT {
                 testRSAKeys(pubKey, ebPrivate, new KeyPair(pubKey, kFactBc.generatePrivate(keySpec)));
             }catch(Exception e){
                 testErrors += 1;
+                brokenKeys.add(keySpec);
                 LOG.error("Exception during key test: " + ebPrivate, e);
                 continue;
             }
         }
 
+        if (!brokenKeys.isEmpty()){
+            for(RSAPrivateCrtKeySpec key : brokenKeys){
+                LOG.debug("Broken keys: " + new KpSizes(key));
+            }
+        }
+        
         assertEquals(importErrors, 0, "Some keys were not imported successfully");
         assertEquals(testErrors, 0, "Some keys were imported but not worked properly");
     }
