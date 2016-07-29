@@ -14,6 +14,8 @@ import org.bouncycastle.jcajce.provider.util.AsymmetricKeyInfoConverter;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.json.JSONObject;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Constructor;
 import java.net.MalformedURLException;
@@ -39,19 +41,34 @@ public class EnigmaProvider extends Provider implements ConfigurableProvider {
     public static final double VERSION = 0.1;
 
     // TODO: store EBEndpoint, ApiKey, Connection Settings and general info to the provider configuration.
-    public static final ProviderConfiguration CONFIGURATION = new EBProviderConfiguration();
+    public static final ProviderConfiguration CONFIGURATION = new EBProviderConfigurationCrypto();
 
     private static final Map keyInfoConverters = new HashMap();
 
     private EBEngine engine;
+    private EBProviderConfiguration config;
 
     public EnigmaProvider(EBEngine engine) {
         super(PROVIDER_NAME, VERSION, PROVIDER_DESC);
+        config = EBProviderConfiguration.getInstance(engine);
         initProvider(engine);
     }
 
     public EnigmaProvider() {
         super(PROVIDER_NAME, VERSION, PROVIDER_DESC);
+        config = EBProviderConfiguration.getInstance();
+        initProvider(null);
+    }
+
+    public EnigmaProvider(String configFile) throws IOException {
+        super(PROVIDER_NAME, VERSION, PROVIDER_DESC);
+        config = EBProviderConfiguration.getInstance(configFile);
+        initProvider(null);
+    }
+
+    public EnigmaProvider(InputStream configStream) throws IOException {
+        super(PROVIDER_NAME, VERSION, PROVIDER_DESC);
+        config = EBProviderConfiguration.getInstance(configStream);
         initProvider(null);
     }
 
@@ -185,7 +202,7 @@ public class EnigmaProvider extends Provider implements ConfigurableProvider {
     {
         synchronized (CONFIGURATION)
         {
-            ((EBProviderConfiguration)CONFIGURATION).setParameter(parameterName, parameter);
+            ((EBProviderConfigurationCrypto)CONFIGURATION).setParameter(parameterName, parameter);
         }
     }
 

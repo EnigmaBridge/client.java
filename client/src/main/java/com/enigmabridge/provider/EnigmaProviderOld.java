@@ -28,7 +28,7 @@ public class EnigmaProviderOld extends Provider implements ConfigurableProvider 
 
     public static final double VERSION = 0.0;
 
-    public static final ProviderConfiguration CONFIGURATION = new EBProviderConfiguration();
+    public static final ProviderConfiguration CONFIGURATION = new EBProviderConfigurationCrypto();
 
     private static final Map keyInfoConverters = new HashMap();
 
@@ -66,7 +66,7 @@ public class EnigmaProviderOld extends Provider implements ConfigurableProvider 
     {
         synchronized (CONFIGURATION)
         {
-            ((EBProviderConfiguration)CONFIGURATION).setParameter(parameterName, parameter);
+            ((EBProviderConfigurationCrypto)CONFIGURATION).setParameter(parameterName, parameter);
         }
     }
 

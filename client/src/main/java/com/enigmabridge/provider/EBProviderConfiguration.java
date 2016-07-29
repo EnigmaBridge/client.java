@@ -1,167 +1,105 @@
 package com.enigmabridge.provider;
 
-import org.bouncycastle.jcajce.provider.asymmetric.util.EC5Util;
-import org.bouncycastle.jcajce.provider.config.ConfigurableProvider;
-import org.bouncycastle.jcajce.provider.config.ProviderConfiguration;
-import org.bouncycastle.jcajce.provider.config.ProviderConfigurationPermission;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.jce.spec.ECParameterSpec;
+import com.enigmabridge.EBEngine;
+import com.enigmabridge.EBUtils;
+import org.json.JSONObject;
 
-import javax.crypto.spec.DHParameterSpec;
-import java.security.Permission;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
-class EBProviderConfiguration
-    implements ProviderConfiguration
-{
-    private static Permission BC_EC_LOCAL_PERMISSION = new ProviderConfigurationPermission(
-        BouncyCastleProvider.PROVIDER_NAME, ConfigurableProvider.THREAD_LOCAL_EC_IMPLICITLY_CA);
-    private static Permission BC_EC_PERMISSION = new ProviderConfigurationPermission(
-        BouncyCastleProvider.PROVIDER_NAME, ConfigurableProvider.EC_IMPLICITLY_CA);
-    private static Permission BC_DH_LOCAL_PERMISSION = new ProviderConfigurationPermission(
-        BouncyCastleProvider.PROVIDER_NAME, ConfigurableProvider.THREAD_LOCAL_DH_DEFAULT_PARAMS);
-    private static Permission BC_DH_PERMISSION = new ProviderConfigurationPermission(
-        BouncyCastleProvider.PROVIDER_NAME, ConfigurableProvider.DH_DEFAULT_PARAMS);
+/**
+ * Provider configuration, provided by the caller either by passing config files or direct arguments.
+ *
+ * Created by dusanklinec on 29.07.16.
+ */
+public class EBProviderConfiguration {
+    protected JSONObject jsonRoot;
 
-    private ThreadLocal ecThreadSpec = new ThreadLocal();
-    private ThreadLocal dhThreadSpec = new ThreadLocal();
-
-    private volatile ECParameterSpec ecImplicitCaParams;
-    private volatile Object dhDefaultParams;
-
-    void setParameter(String parameterName, Object parameter)
-    {
-        SecurityManager securityManager = System.getSecurityManager();
-
-        if (parameterName.equals(ConfigurableProvider.THREAD_LOCAL_EC_IMPLICITLY_CA))
-        {
-            ECParameterSpec curveSpec;
-
-            if (securityManager != null)
-            {
-                securityManager.checkPermission(BC_EC_LOCAL_PERMISSION);
-            }
-
-            if (parameter instanceof ECParameterSpec || parameter == null)
-            {
-                curveSpec = (ECParameterSpec)parameter;
-            }
-            else  // assume java.security.spec
-            {
-                curveSpec = EC5Util.convertSpec((java.security.spec.ECParameterSpec)parameter, false);
-            }
-
-            if (curveSpec == null)
-            {
-                ecThreadSpec.remove();
-            }
-            else
-            {
-                ecThreadSpec.set(curveSpec);
-            }
-        }
-        else if (parameterName.equals(ConfigurableProvider.EC_IMPLICITLY_CA))
-        {
-            if (securityManager != null)
-            {
-                securityManager.checkPermission(BC_EC_PERMISSION);
-            }
-
-            if (parameter instanceof ECParameterSpec || parameter == null)
-            {
-                ecImplicitCaParams = (ECParameterSpec)parameter;
-            }
-            else  // assume java.security.spec
-            {
-                ecImplicitCaParams = EC5Util.convertSpec((java.security.spec.ECParameterSpec)parameter, false);
-            }
-        }
-        else if (parameterName.equals(ConfigurableProvider.THREAD_LOCAL_DH_DEFAULT_PARAMS))
-        {
-            Object dhSpec;
-
-            if (securityManager != null)
-            {
-                securityManager.checkPermission(BC_DH_LOCAL_PERMISSION);
-            }
-
-            if (parameter instanceof DHParameterSpec || parameter instanceof DHParameterSpec[] || parameter == null)
-            {
-                dhSpec = parameter;
-            }
-            else
-            {
-                throw new IllegalArgumentException("not a valid DHParameterSpec");
-            }
-
-            if (dhSpec == null)
-            {
-                dhThreadSpec.remove();
-            }
-            else
-            {
-                dhThreadSpec.set(dhSpec);
-            }
-        }
-        else if (parameterName.equals(ConfigurableProvider.DH_DEFAULT_PARAMS))
-        {
-            if (securityManager != null)
-            {
-                securityManager.checkPermission(BC_DH_PERMISSION);
-            }
-
-            if (parameter instanceof DHParameterSpec || parameter instanceof DHParameterSpec[] || parameter == null)
-            {
-                dhDefaultParams = parameter;
-            }
-            else
-            {
-                throw new IllegalArgumentException("not a valid DHParameterSpec or DHParameterSpec[]");
-            }
-        }
+    /**
+     * Default configuration instance
+     * @return configuration
+     */
+    public static EBProviderConfiguration getInstance(){
+        return new EBProviderConfiguration();
     }
 
-    public ECParameterSpec getEcImplicitlyCa()
-    {
-        ECParameterSpec spec = (ECParameterSpec)ecThreadSpec.get();
+    /**
+     * Parses the input configuration.
+     * By default it is considered as a file name.
+     * If The string starts with "--" it is considered as JSON config.
+     *
+     * @param input input
+     * @return config
+     */
+    public static EBProviderConfiguration getInstance(String input) throws IOException {
+        String jsonInput = null;
+        if (input.startsWith("--")){
+            jsonInput = input.substring(2);
 
-        if (spec != null)
-        {
-            return spec;
+        } else {
+            final FileInputStream fis = new FileInputStream(input);
+            fis.close();
+
+            jsonInput = EBUtils.convertStreamToString(fis);
         }
 
-        return ecImplicitCaParams;
+        return getInstance(EBUtils.parseJSON(jsonInput));
     }
 
-    public DHParameterSpec getDHDefaultParameters(int keySize)
-    {
-        Object params = dhThreadSpec.get();
-        if (params == null)
-        {
-            params = dhDefaultParams;
-        }
+    /**
+     * Parses the input configuration.
+     * By default it is considered as a file name.
+     * If The string starts with "--" it is considered as JSON config.
+     *
+     * @param input input
+     * @return config
+     */
+    public static EBProviderConfiguration getInstance(InputStream input) throws IOException {
+        return getInstance(EBUtils.convertStreamToString(input));
+    }
 
-        if (params instanceof DHParameterSpec)
-        {
-            DHParameterSpec spec = (DHParameterSpec)params;
+    /**
+     * Constructs configuration directly from the json object.
+     * @param jsonObject jsonObject with configuration
+     * @return config
+     */
+    public static EBProviderConfiguration getInstance(JSONObject jsonObject) {
+        return new EBProviderConfiguration(jsonObject);
+    }
 
-            if (spec.getP().bitLength() == keySize)
-            {
-                return spec;
-            }
-        }
-        else if (params instanceof DHParameterSpec[])
-        {
-            DHParameterSpec[] specs = (DHParameterSpec[])params;
+    /**
+     * Extracts configuration from the engine.
+     *
+     * @param engine engine to process
+     * @return config
+     */
+    public static EBProviderConfiguration getInstance(EBEngine engine) {
+        return new EBProviderConfiguration(engine);
+    }
 
-            for (int i = 0; i != specs.length; i++)
-            {
-                if (specs[i].getP().bitLength() == keySize)
-                {
-                    return specs[i];
-                }
-            }
-        }
+    public EBProviderConfiguration() {
+    }
 
-        return null;
+    public EBProviderConfiguration(JSONObject jsonRoot) {
+        fromJSON(jsonRoot);
+    }
+
+    public EBProviderConfiguration(EBEngine engine) {
+        fromEngine(engine);
+    }
+
+    protected void fromJSON(JSONObject json){
+        this.jsonRoot = json;
+        // TODO: implement
+    }
+
+    protected void fromEngine(EBEngine engine){
+        this.jsonRoot = null;
+        // TODO: implement
+    }
+
+    public JSONObject getJsonRoot() {
+        return jsonRoot;
     }
 }
