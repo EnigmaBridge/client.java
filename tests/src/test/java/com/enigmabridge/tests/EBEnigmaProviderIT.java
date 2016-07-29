@@ -210,9 +210,18 @@ public class EBEnigmaProviderIT {
     }
 
     @Test(groups = {"integration"}, enabled = true) //, timeOut = 100000
-    public void testRSAAtypicalKeys() throws Exception {
-        final Collection<RSAPrivateCrtKeySpec> testKeys = EBTestingUtils.getTestImportKeys();
+    public void testRSAAtypicalKeys2048() throws Exception {
+        final Collection<RSAPrivateCrtKeySpec> testKeys = EBTestingUtils.getTestImportKeys2048();
+        testRSAAtypicalKeys(testKeys);
+    }
 
+    @Test(groups = {"integration"}, enabled = true) //, timeOut = 100000
+    public void testRSAAtypicalKeys1024() throws Exception {
+        final Collection<RSAPrivateCrtKeySpec> testKeys = EBTestingUtils.getTestImportKeys1024();
+        testRSAAtypicalKeys(testKeys);
+    }
+
+    protected void testRSAAtypicalKeys(Collection<RSAPrivateCrtKeySpec> testKeys) throws Exception {
         // Use EB factory to import existing RSA key to EB.
         final KeyFactory kFact = KeyFactory.getInstance("RSA", "EB");
         final KeyFactory kFactBc = KeyFactory.getInstance("RSA", "BC");
