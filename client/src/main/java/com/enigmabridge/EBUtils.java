@@ -13,12 +13,28 @@ import java.util.Collection;
 public class EBUtils {
     private static final char[] hexCode = "0123456789ABCDEF".toCharArray();
 
+    public static String sanitizeHexString(String hex, boolean removeWhitespaces){
+        if (hex == null){
+            return null;
+        }
+
+        if (removeWhitespaces){
+            hex = hex.replaceAll("\\s","");
+        }
+
+        if ((hex.length() & 1) == 1){
+            hex = "0" + hex;
+        }
+
+        return hex;
+    }
+
     public static byte[] hex2byte(String hex){
-        return DatatypeConverter.parseHexBinary(hex);
+        return DatatypeConverter.parseHexBinary(sanitizeHexString(hex, false));
     }
 
     public static byte[] hex2byte(String hex, boolean removeWhitespaces){
-        return DatatypeConverter.parseHexBinary(removeWhitespaces ? hex.replaceAll("\\s","") : hex);
+        return DatatypeConverter.parseHexBinary(sanitizeHexString(hex, removeWhitespaces));
     }
 
     public static String byte2hex(byte[] bytes){
