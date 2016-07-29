@@ -1,5 +1,6 @@
 package com.enigmabridge;
 
+import org.hjson.JsonValue;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -253,5 +254,14 @@ public class EBUtils {
         }
 
         return result;
+    }
+
+    public static String convertStreamToString(java.io.InputStream is) {
+        java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
+        return s.hasNext() ? s.next() : "";
+    }
+
+    public static JSONObject parseJSON(String json){
+        return new JSONObject(JsonValue.readHjson(json).toString());
     }
 }
