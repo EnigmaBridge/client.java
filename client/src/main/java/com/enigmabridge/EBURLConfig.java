@@ -20,10 +20,8 @@ import java.util.regex.Pattern;
  * Created by dusanklinec on 05.07.16.
  */
 public class EBURLConfig implements EBSettings {
-    private static final String FIELD_API_KEY = "apiKey";
-    private static final String FIELD_SETTINGS = "settings";
-
     private static final Pattern PATTERN_NODE = Pattern.compile("^[a-zA-Z_][a-zA-Z0-9_]*$", Pattern.CASE_INSENSITIVE);
+    private static final String DEFAULT_ENDPOINT = "https://site1.enigmabridge.com:11180";
 
     /**
      * API key for using EB service.
@@ -34,7 +32,7 @@ public class EBURLConfig implements EBSettings {
      * Connection string to the EB endpoint
      * https://site1.enigmabridge.com:11180
      */
-    protected EBEndpointInfo endpointInfo = new EBEndpointInfo("https://site1.enigmabridge.com:11180");
+    protected EBEndpointInfo endpointInfo = new EBEndpointInfo(DEFAULT_ENDPOINT);
 
     /**
      * Connection settings for UO operation.
@@ -115,6 +113,16 @@ public class EBURLConfig implements EBSettings {
             return setFromSettingsIfNotSet(defs);
         }
 
+        public B setJSON(JSONObject json) throws MalformedURLException, UnsupportedEncodingException {
+            getObj().fromJSON(json);
+            return getThisBuilder();
+        }
+
+        public B setJSON(String json) throws MalformedURLException, UnsupportedEncodingException {
+            getObj().fromJSON(EBUtils.parseJSON(json));
+            return getThisBuilder();
+        }
+
         public abstract T build();
         public abstract B getThisBuilder();
         public abstract T getObj();
@@ -157,6 +165,27 @@ public class EBURLConfig implements EBSettings {
         return connectionSettings;
     }
 
+    /**
+     * Converts JSON to the URL config, if possible.
+     * Reads json as EBSettingsBase serializes it. endpoint is mandatory. The left can be left out.
+     * @param json json
+     */
+    protected void fromJSON(JSONObject json) throws MalformedURLException {
+        if (json.has(EBSettingsBase.FIELD_ENDPOINT)){
+            endpointInfo = new EBEndpointInfo(json.getString(EBSettingsBase.FIELD_ENDPOINT));
+        }
+
+        if (json.has(EBSettingsBase.FIELD_SETTINGS)){
+            connectionSettings = new EBConnectionSettings(json.getJSONObject(EBSettingsBase.FIELD_SETTINGS));
+        }
+
+        if (json.has(EBSettingsBase.FIELD_APIKEY)){
+            apiKey = json.getString(EBSettingsBase.FIELD_APIKEY);
+        }
+
+        EBUtils.mergeInto(this.jsonRoot, json);
+    }
+
     protected void fromUrl(String url) throws MalformedURLException, UnsupportedEncodingException {
         this.endpointInfo = new EBEndpointInfo(url);
 
@@ -169,13 +198,12 @@ public class EBURLConfig implements EBSettings {
         }
 
         // Api key?
-        final String tmpApiKey = root.has(FIELD_API_KEY) ?
-                    root.getString(FIELD_API_KEY) : null;
-
+        final String tmpApiKey = root.has(EBSettingsBase.FIELD_APIKEY) ?
+                    root.getString(EBSettingsBase.FIELD_APIKEY) : null;
 
         // Settings.
-        final EBConnectionSettings tmpConnSettings = root.has(FIELD_SETTINGS) ?
-                new EBConnectionSettings(root.getJSONObject(FIELD_SETTINGS)) : null;
+        final EBConnectionSettings tmpConnSettings = root.has(EBSettingsBase.FIELD_SETTINGS) ?
+                new EBConnectionSettings(root.getJSONObject(EBSettingsBase.FIELD_SETTINGS)) : null;
 
         // Apply, no exception so far.
         if (tmpApiKey != null){
@@ -185,6 +213,9 @@ public class EBURLConfig implements EBSettings {
             this.connectionSettings = tmpConnSettings;
         }
         EBUtils.mergeInto(this.jsonRoot, root);
+
+        // Add endpoint to the json root
+        this.jsonRoot.put(EBSettingsBase.FIELD_ENDPOINT, endpointInfo.toString());
     }
 
     /**
@@ -250,11 +281,11 @@ public class EBURLConfig implements EBSettings {
     public String toString(){
         final JSONObject mainRoot = jsonRoot;
         if (this.apiKey != null){
-            mainRoot.put(FIELD_API_KEY, this.apiKey);
+            mainRoot.put(EBSettingsBase.FIELD_APIKEY, this.apiKey);
         }
 
         if (this.connectionSettings != null){
-            mainRoot.put(FIELD_SETTINGS, this.connectionSettings.toJSON(null));
+            mainRoot.put(EBSettingsBase.FIELD_SETTINGS, this.connectionSettings.toJSON(null));
         }
 
         final StringBuilder sb = new StringBuilder(this.endpointInfo.getConnectionString());
@@ -519,14 +550,23 @@ public class EBURLConfig implements EBSettings {
 
     protected void setApiKey(String apiKey) {
         this.apiKey = apiKey;
+        if (jsonRoot != null) {
+            jsonRoot.put(EBSettingsBase.FIELD_APIKEY, apiKey);
+        }
     }
 
     protected void setEndpointInfo(EBEndpointInfo endpointInfo) {
         this.endpointInfo = endpointInfo;
+        if (jsonRoot != null) {
+            jsonRoot.put(EBSettingsBase.FIELD_ENDPOINT, endpointInfo.toString());
+        }
     }
 
     protected void setConnectionSettings(EBConnectionSettings connectionSettings) {
         this.connectionSettings = connectionSettings;
+        if (jsonRoot != null) {
+            jsonRoot.put(EBSettingsBase.FIELD_SETTINGS, connectionSettings.toJSON(null));
+        }
     }
 
     /**
