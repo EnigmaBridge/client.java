@@ -5,7 +5,7 @@ import com.enigmabridge.comm.EBConnectionSettings;
 import com.enigmabridge.comm.retry.EBRetryStrategySimple;
 import com.enigmabridge.create.Constants;
 import com.enigmabridge.create.EBUOGetTemplateRequest;
-import com.enigmabridge.misc.EBTestingUtils;
+import com.enigmabridge.misc.EBTestingUtilsIT;
 import com.enigmabridge.provider.EnigmaProvider;
 import com.enigmabridge.provider.specs.*;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -39,7 +39,7 @@ public class EBEnigmaProviderIT {
     private final EBEngine engine = new EBEngine();
 
     // TEST API key
-    private final String apiKey = EBTestingUtils.API_KEY;
+    private final String apiKey = EBTestingUtilsIT.API_KEY;
 
     // Testing endpoint
     private EBEndpointInfo endpoint;
@@ -68,7 +68,7 @@ public class EBEnigmaProviderIT {
 
     @BeforeMethod(alwaysRun = true, groups = {"integration"})
     public void setUpMethod() throws Exception {
-        endpoint = new EBEndpointInfo(EBTestingUtils.CONNECTION_STRING);
+        endpoint = new EBEndpointInfo(EBTestingUtilsIT.CONNECTION_STRING);
         settings = new EBConnectionSettings();
         settings.setRetryStrategyNetwork(new EBRetryStrategySimple(3));
         settings.setRetryStrategyApplication(new EBRetryStrategySimple(3));
@@ -185,7 +185,7 @@ public class EBEnigmaProviderIT {
         final String ksPassword = "changeit";
 
         // We need self signed certificate for KS store for PrivateKey.
-        final X509Certificate x509Certificate = EBTestingUtils.generateCertificate(keyPair);
+        final X509Certificate x509Certificate = EBTestingUtilsIT.generateCertificate(keyPair);
 
         ks.load(null, ksPassword.toCharArray());
         ks.setKeyEntry(ksAlias, ebPrivate, ksPassword.toCharArray(), new Certificate[]{x509Certificate});
@@ -211,13 +211,13 @@ public class EBEnigmaProviderIT {
 
     @Test(groups = {"integration"}, enabled = true) //, timeOut = 100000
     public void testRSAAtypicalKeys2048() throws Exception {
-        final Collection<RSAPrivateCrtKeySpec> testKeys = EBTestingUtils.getTestImportKeys2048();
+        final Collection<RSAPrivateCrtKeySpec> testKeys = EBTestingUtilsIT.getTestImportKeys2048();
         testRSAAtypicalKeys(testKeys);
     }
 
     @Test(groups = {"integration"}, enabled = true) //, timeOut = 100000
     public void testRSAAtypicalKeys1024() throws Exception {
-        final Collection<RSAPrivateCrtKeySpec> testKeys = EBTestingUtils.getTestImportKeys1024();
+        final Collection<RSAPrivateCrtKeySpec> testKeys = EBTestingUtilsIT.getTestImportKeys1024();
         testRSAAtypicalKeys(testKeys);
     }
 
@@ -230,7 +230,7 @@ public class EBEnigmaProviderIT {
         for(RSAPrivateCrtKeySpec keySpec : testKeys){
             // Convert specs to the EB stored key - import happens
             final PrivateKey privKey = kFactBc.generatePrivate(keySpec);
-            final PublicKey pubKey = kFactBc.generatePublic(EBTestingUtils.getPubKeySpec(keySpec));
+            final PublicKey pubKey = kFactBc.generatePublic(EBTestingUtilsIT.getPubKeySpec(keySpec));
 
             // test
             testRSAKeys(pubKey, privKey, new KeyPair(pubKey, kFactBc.generatePrivate(keySpec)));
@@ -240,7 +240,7 @@ public class EBEnigmaProviderIT {
         int importErrors = 0;
         int testErrors = 0;
         for(RSAPrivateCrtKeySpec keySpec : testKeys){
-            final PublicKey pubKey = kFactBc.generatePublic(EBTestingUtils.getPubKeySpec(keySpec));
+            final PublicKey pubKey = kFactBc.generatePublic(EBTestingUtilsIT.getPubKeySpec(keySpec));
             PrivateKey ebPrivate = null;
 
             // Convert specs to the EB stored key - import happens

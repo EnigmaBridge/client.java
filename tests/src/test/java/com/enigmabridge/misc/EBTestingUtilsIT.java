@@ -20,7 +20,7 @@ import java.util.List;
  * Misc utilities and constants for testing.
  * Created by dusanklinec on 04.05.16.
  */
-public class EBTestingUtils {
+public class EBTestingUtilsIT {
     public static final String CONNECTION_STRING = "https://site2.enigmabridge.com:11180";
     public static final String API_KEY = "TEST_API";
 
@@ -49,14 +49,14 @@ public class EBTestingUtils {
     }
 
     public static PublicKey createRSAPublicKey1k() throws InvalidKeySpecException, NoSuchAlgorithmException {
-        final BigInteger exp = BigInteger.valueOf(EBTestingUtils.RSA1k_PUB_EXP);
-        final BigInteger mod = new BigInteger(EBUtils.hex2byte(EBTestingUtils.RSA1k_MODULUS));
+        final BigInteger exp = BigInteger.valueOf(EBTestingUtilsIT.RSA1k_PUB_EXP);
+        final BigInteger mod = new BigInteger(EBUtils.hex2byte(EBTestingUtilsIT.RSA1k_MODULUS));
         return createRSAPublicKey(mod, exp);
     }
 
     public static PublicKey createRSAPublicKey2k() throws InvalidKeySpecException, NoSuchAlgorithmException {
-        final BigInteger exp = BigInteger.valueOf(EBTestingUtils.RSA2k_PUB_EXP);
-        final BigInteger mod = new BigInteger(EBUtils.hex2byte(EBTestingUtils.RSA2k_MODULUS));
+        final BigInteger exp = BigInteger.valueOf(EBTestingUtilsIT.RSA2k_PUB_EXP);
+        final BigInteger mod = new BigInteger(EBUtils.hex2byte(EBTestingUtilsIT.RSA2k_MODULUS));
         return createRSAPublicKey(mod, exp);
     }
 
