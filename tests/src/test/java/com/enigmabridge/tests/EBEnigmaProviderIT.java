@@ -23,6 +23,7 @@ import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.security.spec.RSAPrivateCrtKeySpec;
 import java.security.spec.RSAPublicKeySpec;
+import java.util.Collection;
 
 import static org.testng.Assert.assertEquals;
 
@@ -206,6 +207,55 @@ public class EBEnigmaProviderIT {
         testRSAKeys(keyPair.getPublic(), (PrivateKey) ebPrivateNew, keyPair);
         testRSAKeys(ebNewPubKey, (PrivateKey) ebPrivateNew, keyPair);
         testRSAKeys(ebNewPubKey, keyPair.getPrivate(), keyPair);
+    }
+
+    @Test(groups = {"integration"}, enabled = true) //, timeOut = 100000
+    public void testRSAAtypicalKeys() throws Exception {
+        final Collection<RSAPrivateCrtKeySpec> testKeys = EBTestingUtils.getTestImportKeys();
+
+        // Use EB factory to import existing RSA key to EB.
+        final KeyFactory kFact = KeyFactory.getInstance("RSA", "EB");
+        final KeyFactory kFactBc = KeyFactory.getInstance("RSA", "BC");
+
+        // Test keys locally - no typos?
+        for(RSAPrivateCrtKeySpec keySpec : testKeys){
+            // Convert specs to the EB stored key - import happens
+            final PrivateKey privKey = kFactBc.generatePrivate(keySpec);
+            final PublicKey pubKey = kFactBc.generatePublic(EBTestingUtils.getPubKeySpec(keySpec));
+
+            // test
+            testRSAKeys(pubKey, privKey, new KeyPair(pubKey, kFactBc.generatePrivate(keySpec)));
+        }
+
+        // Test keys with EB.
+        int importErrors = 0;
+        int testErrors = 0;
+        for(RSAPrivateCrtKeySpec keySpec : testKeys){
+            final PublicKey pubKey = kFactBc.generatePublic(EBTestingUtils.getPubKeySpec(keySpec));
+            PrivateKey ebPrivate = null;
+
+            // Convert specs to the EB stored key - import happens
+            try {
+                ebPrivate = kFact.generatePrivate(keySpec);
+
+            } catch(Exception e){
+                importErrors+=1;
+                LOG.error("Exception during key import: " + ebPrivate, e);
+                continue;
+            }
+
+            // test
+            try {
+                testRSAKeys(pubKey, ebPrivate, new KeyPair(pubKey, kFactBc.generatePrivate(keySpec)));
+            }catch(Exception e){
+                testErrors += 1;
+                LOG.error("Exception during key test: " + ebPrivate, e);
+                continue;
+            }
+        }
+
+        assertEquals(importErrors, 0, "Some keys were not imported successfully");
+        assertEquals(testErrors, 0, "Some keys were imported but not worked properly");
     }
 
     @Test(groups = {"integration"}, enabled = false) //, timeOut = 100000
