@@ -36,7 +36,7 @@ public class GenerateInterestingKeysTest {
     public void tearDownMethod() throws Exception {
     }
 
-    @Test(groups = {"benchmark"}, enabled = true) //, timeOut = 100000
+    @Test(groups = {"benchmark"}, enabled = false) //, timeOut = 100000
     public void testCreate() throws Exception {
         final KeyPairGenerator kpGen = KeyPairGenerator.getInstance("RSA", "BC");
         final KeyFactory kFact = KeyFactory.getInstance("RSA", "BC");
