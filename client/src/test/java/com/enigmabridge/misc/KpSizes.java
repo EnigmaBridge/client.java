@@ -10,6 +10,7 @@ import java.security.spec.RSAPrivateCrtKeySpec;
  */
 public class KpSizes {
     protected RSAPrivateCrtKeySpec repr;
+    protected int counter = 0;
 
     // Aux
     protected int modulusSize;
@@ -87,7 +88,8 @@ public class KpSizes {
     @Override
     public String toString() {
         return "KpSizes{" +
-                "n=" + modulusSize +
+                "ctr=" + counter +
+                ", n=" + modulusSize +
                 ", e=" + publicExponentSize +
                 ", d=" + privateExponentSize +
                 ", p=" + primePSize +
@@ -97,5 +99,10 @@ public class KpSizes {
                 ", pqInv=" + crtCoefficientSize +
                 ", repr=" + specString() +
                 '}';
+    }
+
+    public KpSizes setCounter(int counter) {
+        this.counter = counter;
+        return this;
     }
 }
