@@ -5,6 +5,7 @@ import com.enigmabridge.comm.EBConnectionSettings;
 import com.enigmabridge.comm.retry.EBRetryStrategySimple;
 import com.enigmabridge.create.Constants;
 import com.enigmabridge.create.EBUOGetTemplateRequest;
+import com.enigmabridge.create.misc.EBRSAPrivateCrtKeyWrapper;
 import com.enigmabridge.misc.EBTestingUtilsIT;
 import com.enigmabridge.misc.KpSizes;
 import com.enigmabridge.provider.EnigmaProvider;
@@ -229,12 +230,15 @@ public class EBEnigmaProviderIT {
         final KeyFactory kFact = KeyFactory.getInstance("RSA", "EB");
         final KeyFactory kFactBc = KeyFactory.getInstance("RSA", "BC");
         final List<RSAPrivateCrtKeySpec> brokenKeys = new LinkedList<RSAPrivateCrtKeySpec>();
+        byte[] keyBuff = new byte[4096*6];
 
         // Test keys locally - no typos?
         for(RSAPrivateCrtKeySpec keySpec : testKeys){
             // Convert specs to the EB stored key - import happens
             final PrivateKey privKey = kFactBc.generatePrivate(keySpec);
             final PublicKey pubKey = kFactBc.generatePublic(EBTestingUtilsIT.getPubKeySpec(keySpec));
+            short len = EBTestingUtilsIT.ExportPrivateKey(keyBuff, (short)0, new EBRSAPrivateCrtKeyWrapper(keySpec));
+            LOG.debug(EBUtils.byte2hex(keyBuff, 0, len));
 
             // test
             testRSAKeys(pubKey, privKey, new KeyPair(pubKey, kFactBc.generatePrivate(keySpec)));

@@ -1,6 +1,8 @@
 package com.enigmabridge.misc;
 
 import com.enigmabridge.EBUtils;
+import com.enigmabridge.comm.EBCommUtils;
+import com.enigmabridge.create.misc.EBRSAPrivateCrtKeyWrapper;
 import org.bouncycastle.jce.X509Principal;
 import org.bouncycastle.x509.X509V3CertificateGenerator;
 
@@ -274,6 +276,42 @@ public class EBTestingUtilsIT {
         ));
 
         return list;
+    }
+
+    public static short ExportPrivateKey(byte[] buffer, short baseOffset, EBRSAPrivateCrtKeyWrapper privKey) {
+        short offset = baseOffset;
+        // Private key
+        buffer[offset] = (byte) 0x83; offset++;
+        short keyLen = privKey.getDP1(buffer, (short) (offset + 2)); // leave space for length
+        EBCommUtils.setShort(buffer, offset, keyLen); // length
+        offset += 2;
+        offset += keyLen;
+
+        buffer[offset] = (byte) 0x84; offset++;
+        keyLen = privKey.getDQ1(buffer, (short) (offset + 2)); // leave space for length
+        EBCommUtils.setShort(buffer, offset, keyLen); // length
+        offset += 2;
+        offset += keyLen;
+
+        buffer[offset] = (byte) 0x85; offset++;
+        keyLen = privKey.getP(buffer, (short) (offset + 2)); // leave space for length
+        EBCommUtils.setShort(buffer, offset, keyLen); // length
+        offset += 2;
+        offset += keyLen;
+
+        buffer[offset] = (byte) 0x86; offset++;
+        keyLen = privKey.getQ(buffer, (short) (offset + 2)); // leave space for length
+        EBCommUtils.setShort(buffer, offset, keyLen); // length
+        offset += 2;
+        offset += keyLen;
+
+        buffer[offset] = (byte) 0x87; offset++;
+        keyLen = privKey.getPQ(buffer, (short) (offset + 2)); // leave space for length
+        EBCommUtils.setShort(buffer, offset, keyLen);
+        offset += 2;
+        offset += keyLen;
+
+        return (short) (offset - baseOffset);
     }
 
     public static X509Certificate generateCertificate(KeyPair keyPair) throws NoSuchAlgorithmException, CertificateEncodingException, NoSuchProviderException, InvalidKeyException, SignatureException {
