@@ -64,7 +64,7 @@ public class EBUtils {
         return new String(new char[n]).replace("\0", s);
     }
 
-    /***
+    /**
      * Tries to extract json parameter as an integer.
      * @param json target
      * @param key field name
@@ -114,7 +114,7 @@ public class EBUtils {
         }
     }
 
-    /***
+    /**
      * Tries to extract json parameter as an string.
      * @param json target
      * @param key field name
@@ -125,7 +125,7 @@ public class EBUtils {
         return json.getString(key);
     }
 
-    /***
+    /**
      * Tries to extract json parameter as an integer.
      * @param json target
      * @param key field name
