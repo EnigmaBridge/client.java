@@ -2,8 +2,8 @@ package com.enigmabridge.comm;
 
 import com.enigmabridge.EBJSONSerializable;
 import com.enigmabridge.EBUtils;
-import com.enigmabridge.comm.retry.EBRetryStrategy;
-import com.enigmabridge.comm.retry.EBRetryStrategyFactory;
+import com.enigmabridge.retry.EBRetryStrategy;
+import com.enigmabridge.retry.EBRetryStrategyFactory;
 import org.json.JSONObject;
 
 import java.io.Serializable;

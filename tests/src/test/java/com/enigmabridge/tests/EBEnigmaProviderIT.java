@@ -2,7 +2,6 @@ package com.enigmabridge.tests;
 
 import com.enigmabridge.*;
 import com.enigmabridge.comm.EBConnectionSettings;
-import com.enigmabridge.comm.retry.EBRetryStrategySimple;
 import com.enigmabridge.create.Constants;
 import com.enigmabridge.create.EBUOGetTemplateRequest;
 import com.enigmabridge.create.misc.EBRSAPrivateCrtKeyWrapper;

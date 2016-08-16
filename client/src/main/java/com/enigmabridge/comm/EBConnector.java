@@ -1,7 +1,7 @@
 package com.enigmabridge.comm;
 
 import com.enigmabridge.EBEndpointInfo;
-import com.enigmabridge.comm.retry.*;
+import com.enigmabridge.retry.*;
 import okhttp3.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

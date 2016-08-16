@@ -1,7 +1,8 @@
 package com.enigmabridge.comm;
 
 import com.enigmabridge.*;
-import com.enigmabridge.comm.retry.*;
+import com.enigmabridge.EBUtils;
+import com.enigmabridge.retry.*;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

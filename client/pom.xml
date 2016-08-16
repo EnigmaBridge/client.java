@@ -47,6 +47,13 @@
             <version>1.54</version>
         </dependency>
 
+        <!-- EB Retry -->
+        <dependency>
+            <groupId>com.enigmabridge</groupId>
+            <artifactId>retry</artifactId>
+            <version>0.1.0</version>
+        </dependency>
+
         <!-- Logging -->
         <dependency>
             <groupId>org.slf4j</groupId>
