@@ -9,6 +9,7 @@ import com.enigmabridge.misc.EBTestingUtilsIT;
 import com.enigmabridge.misc.KpSizes;
 import com.enigmabridge.provider.EnigmaProvider;
 import com.enigmabridge.provider.specs.*;
+import com.enigmabridge.retry.EBRetryStrategySimple;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
