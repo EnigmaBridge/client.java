@@ -21,6 +21,7 @@ import java.util.List;
 public class EBGetUOTemplateCall extends EBAPICall implements EBResponseParser {
     private static final Logger LOG = LoggerFactory.getLogger(EBProcessDataCall.class);
     public static final String FIELD_DATA = "data";
+    public static final String FIELD_RESULT = "result";
 
     protected EBUOGetTemplateRequest pkRequest;
     protected EBUOTemplateResponse pkResponse;
@@ -208,7 +209,7 @@ public class EBGetUOTemplateCall extends EBAPICall implements EBResponseParser {
 
     @Override
     public EBResponse.ABuilder parseResponse(JSONObject data, EBResponse.ABuilder resp, EBResponseParserOptions options) throws EBCorruptedException {
-        if (data == null || !data.has(FIELD_DATA)){
+        if (data == null || !data.has(FIELD_RESULT)){
             throw new EBCorruptedException("Message corrupted");
         }
 
@@ -223,7 +224,7 @@ public class EBGetUOTemplateCall extends EBAPICall implements EBResponseParser {
         }
 
         final EBUOTemplateResponse.ABuilder resp2ret = (EBUOTemplateResponse.ABuilder) resp;
-        final JSONObject res = data.getJSONObject(FIELD_DATA);
+        final JSONObject res = data.getJSONObject(FIELD_RESULT);
 
         resp2ret.setObjectId(EBUtils.getAsLong(res, "objectid", 16));
         resp2ret.setEncryptionOffset(EBUtils.getAsLong(res, "encryptionoffset", 10));

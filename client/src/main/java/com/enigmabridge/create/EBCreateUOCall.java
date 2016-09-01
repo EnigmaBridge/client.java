@@ -20,6 +20,7 @@ import java.io.IOException;
 public class EBCreateUOCall extends EBAPICall implements EBResponseParser {
     private static final Logger LOG = LoggerFactory.getLogger(EBCreateUOCall.class);
     public static final String FIELD_DATA = "data";
+    public static final String FIELD_RESULT = "result";
 
     protected EBCreateUORequest pkRequest;
     protected EBCreateUOResponse pkResponse;
@@ -191,7 +192,7 @@ public class EBCreateUOCall extends EBAPICall implements EBResponseParser {
 
     @Override
     public EBResponse.ABuilder parseResponse(JSONObject data, EBResponse.ABuilder resp, EBResponseParserOptions options) throws EBCorruptedException {
-        if (data == null || !data.has(FIELD_DATA)){
+        if (data == null || !data.has(FIELD_RESULT)){
             throw new EBCorruptedException("Create UO response corrupted: " + data);
         }
 
@@ -206,7 +207,7 @@ public class EBCreateUOCall extends EBAPICall implements EBResponseParser {
         }
 
         final EBCreateUOResponse.ABuilder resp2ret = (EBCreateUOResponse.ABuilder) resp;
-        final JSONObject res = data.getJSONObject(FIELD_DATA);
+        final JSONObject res = data.getJSONObject(FIELD_RESULT);
 
         resp2ret.setHandle(res.getString("handle"));
 
