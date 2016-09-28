@@ -16,7 +16,7 @@ public class EBUOGetTemplateRequest extends EBRawRequest {
             Constants.GENKEY_CLIENT); //<32bit integer>,
 
     protected String environment = Constants.ENV_DEV; // shows whether the UO should be for production (live), test (pre-production testing), or dev (development)
-    protected String maxtps = Constants.MAXTPS_UNLIMITED; // maximum guaranteed TPS
+    protected String maxtps = Constants.MAXTPS_1; // maximum guaranteed TPS
     protected String core = Constants.CORE_EMPTY; // how many cards have UO loaded permanently
     protected String persistence = Constants.PERSISTENCE_1MIN; // once loaded onto card, how long will the UO stay there without use (this excludes the "core")
     protected String priority = Constants.PRIORITY_DEFAULT; // this defines a) priority when the server capacity is fully utilised and it also defines how quickly new copies of UO are installed (pre-empting icreasing demand)
