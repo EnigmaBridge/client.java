@@ -145,8 +145,18 @@ public class EBAPICall {
      */
     public String buildApiBlock(String apiKey, Long uoId, Long uoType){
         String apiKeyToUser = apiKey == null ? this.getApiKey() : apiKey;
-        long uoIdr = uoId   == null ? this.getUo().getUoid() : uoId;
-        long type  = uoType == null ? this.getUo().getUserObjectType().getValue() : uoType;
+        long uoIdr = uoId != null ? uoId : 0;
+        long type  = uoType != null ? uoType : 0;
+
+        if (uoId == null || uoType == null) {
+            final UserObjectInfo uo = this.getUo();
+            if (uoId == null && uo != null) {
+                uoIdr = uo.getUoid();
+            }
+            if (uoType == null && uo != null && uo.getUserObjectType() != null){
+                type = uo.getUserObjectType().getValue();
+            }
+        }
 
         this.apiBlock = EBCreateUtils.getUoHandle(apiKeyToUser, uoIdr, type);
         return this.apiBlock;
