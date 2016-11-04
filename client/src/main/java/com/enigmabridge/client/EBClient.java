@@ -122,7 +122,7 @@ public class EBClient {
 
     // Simple sync API
 
-    public EBClientObject initFromJSON(String json){
+    public EBClientObject initFromJSON(String json) throws IOException {
         return init(new JSONObject(json));
     }
 
@@ -130,7 +130,7 @@ public class EBClient {
         return init(new EBURLConfig(urlConfig));
     }
 
-    public EBClientObject init(JSONObject json){
+    public EBClientObject init(JSONObject json) throws IOException {
         final EBWrappedCombined wrapper = getCryptoWrapperInstance(json);
         return new EBClientObject()
             .setClient(this)
@@ -152,7 +152,7 @@ public class EBClient {
 
     // Simple async API
 
-    public EBClientObjectAsyncSimple initAsyncSimpleFromJSON(String json){
+    public EBClientObjectAsyncSimple initAsyncSimpleFromJSON(String json) throws IOException {
         return initAsyncSimple(new JSONObject(json));
     }
 
@@ -160,7 +160,7 @@ public class EBClient {
         return initAsyncSimple(new EBURLConfig(urlConfig));
     }
 
-    public EBClientObjectAsyncSimple initAsyncSimple(JSONObject json){
+    public EBClientObjectAsyncSimple initAsyncSimple(JSONObject json) throws IOException {
         final EBWrappedCombined wrapper = getCryptoWrapperInstance(json);
         return new EBClientObjectAsyncSimple.Builder()
                 .setClient(this)
@@ -185,7 +185,7 @@ public class EBClient {
 
     // Complex async API
 
-    public EBClientObjectAsync initAsyncFromJSON(String json){
+    public EBClientObjectAsync initAsyncFromJSON(String json) throws IOException {
         return initAsync(new JSONObject(json));
     }
 
@@ -193,7 +193,7 @@ public class EBClient {
         return initAsync(new EBURLConfig(urlConfig));
     }
 
-    public EBClientObjectAsync initAsync(JSONObject json){
+    public EBClientObjectAsync initAsync(JSONObject json) throws IOException {
         final EBWrappedCombined wrapper = getCryptoWrapperInstance(json);
         return new EBClientObjectAsync.Builder()
                 .setClient(this)
@@ -218,9 +218,8 @@ public class EBClient {
 
     // Crypto wrapper factory
 
-    public EBWrappedCombined getCryptoWrapperInstance(JSONObject json){
-        // TODO: implement
-        throw new UnsupportedOperationException("Not implemented yet");
+    public EBWrappedCombined getCryptoWrapperInstance(JSONObject json) throws IOException {
+        return getCryptoWrapperInstance(new EBURLConfig.Builder().setJSON(json).build());
     }
 
     public EBWrappedCombined getCryptoWrapperInstance(EBURLConfig urlConfig) throws IOException {
