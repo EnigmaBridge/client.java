@@ -4,6 +4,7 @@ import com.enigmabridge.EBJSONSerializable;
 import com.enigmabridge.EBUtils;
 import com.enigmabridge.retry.EBRetryStrategy;
 import com.enigmabridge.retry.EBRetryStrategyFactory;
+import com.enigmabridge.retry.EBRetryStrategySimple;
 import org.json.JSONObject;
 
 import java.io.Serializable;
@@ -14,11 +15,13 @@ import java.io.Serializable;
  */
 public class EBConnectionSettings implements Serializable, EBJSONSerializable {
     public static final long serialVersionUID = 1L;
+    public static final String FIELD_TIMEOUT = "timeout";
     public static final String FIELD_CONNECT_TIMEOUT = "connectTimeout";
     public static final String FIELD_READ_TIMEOUT = "readTimeout";
     public static final String FIELD_WRITE_TIMEOUT = "writeTimeout";
     public static final String FIELD_HTTP_METHOD = "httpMethod";
     public static final String FIELD_TRUST = "trust";
+    public static final String FIELD_RETRY = "retry";
     public static final String FIELD_RETRY_STRATEGY_NETWORK = "retryNet";
     public static final String FIELD_RETRY_STRATEGY_APPLICATION = "retryApp";
 
@@ -68,6 +71,25 @@ public class EBConnectionSettings implements Serializable, EBJSONSerializable {
         fromJSON(json);
     }
 
+    public static EBConnectionSettings createFromJSON(JSONObject json){
+        return new EBConnectionSettings(json);
+    }
+
+    /**
+     * Creates connection settings in a compatible mode with other clients
+     * @param json json config
+     * @return EBConnectionSettings
+     */
+    public static EBConnectionSettings createFromCompatibleJSON(JSONObject json){
+        // For now it is the same as the usual way.
+        return new EBConnectionSettings(json);
+    }
+
+    /**
+     * Deserializes connection settings from the JSON.
+     * Supports both extended format and the simple compatible format.
+     * @param json configuration
+     */
     protected void fromJSON(JSONObject json) {
         if (json == null) {
             throw new IllegalArgumentException("Invalid JSON format");
@@ -100,6 +122,42 @@ public class EBConnectionSettings implements Serializable, EBJSONSerializable {
         if (json.has(FIELD_RETRY_STRATEGY_APPLICATION)){
             setRetryStrategyApplication(EBRetryStrategyFactory.fromJSON(json.getJSONObject(FIELD_RETRY_STRATEGY_APPLICATION)));
         }
+
+        // Compatible mode - one timeout for all
+        if (json.has(FIELD_TIMEOUT)){
+            final int timeout = EBUtils.getAsInteger(json, FIELD_TIMEOUT, 10);
+            connectTimeoutMilli = timeout;
+            readTimeoutMilli = timeout;
+            writeTimeoutMilli = timeout;
+        }
+
+        // Compatible mode - one retry for all
+        if (json.has(FIELD_RETRY)){
+            final JSONObject retry = json.getJSONObject(FIELD_RETRY);
+            final EBRetryStrategy retryStrategy = createRetryFromJSON(retry);
+            setRetryStrategyNetwork(retryStrategy);
+            setRetryStrategyApplication(retryStrategy);
+        }
+    }
+
+    /**
+     * Creates a default retry strategy from the JSON.
+     * Supports a compatible mode of retry serialization from other clients.
+     * @param retry retry JSON object
+     * @return EBRetryStrategy
+     */
+    public static EBRetryStrategy createRetryFromJSON(JSONObject retry){
+        if (retry == null){
+            return null;
+        }
+
+        if (retry.has("name")){
+            return EBRetryStrategyFactory.fromJSON(retry);
+        }
+
+        // Simple fast retry.
+        final Integer maxAttempts = EBUtils.tryGetAsInteger(retry, "maxAttempts", 10);
+        return new EBRetryStrategySimple(maxAttempts == null ? 3 : maxAttempts);
     }
 
     @Override

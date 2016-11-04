@@ -125,7 +125,10 @@ public class EBSettingsBase implements EBSettings, Serializable {
         }
 
         if (json.has(FIELD_SETTINGS)){
-            setConnectionSettings(new EBConnectionSettings(json.getJSONObject(FIELD_SETTINGS)));
+            setConnectionSettings(EBConnectionSettings.createFromJSON(json.getJSONObject(FIELD_SETTINGS)));
+        } else {
+            // Compatibility mode with other clients.
+            setConnectionSettings(EBConnectionSettings.createFromCompatibleJSON(json));
         }
     }
 

@@ -259,7 +259,7 @@ public class UserObjectKeyCreator {
      * @return builder for new user object key
      */
     public UserObjectKeyBase.Builder create() throws IOException {
-        final EBEndpointInfo endpoint = engine.getEnrollmentEndpoint();
+        final EBEndpointInfo endpoint = engine.getEndpointEnrollment();
         final EBUOGetTemplateRequest req = this.getTemplateRequest;
 
         if (commKeys == null){
