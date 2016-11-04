@@ -72,6 +72,11 @@ public class EBURLConfig implements EBSettings {
             return getThisBuilder();
         }
 
+        public B addElement(Object value, String key){
+            getObj().addElement(value, key);
+            return getThisBuilder();
+        }
+
         public B setURLConfig(String config) throws MalformedURLException, UnsupportedEncodingException {
             getObj().fromUrl(config);
             return getThisBuilder();
@@ -225,10 +230,20 @@ public class EBURLConfig implements EBSettings {
      * @param key name of the object to serialize. If contains dot, considered as path, descends.
      */
     protected void addElement(EBJSONSerializable ebjsonSerializable, String key){
+        this.addElement(ebjsonSerializable.toJSON(null), key);
+    }
+
+    /**
+     * Serializes object under given key to the settings. Can be retrieved with getElement().
+     *
+     * @param obj object to add (String, number, JSONObject, JSONArray).
+     * @param key name of the object to serialize. If contains dot, considered as path, descends.
+     */
+    protected void addElement(Object obj, String key){
         final String[] path = getKeyPath(key);
         final String last = path[path.length-1];
         final JSONObject parent = getParentNode(jsonRoot, path, true);
-        parent.put(last, ebjsonSerializable.toJSON(null));
+        parent.put(last, obj);
     }
 
     /**
@@ -339,6 +354,21 @@ public class EBURLConfig implements EBSettings {
         final String last = path[path.length-1];
         final JSONObject parent = getParentNode(jsonRoot, path, false);
         return parent != null && parent.has(last) ? parent.getJSONObject(last) : null;
+    }
+
+    /**
+     * Returns sub JSON object from the root JSON configuration object
+     * by the key. Elements are serialized using addElement(elem, key).
+     * This call is for reversal process - deserialization.
+     *
+     * @param field key to extract. If contains dot, considered as path (package like).
+     * @return JSONObject
+     */
+    public Object getElementObj(String field){
+        final String[] path = getKeyPath(field);
+        final String last = path[path.length-1];
+        final JSONObject parent = getParentNode(jsonRoot, path, false);
+        return parent != null && parent.has(last) ? parent.get(last) : null;
     }
 
     /**
