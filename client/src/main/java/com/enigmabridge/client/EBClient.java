@@ -13,6 +13,7 @@ import com.enigmabridge.provider.rsa.KeyFactorySpi;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -59,7 +60,7 @@ public class EBClient {
             return getThisBuilder();
         }
 
-        public B setDefaultSettings(EBConnectionSettings settings){
+        public B setDefaultSettings(EBConnectionSettings settings) throws MalformedURLException {
             getObj().setDefaultSettings(settings);
             return getThisBuilder();
         }
@@ -112,11 +113,15 @@ public class EBClient {
     /**
      * Constructs client state
      */
-    protected void build(){
+    protected void build() {
         if (this.executorService == null){
             this.executorService = Executors.newFixedThreadPool(this.workerCount);
         } else if (this.executorService instanceof ThreadPoolExecutor){
             this.workerCount = ((ThreadPoolExecutor) this.executorService).getPoolSize();
+        }
+
+        if (this.engine == null){
+            this.engine = EBEngine.defaultEngine();
         }
     }
 
@@ -314,9 +319,9 @@ public class EBClient {
         return this;
     }
 
-    protected EBClient setDefaultSettings(EBConnectionSettings settings) {
+    protected EBClient setDefaultSettings(EBConnectionSettings settings) throws MalformedURLException {
         if (this.engine == null){
-            this.engine = new EBEngine();
+            this.engine = EBEngine.defaultEngine();
         }
 
         EBSettings oldSettings = this.engine.getDefaultSettings();
