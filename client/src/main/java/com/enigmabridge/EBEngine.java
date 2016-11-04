@@ -124,7 +124,7 @@ public class EBEngine {
      * Expands settings to the root + adds remaining endpoints.
      * @param json object where to deploy the configuration. If null a new one is created
      * @param compatible if true the compatible JSON format is used, otherwise the more structured one.
-     * @return
+     * @return JSONObject with the configuration
      */
     public JSONObject configureToJSON(JSONObject json, boolean compatible){
         if (json == null){
