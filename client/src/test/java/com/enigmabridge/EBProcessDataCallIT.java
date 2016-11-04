@@ -444,6 +444,6 @@ public class EBProcessDataCallIT {
         assertNotNull(response, "Response is null");
         assertNotNull(response.getRawResponse(), "Raw response is null");
         assertTrue(response.getRawResponse().isSuccessful(), "HTTP request was not successful");
-        assertTrue(response.isCodeOk(), "Response code is not OK");
+        assertTrue(response.isCodeOk(), "Response code is not OK: " + response.getStatusCode());
     }
 }
