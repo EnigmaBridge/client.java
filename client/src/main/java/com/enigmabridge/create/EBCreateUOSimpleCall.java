@@ -91,6 +91,11 @@ public class EBCreateUOSimpleCall {
             getObj().getTemplateCallBld.setEngine(engine);
             getObj().createUOcallBld.setEngine(engine);
 
+            // Take enrollment endpoint preferably if configured via engine
+            if (engine != null && engine.getEndpointEnrollment() != null){
+                getThisBuilder().setEndpoint(engine.getEndpointEnrollment());
+            }
+
             final EBSettings settings = engine == null ? null : engine.getDefaultSettings();
             if (settings != null){
                 if (settings.getApiKey() != null && !apiKeySet){

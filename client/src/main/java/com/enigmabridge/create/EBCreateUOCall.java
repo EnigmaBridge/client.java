@@ -61,6 +61,12 @@ public class EBCreateUOCall extends EBAPICall implements EBResponseParser {
 
         public B setEngine(EBEngine engine){
             getObj().setEngine(engine);
+
+            // Take enrollment endpoint preferably if configured via engine
+            if (engine != null && engine.getEndpointEnrollment() != null){
+                getObj().setEndpoint(engine.getEndpointEnrollment());
+            }
+
             final EBSettings settings = engine == null ? null : engine.getDefaultSettings();
             if (settings != null){
                 if (settings.getApiKey() != null && getObj().getApiKey() == null){
