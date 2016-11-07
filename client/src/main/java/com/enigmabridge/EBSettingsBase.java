@@ -110,9 +110,7 @@ public class EBSettingsBase implements EBSettings, Serializable {
      * @throws MalformedURLException
      */
     protected void fromJSON(JSONObject json) throws MalformedURLException {
-        if (json == null
-                || !json.has(FIELD_APIKEY)
-                || !json.has(FIELD_ENDPOINT))
+        if (json == null || !json.has(FIELD_APIKEY))
         {
             throw new IllegalArgumentException("Invalid JSON format");
         }

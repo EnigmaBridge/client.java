@@ -193,10 +193,17 @@ public class EBEngine {
                 .build();
 
         this.defaultSettings = urlCfg;
-        Object endpointEnrollObj = urlCfg.getElementObj(FIELD_ENDPOINT_ENROLLMENT);
-        Object endpointReg = urlCfg.getElementObj(FIELD_ENDPOINT_REGISTER);
+        final Object endpointEnrollObj = urlCfg.getElementObj(FIELD_ENDPOINT_ENROLLMENT);
+        if (endpointEnrollObj != null){
+            final String endpointEnroll = (String) endpointEnrollObj;
+            setEndpointEnrollment(new EBEndpointInfo(endpointEnroll));
+        }
 
-
+        final Object endpointRegObj = urlCfg.getElementObj(FIELD_ENDPOINT_REGISTER);
+        if (endpointRegObj != null){
+            final String endpointRegister = (String) endpointRegObj;
+            setEndpointRegistration(new EBEndpointInfo(endpointRegister));
+        }
     }
 
     @Override
