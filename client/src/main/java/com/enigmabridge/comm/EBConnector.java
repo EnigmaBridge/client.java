@@ -127,6 +127,11 @@ public class EBConnector {
                 .header("User-Agent", "EBClient.java")
                 .addHeader("Accept", "application/json; q=0.5");
 
+        // Custom headers
+        for (EBRawRequest.Header header : rawRequest.getHeaders()) {
+            requestBuilder.addHeader(header.getName(), header.getValue());
+        }
+
         final String method = rawRequest.getMethod();
         if (EBCommUtils.METHOD_GET.equals(method)){
             // Nothing to do really.
