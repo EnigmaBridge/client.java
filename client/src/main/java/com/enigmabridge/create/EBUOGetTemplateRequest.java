@@ -1,5 +1,6 @@
 package com.enigmabridge.create;
 
+import com.enigmabridge.EBCreateUOTpl;
 import com.enigmabridge.UserObjectType;
 import com.enigmabridge.comm.EBRawRequest;
 
@@ -30,6 +31,31 @@ public class EBUOGetTemplateRequest extends EBRawRequest {
     protected int generationCommKey = Constants.GENKEY_CLIENT;
     protected int generationBillingKey = Constants.GENKEY_LEGACY_ENROLL_RANDOM;
     protected int generationAppKey = Constants.GENKEY_LEGACY_ENROLL_RANDOM;
+
+    public void fromTemplate(EBCreateUOTpl tpl){
+        if (tpl == null){
+            return;
+        }
+
+        type = tpl.getType();
+
+        environment = tpl.getEnvironment();
+        maxtps = tpl.getMaxtps();
+        core = tpl.getCore();
+        persistence = tpl.getPersistence();
+        priority = tpl.getPriority();
+        separation = tpl.getSeparation();
+        bcr = tpl.getBcr();
+        unlimited = tpl.getUnlimited();
+        clientiv = tpl.getClientiv();
+        clientdiv = tpl.getClientdiv();
+        resource = tpl.getResource();
+
+        credit = tpl.getCredit();
+        generationCommKey = tpl.getGenerationCommKey();
+        generationBillingKey = tpl.getGenerationBillingKey();
+        generationAppKey = tpl.getGenerationAppKey();
+    }
 
     public int getFormat() {
         return format;
