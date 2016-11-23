@@ -235,6 +235,30 @@ public class EBUtils {
         return merged;
     }
 
+    public static String absorbSettingIfSet(JSONObject obj, String key, String defaultValue){
+        if (obj == null || !obj.has(key)){
+            return defaultValue;
+        }
+
+        return obj.getString(key);
+    }
+
+    public static int absorbSettingIfSet(JSONObject obj, String key, int defaultValue){
+        if (obj == null || !obj.has(key)){
+            return defaultValue;
+        }
+
+        return obj.getInt(key);
+    }
+
+
+    public static long absorbSettingIfSet(JSONObject obj, String key, long defaultValue){
+        if (obj == null || !obj.has(key)){
+            return defaultValue;
+        }
+
+        return obj.getLong(key);
+    }
     public static byte[] concatByteArrays(Collection<byte[]> bytes){
         if (bytes.size() == 0)
             return null;
