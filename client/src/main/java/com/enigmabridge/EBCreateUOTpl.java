@@ -12,7 +12,7 @@ import static com.enigmabridge.EBUtils.*;
  *
  * Created by dusanklinec on 07.11.16.
  */
-public class EBCreateUOTpl extends JSONObject {
+public class EBCreateUOTpl extends JSONObject implements EBJSONSerializable{
     // Public JSON constants
     public static final String FIELD_FORMAT = "format";
     public static final String FIELD_PROTOCOL = "protocol";
@@ -111,7 +111,11 @@ public class EBCreateUOTpl extends JSONObject {
         super(source);
     }
 
-    public void fromJson(JSONObject obj){
+    public EBCreateUOTpl(JSONObject tplJson) {
+        fromJSON(tplJson);
+    }
+
+    public void fromJSON(JSONObject obj){
         if (obj == null){
             throw new NullPointerException("Cannot load from null JSONObject");
         }
@@ -143,6 +147,88 @@ public class EBCreateUOTpl extends JSONObject {
             absorbIntFieldValue(gen, FIELD_GENERATION_BILLINGKEY, generationBillingKey);
             absorbIntFieldValue(gen, FIELD_GENERATION_APPKEY, generationAppKey);
         }
+    }
+
+    @Override
+    public JSONObject toJSON(JSONObject json) {
+        return toJSON(json, false);
+    }
+
+    public JSONObject toJSON(JSONObject obj, boolean addDefaults){
+        if (obj == null){
+            obj = new JSONObject();
+        }
+
+        // Absorb existing fields to attributes
+        addToJSON(obj, FIELD_FORMAT, format, addDefaults);
+        addToJSON(obj, FIELD_PROTOCOL, protocol, addDefaults);
+        addToJSON(obj, FIELD_TYPE, type, addDefaults);
+
+        addToJSON(obj, FIELD_ENVIRONMENT, environment, addDefaults);
+        addToJSON(obj, FIELD_MAXTPS, maxtps, addDefaults);
+        addToJSON(obj, FIELD_CORE, core, addDefaults);
+        addToJSON(obj, FIELD_PERSISTENCE, persistence, addDefaults);
+        addToJSON(obj, FIELD_PRIORITY, priority, addDefaults);
+        addToJSON(obj, FIELD_SEPARATION, separation, addDefaults);
+        addToJSON(obj, FIELD_BCR, bcr, addDefaults);
+        addToJSON(obj, FIELD_UNLIMITED, unlimited, addDefaults);
+        addToJSON(obj, FIELD_CLIENTIV, clientiv, addDefaults);
+        addToJSON(obj, FIELD_CLIENTDIV, clientdiv, addDefaults);
+        addToJSON(obj, FIELD_RESOURCE, resource, addDefaults);
+        addToJSON(obj, FIELD_CREDIT, credit, addDefaults);
+
+        if (addDefaults || (
+                !generationCommKey.isDefault() ||
+                        !generationBillingKey.isDefault() ||
+                        !generationAppKey.isDefault() ))
+        {
+            JSONObject generation = new JSONObject();
+            if (obj.has(FIELD_GENERATION)){
+                generation = obj.getJSONObject(FIELD_GENERATION);
+            }
+
+            addToJSON(generation, FIELD_GENERATION_COMMKEY, generationCommKey, addDefaults);
+            addToJSON(generation, FIELD_GENERATION_BILLINGKEY, generationBillingKey, addDefaults);
+            addToJSON(generation, FIELD_GENERATION_APPKEY, generationAppKey, addDefaults);
+
+            obj.put(FIELD_GENERATION, generation);
+        }
+
+        return obj;
+    }
+
+    protected void addToJSON(JSONObject obj, String key, FieldWrapper field, boolean addDefault){
+        if (!addDefault && field.isDefault()){
+            return;
+        }
+
+        obj.put(key, field.getValue());
+    }
+
+    /**
+     * Returns true if all properties are in the default value
+     * @return true if all fields are in defaults.
+     */
+    public boolean isAllDefault(){
+        return
+                format.isDefault()
+                && protocol.isDefault()
+                && type.isDefault()
+                && environment.isDefault()
+                && maxtps.isDefault()
+                && core.isDefault()
+                && persistence.isDefault()
+                && priority.isDefault()
+                && separation.isDefault()
+                && bcr.isDefault()
+                && unlimited.isDefault()
+                && clientiv.isDefault()
+                && clientdiv.isDefault()
+                && resource.isDefault()
+                && credit.isDefault()
+                && generationCommKey.isDefault()
+                && generationBillingKey.isDefault()
+                && generationAppKey.isDefault();
     }
 
     // Raw access getters for isDefault

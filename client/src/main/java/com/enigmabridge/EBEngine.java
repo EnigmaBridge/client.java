@@ -16,6 +16,7 @@ public class EBEngine {
     public static final String FIELD_ENDPOINT_PROCESS = "endpointProcess";
     public static final String FIELD_ENDPOINT_ENROLLMENT = "endpointEnroll";
     public static final String FIELD_ENDPOINT_REGISTER = "endpointRegister";
+    public static final String FIELD_CREATE_UO_TPL = "tpl";
 
     /**
      * Connection manager
@@ -44,6 +45,11 @@ public class EBEngine {
     protected EBEndpointInfo endpointRegistration;
 
     /**
+     * Create UO template request.
+     */
+    protected EBCreateUOTpl tpl;
+
+    /**
      * Creates an empty engine
      */
     public EBEngine()  {
@@ -57,6 +63,7 @@ public class EBEngine {
     public static EBEngine defaultEngine() {
         final EBEngine e = new EBEngine();
         e.rnd = new SecureRandom();
+        e.tpl = new EBCreateUOTpl();
         try {
             e.defaultSettings = new EBSettingsBase.Builder()
                     .setEndpointInfo(new EBEndpointInfo("https://site2.enigmabridge.com:11180"))
@@ -115,6 +122,14 @@ public class EBEngine {
         return endpointRegistration;
     }
 
+    public EBCreateUOTpl getTpl() {
+        return tpl;
+    }
+
+    public void setTpl(EBCreateUOTpl tpl) {
+        this.tpl = tpl;
+    }
+
     public JSONObject configureToJSON(){
         return configureToJSON(null, true);
     }
@@ -122,6 +137,9 @@ public class EBEngine {
     /**
      * Serializes the configuration to the JSON.
      * Expands settings to the root + adds remaining endpoints.
+     * The compatible serialization uses more simple JSON hierarchy - to provide compatibility with
+     * another clients, like client.js and client.py.
+     *
      * @param json object where to deploy the configuration. If null a new one is created
      * @param compatible if true the compatible JSON format is used, otherwise the more structured one.
      * @return JSONObject with the configuration
@@ -144,14 +162,35 @@ public class EBEngine {
         json.put(FIELD_ENDPOINT_ENROLLMENT, endpointEnrollment == null ? null : endpointEnrollment);
         json.put(FIELD_ENDPOINT_REGISTER, endpointRegistration == null ? null : endpointRegistration);
 
+        // Create UO template - serialize only non-default values.
+        if (tpl != null && !tpl.isAllDefault()){
+            JSONObject tplJson = new JSONObject();
+            if (json.has(FIELD_CREATE_UO_TPL)){
+                tplJson = json.getJSONObject(FIELD_CREATE_UO_TPL);
+            }
+
+            tpl.toJSON(tplJson, false);
+            json.put(FIELD_CREATE_UO_TPL, tplJson);
+        }
+
         return json;
     }
 
     public String configureToURL() throws MalformedURLException {
         final EBURLConfig.Builder urlCfgBld = new EBURLConfig.Builder()
-                .setFromSettings(getDefaultSettings())
-                .addElement(this.endpointEnrollment, FIELD_ENDPOINT_ENROLLMENT)
-                .addElement(this.endpointRegistration, FIELD_ENDPOINT_REGISTER);
+                .setFromSettings(getDefaultSettings());
+
+        if (endpointEnrollment != null){
+            urlCfgBld.addElement(endpointEnrollment.getConnectionString(), FIELD_ENDPOINT_ENROLLMENT);
+        }
+
+        if (endpointRegistration != null){
+            urlCfgBld.addElement(endpointRegistration.getConnectionString(), FIELD_ENDPOINT_REGISTER);
+        }
+
+        if (tpl != null && !tpl.isAllDefault()){
+            urlCfgBld.addElement(tpl.toJSON(null, false), FIELD_CREATE_UO_TPL);
+        }
 
         return urlCfgBld
                 .build()
@@ -185,6 +224,13 @@ public class EBEngine {
                     .setEndpointInfo(new EBEndpointInfo(endpointProcessStr))
                     .build();
         }
+
+        // TPL
+        if (obj.has(FIELD_CREATE_UO_TPL)){
+            tpl = new EBCreateUOTpl();
+            tpl.fromJSON(obj.getJSONObject(FIELD_CREATE_UO_TPL));
+
+        }
     }
 
     public void configureFromURL(String url) throws MalformedURLException, UnsupportedEncodingException {
@@ -204,6 +250,12 @@ public class EBEngine {
             final String endpointRegister = (String) endpointRegObj;
             setEndpointRegistration(new EBEndpointInfo(endpointRegister));
         }
+
+        final Object tplObj = urlCfg.getElementObj(FIELD_CREATE_UO_TPL);
+        if (tplObj != null){
+            final JSONObject tplJson = (JSONObject) tplObj;
+            setTpl(new EBCreateUOTpl(tplJson));
+        }
     }
 
     @Override
@@ -214,6 +266,7 @@ public class EBEngine {
                 ", defaultSettings=" + defaultSettings +
                 ", endpointEnrollment=" + endpointEnrollment +
                 ", endpointRegistration=" + endpointRegistration +
+                ", tpl=" + tpl +
                 '}';
     }
 }
