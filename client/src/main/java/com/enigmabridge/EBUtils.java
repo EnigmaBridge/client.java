@@ -205,18 +205,18 @@ public class EBUtils {
         return toret;
     }
 
-    public static JSONObject mergeInto(JSONObject src, JSONObject dst){
-        if (src == null){
+    public static JSONObject mergeInto(JSONObject dst, JSONObject src){
+        if (dst == null){
             throw new NullPointerException("Source cannot be null");
-        } else if (dst == null || dst.length() == 0){
-            return src;
+        } else if (src == null || src.length() == 0){
+            return dst;
         }
 
-        for(String key : JSONObject.getNames(dst)) {
-            src.put(key, dst.get(key));
+        for(String key : JSONObject.getNames(src)) {
+            dst.put(key, src.get(key));
         }
 
-        return src;
+        return dst;
     }
 
     public static JSONObject mergeObjects(JSONObject a, JSONObject b){
@@ -234,6 +234,15 @@ public class EBUtils {
         }
 
         return merged;
+    }
+
+    public static boolean absorbIfNonNull(JSONObject dst, String key, Object val){
+        if (val == null){
+            return false;
+        }
+
+        dst.put(key, val);
+        return true;
     }
 
     public static String absorbSettingIfSet(JSONObject obj, String key, String defaultValue){
