@@ -1,5 +1,6 @@
 package com.enigmabridge;
 
+import com.enigmabridge.utils.FieldWrapper;
 import org.hjson.JsonValue;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -259,6 +260,43 @@ public class EBUtils {
 
         return obj.getLong(key);
     }
+
+    public static boolean absorbFieldValue(JSONObject obj, String key, FieldWrapper<Object> wrapper){
+        if (obj == null || !obj.has(key)){
+            return false;
+        }
+
+        wrapper.setValue(obj.get(key));
+        return true;
+    }
+
+    public static boolean absorbStringFieldValue(JSONObject obj, String key, FieldWrapper<String> wrapper){
+        if (obj == null || !obj.has(key)){
+            return false;
+        }
+
+        wrapper.setValue(obj.getString(key));
+        return true;
+    }
+
+    public static boolean absorbIntFieldValue(JSONObject obj, String key, FieldWrapper<Integer> wrapper){
+        if (obj == null || !obj.has(key)){
+            return false;
+        }
+
+        wrapper.setValue(obj.getInt(key));
+        return true;
+    }
+
+    public static boolean absorbLongFieldValue(JSONObject obj, String key, FieldWrapper<Long> wrapper){
+        if (obj == null || !obj.has(key)){
+            return false;
+        }
+
+        wrapper.setValue(obj.getLong(key));
+        return true;
+    }
+
     public static byte[] concatByteArrays(Collection<byte[]> bytes){
         if (bytes.size() == 0)
             return null;
