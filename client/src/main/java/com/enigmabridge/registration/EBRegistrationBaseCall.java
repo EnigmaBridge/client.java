@@ -25,8 +25,6 @@ import static com.enigmabridge.EBUtils.absorbIfNonNull;
  */
 public class EBRegistrationBaseCall extends EBAPICall implements EBResponseParser {
     private static final Logger LOG = LoggerFactory.getLogger(EBProcessDataCall.class);
-    public static final String FIELD_DATA = "data";
-    public static final String FIELD_RESULT = "result";
     public static final String FIELD_STATUS = "status";
 
     public static final String FIELD_NONCE = "nonce";
@@ -248,6 +246,7 @@ public class EBRegistrationBaseCall extends EBAPICall implements EBResponseParse
         }
 
         final EBRegistrationBaseResponse.ABuilder resp2ret = (EBRegistrationBaseResponse.ABuilder) resp;
+        resp2ret.setRoot(data);
 
         if (data.has(FIELD_VERSION)) {
             resp2ret.setVersion(EBUtils.getAsInteger(data, FIELD_VERSION, 10));
